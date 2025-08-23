@@ -12,23 +12,22 @@ if (!defined('BASEPATH'))
      * @param string $search Kata kunci pencarian
      * @return array Daftar transaksi
      */
-    public function getTransactions($start, $length, $search)
+    public function getTransactions($start, $length, $search = '')
     {
-        // Pencarian (jika ada kata kunci)
+        $this->db->from('all_transaction');
+        $this->db->where('t_status !=', 'SELESAI'); // 🚀 filter status selesai
+
         if (!empty($search)) {
             $this->db->group_start();
             $this->db->like('t_no_order', $search);
-            $this->db->or_like('t_type', $search);
-            $this->db->or_like('t_status', $search);
             $this->db->or_like('t_paid_by', $search);
+            $this->db->or_like('t_status', $search);
             $this->db->group_end();
         }
 
-        // Pagination
+		$this->db->order_by('t_date_created', 'DESC');
         $this->db->limit($length, $start);
-
-        // Ambil data dari view all_transaction
-        return $this->db->get('all_transaction')->result();
+        return $this->db->get()->result();
     }
 
     /**
@@ -38,8 +37,9 @@ if (!defined('BASEPATH'))
      */
     public function getTotalRecords()
     {
-        // Hitung total data dari view all_transaction
-        return $this->db->count_all('all_transaction');
+        $this->db->from('all_transaction');
+        $this->db->where('t_status !=', 'SELESAI'); // 🚀 konsisten filter
+        return $this->db->count_all_results();
     }
 
     /**
@@ -48,20 +48,20 @@ if (!defined('BASEPATH'))
      * @param string $search Kata kunci pencarian
      * @return int Total data yang sesuai pencarian
      */
-    public function getFilteredRecords($search)
+    public function getFilteredRecords($search = '')
     {
-        // Filter pencarian (jika ada kata kunci)
+        $this->db->from('all_transaction');
+        $this->db->where('t_status !=', 'SELESAI'); // 🚀 konsisten filter
+
         if (!empty($search)) {
             $this->db->group_start();
             $this->db->like('t_no_order', $search);
-            $this->db->or_like('t_type', $search);
-            $this->db->or_like('t_status', $search);
             $this->db->or_like('t_paid_by', $search);
+            $this->db->or_like('t_status', $search);
             $this->db->group_end();
         }
 
-        // Hitung total data dari view all_transaction yang sesuai pencarian
-        return $this->db->count_all_results('all_transaction');
+        return $this->db->count_all_results();
     }
 
 

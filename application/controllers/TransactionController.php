@@ -29,31 +29,61 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
     }
-	function list()
-    {
+	public function list()
+	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
+		$idUser   = $this->session->userdata("idUser");
+
 		$this->data["title"] = "TRANSACTION";
-		if ($authUser == true) {
-			
-			if(@$this->input->get('dateStart')){
-				$this->db->where('t_date_created >=', $this->input->get('dateStart'));
-				
-			}
-			if(@$this->input->get('dateEnd')){
-				$this->db->where('t_date_created =<', $this->input->get('dateEnd'));
-				
-			}
-			$this->db->where('t_status !=', 'SELESAI');
-			// $this->db->where('is_delete', null);
-			$this->data['transaction'] = $this->db->get('all_transaction')->result();
-			$this->data['content'] = $this->load->view('ListTransaction', $this->data, true);
-			$this->load->view("UserTemplate", $this->data);
-		}
-		else {
+
+		if ($authUser !== true) {
 			redirect(base_url());
+			return;
 		}
-    }
+
+		// ==========================
+		// FILTER TANGGAL
+		// ==========================
+		if ($this->input->get('dateStart')) {
+			$this->db->where('t_date_created >=', $this->input->get('dateStart'));
+		}
+
+		if ($this->input->get('dateEnd')) {
+			$this->db->where('t_date_created <=', $this->input->get('dateEnd'));
+		}
+
+		// ==========================
+		// FILTER STATUS
+		// ==========================
+		$this->db->where('t_status !=', 'SELESAI'); // pakai "!=" lebih aman di CI
+
+		// ==========================
+		// EKSEKUSI QUERY
+		// ==========================
+		$query = $this->db->get('all_transaction');
+		$this->data['transaction'] = $query->result();
+
+		// ==========================
+		// DEBUG (opsional)
+		// ==========================
+		/*
+		echo "<pre>";
+		echo "===== DEBUG LIST TRANSACTION =====\n";
+		echo "SQL:\n" . $this->db->last_query() . "\n\n";
+		echo "DATA:\n";
+		print_r($this->data['transaction']);
+		echo "===== END DEBUG =====";
+		echo "</pre>";
+		exit;
+		*/
+
+		// ==========================
+		// RENDER VIEW
+		// ==========================
+		$this->data['content'] = $this->load->view('ListTransaction', $this->data, true);
+		$this->load->view("UserTemplate", $this->data);
+	}
+
 	public function redirectTransaction($no_order)
 {
     $authUser = $this->session->userdata("authUser");

@@ -28,13 +28,15 @@
                                 <a href="<?=base_url()?>transaction/new-customer/" class="text-info float-right">
                                     <span class="text"><i class="fas fa-user-plus"></i> Add Customer</span>
                                 </a>
-                                <!-- Mengganti input autocomplete menjadi Select2 -->
-                                <select id="u_name" name="u_name" class="form-control select2">
-                                    <option value="" disabled selected>Please select customer...</option>
-                                    <?php foreach($customer as $c): ?>
-                                        <option value="<?=$c->c_id?>"><?=$c->c_id?> - <?=$c->c_name?> - <?=$c->c_id_number?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <input id="u_name" name="u_name" class="form-control" type="text" placeholder=" Enter something...">
+                                <!-- <select name="u_name" required class="form-control select2" id="u_name">
+									<option value="" disable>Please select customer...</option>
+									<?php foreach($customer as $c){ ?>
+									<option value="<?=$c->c_id?>">
+										<?=$c->c_name?>
+									</option>
+									<?php } ?>
+								</select> -->
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
@@ -53,6 +55,7 @@
                                     <span class="text"><i class="fas fa-arrow-left"></i>&ensp;Back</span>
                                 </a>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -60,80 +63,123 @@
         </div>
     </div>
 </div>
-
+<script type="text/javascript">
+    $(".u_name").select2();
+    $(".select2").select2();
+</script>
 <script type="text/javascript">
     $(document).ready(function () {
-    // Inisialisasi Select2 dengan mode AJAX
-    $('#u_name').select2({
-        placeholder: "Please select customer...",
-        allowClear: true,
-        minimumInputLength: 2, // Jumlah minimal karakter sebelum pencarian dilakukan
-        ajax: {
-            url: "<?=base_url()?>index.php/TransactionController/getCustomers", // Endpoint untuk mengambil data pelanggan
-            dataType: 'json',
-            delay: 250, // Delay untuk optimasi pencarian
-            data: function (params) {
-                return {
-                    search: params.term, // Data yang dicari oleh pengguna
-                    page: params.page || 1 // Nomor halaman untuk pagination
-                };
-            },
-            processResults: function (data, params) {
-                params.page = params.page || 1;
-
-                // Pastikan format data sesuai dengan Select2
-                return {
-                    results: data.results.map(function (item) {
-                        return {
-                            id: item.c_id, // ID yang akan dikirimkan saat dipilih
-                            text: `${item.c_id} - ${item.c_name} - ${item.c_id_number}` // Teks yang ditampilkan di dropdown
-                        };
-                    }),
-                    pagination: {
-                        more: data.pagination.more
-                    }
-                };
-            },
-            cache: true
-        }
-    });
-
-    // Mengirim data pelanggan ke backend saat dipilih
-    $('#u_name').on('select2:select', function (e) {
-        var customerId = e.params.data.id; // Mengambil ID pelanggan dari event Select2
-        if (customerId) {
+        function edit_data(id) {
             $.ajax({
                 url: "<?=base_url()?>index.php/TransactionController/updateLive/",
                 method: "POST",
-                data: { id: customerId },
-                success: function (response) {
-                    // alert(`Customer ID ${customerId} successfully sent to the server.`);
+                data: {
+                    id: id
                 },
-                error: function (xhr, status, error) {
-                    // alert(`Error sending customer data: ${status} - ${error}`);
+                dataType: "text",
+                success: function (data) {
+                    // swal("Update Success!", "You update data!", "success");
                 }
             });
         }
-    });
 
-    // Tombol Sell
+        $(document).on('change', '#u_name', function () {
+            var u_name = $(this).val();
+            edit_data(u_name);
+        });
+
+
+    });
+</script>
+<script>
     $("#sell").click(function () {
         var customer = $("#u_name").val();
-        if (!customer) {
+        if (customer == '') {
             alert("Please select customer!");
         } else {
+			//var u_name = $("#u_name").val();
+			//edit_data(u_name);
             window.location.href = "<?=base_url()?>transaction/sell/";
         }
     });
-
-    // Tombol Buy
+</script>
+<script>
     $("#buy").click(function () {
         var customer = $("#u_name").val();
-        if (!customer) {
+        if (customer == '') {
             alert("Please select customer!");
         } else {
             window.location.href = "<?=base_url()?>transaction/buy/";
         }
     });
-});
+</script>
+
+
+<script>
+    jQuery(function ($) {
+
+        // QWERTY Text Input
+        // The bottom of this file is where the autocomplete extension is added
+        // ********************
+        $('#u_name').keyboard({
+            layout: 'qwerty'
+        });
+
+        $('.version').html('(v' + $('#u_name').getkeyboard().version + ')');
+
+        // Contenteditable
+        // ********************
+        $.keyboard.keyaction.undo = function (base) {
+            base.execCommand('undo');
+            return false;
+        };
+        $.keyboard.keyaction.redo = function (base) {
+            base.execCommand('redo');
+            return false;
+        };
+
+        $('#contenteditable').keyboard({
+            usePreview: false,
+            useCombos: false,
+            autoAccept: true,
+            layout: 'custom',
+            customLayout: {
+                'normal': [
+                    '` 1 2 3 4 5 6 7 8 9 0 - = {del} {b}',
+                    '{tab} q w e r t y u i o p [ ] \\',
+                    'a s d f g h j k l ; \' {enter}',
+                    '{shift} z x c v b n m , . / {shift}',
+                    '{accept} {space} {left} {right} {undo:Undo} {redo:Redo}'
+                ],
+                'shift': [
+                    '~ ! @ # $ % ^ & * ( ) _ + {del} {b}',
+                    '{tab} Q W E R T Y U I O P { } |',
+                    'A S D F G H J K L : " {enter}',
+                    '{shift} Z X C V B N M < > ? {shift}',
+                    '{accept} {space} {left} {right} {undo:Undo} {redo:Redo}'
+                ]
+            },
+            display: {
+                del: '\u2326:Delete',
+                redo: '↻',
+                undo: '↺'
+            }
+        });
+
+
+        // Autocomplete demo
+        var availableTags = [
+            <?php foreach($customer as $c){ ?>
+            "<?=$c->c_id?> - <?=$c->c_name?> - <?=$c->c_id_number?>",
+            <?php } ?>
+        ];
+        $('#u_name')
+            .autocomplete({
+                source: availableTags
+            })
+            .addAutocomplete();
+
+        prettyPrint();
+
+    });
 </script>

@@ -8,6 +8,7 @@ $route['dashboard'] = 'HomeController/dashboard';
 //transaction
 $route['transaction'] = 'TransactionController';
 $route['transaction-list'] = 'TransactionController/list';
+$route['transaction/getTransactions'] = 'TransactionController/getTransactions';
 $route['transaction/redirect/(:any)'] = 'TransactionController/redirectTransaction/$1';
 $route['transaction/delete-transaction/(:any)'] = 'TransactionController/deleteTransaction/$1';
 $route['transaction/confirm-edit'] = 'TransactionController/confirmEdit';
@@ -37,6 +38,7 @@ $route['transaction/sell-add-to-cart-reset'] = 'TransactionController/sellAddToC
 $route['transaction/sell-checkout'] = 'TransactionController/sellCheckout';
 $route['transaction/sell-delete-transaction/(:any)'] = 'TransactionController/sellDeleteTransaction/$1';
 
+$route['transaction/updateAllStatus'] = 'TransactionController/updateAllStatus';
 $route['transaction/select-customer/(:any)'] = 'TransactionController/selectCustomer/$1';
 $route['transaction/new-customer'] = 'TransactionController/newCustomer';
 $route['transaction/new-customer-process'] = 'TransactionController/newCustomerProcess';

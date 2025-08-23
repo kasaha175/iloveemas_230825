@@ -299,10 +299,6 @@ class TransactionController extends CI_Controller
 		$authUser = $this->session->userdata("authUser");
 		$idUser = $this->session->userdata("idUser");
 		$this->data["title"] = "TRANSACTION BUY";
-			// echo "<pre>";
-            // print_r ($authUser);
-            // echo "</pre>";
-			// die();
 		if ($authUser == true) {
 			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
 			//$this->data['data'] = $this->MaterialModel->materialData('Buy')->result();
@@ -1719,96 +1715,4 @@ class TransactionController extends CI_Controller
 		}
 		$this->cart->destroy();
 	}
-
-	public function getTransactions()
-{
-    $this->load->model('TransactionModel');
-    $start = intval($this->input->post('start'));
-    $length = intval($this->input->post('length'));
-    $search = $this->input->post('search')['value'] ?? '';
-
-    $transactions = $this->TransactionModel->getTransactions($start, $length, $search);
-    $totalRecords = $this->TransactionModel->getTotalRecords();
-    $filteredRecords = $this->TransactionModel->getFilteredRecords($search);
-
-    // Tambahkan default value jika price_total tidak ada
-    $data = [];
-    foreach ($transactions as $key => $transaction) {
-        $data[] = [
-            'no' => $start + $key + 1,
-            'action' => '<a href="' . base_url('transaction/redirect/' . $transaction->t_no_order) . '" class="btn btn-primary btn-sm">Action</a>',
-            'transaction' => $transaction->t_type ?? 'N/A',
-            'no_order' => $transaction->t_no_order ?? 'N/A',
-            'status' => $transaction->t_status ?? 'N/A',
-            'date' => $transaction->t_date_created ?? 'N/A',
-            'customer' => $transaction->t_paid_by ?? 'N/A',
-            'qty' => intval($transaction->t_qtt ?? 0),
-            'price_total' => $transaction->t_price_total ?? 0
-        ];
-    }
-
-    // Log untuk debugging
-    log_message('debug', json_encode($data));
-
-    echo json_encode([
-        'draw' => intval($this->input->post('draw')),
-        'recordsTotal' => $totalRecords,
-        'recordsFiltered' => $filteredRecords,
-        'data' => $data
-    ]);
-}
-
-public function getCustomers()
-{
-    $search = $this->input->get('search'); // Kata kunci pencarian
-    $page = $this->input->get('page'); // Halaman untuk pagination
-    $limit = 10; // Jumlah data per halaman
-    $offset = ($page - 1) * $limit;
-
-    // Query untuk mengambil data pelanggan
-    $this->db->select('c_id, c_name, c_id_number');
-    if (!empty($search)) {
-        $this->db->like('c_name', $search); // Filter berdasarkan nama pelanggan
-        $this->db->or_like('c_id_number', $search); // Filter berdasarkan nomor ID pelanggan
-    }
-    $this->db->limit($limit, $offset);
-    $query = $this->db->get('tb_customer'); // Ganti 'tb_customer' dengan nama tabel Anda
-
-    $results = $query->result();
-
-    // Hitung total data untuk pagination
-    $total = $this->db->from('tb_customer')->count_all_results();
-
-    // Struktur data yang sesuai dengan Select2
-    $data = [
-        'results' => $results,
-        'pagination' => [
-            'more' => ($offset + $limit) < $total // Cek apakah ada halaman berikutnya
-        ]
-    ];
-
-    // Kirim data dalam format JSON
-    echo json_encode($data);
-}
-
-public function updateAllStatus() {
-    $this->load->model('TransactionModel'); // Pastikan model sudah dibuat
-    try {
-        // Proses update status di model
-        $result = $this->TransactionModel->updateAllToSelesai();
-
-        // Kirimkan respons sukses
-        echo json_encode([
-            'success' => true,
-            'message' => 'All transactions have been updated to SELESAI.'
-        ]);
-    } catch (Exception $e) {
-        // Kirimkan respons error
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-}
-
 }

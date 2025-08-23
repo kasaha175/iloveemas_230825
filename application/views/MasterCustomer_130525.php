@@ -30,10 +30,10 @@ function nominal($angka){
                             
                             <?php if($this->session->userdata('status')=='success'){ ?>
                             <div class="col-md-12 mt-3">
-                                <div class="alert alert-success alert-dismissible m-0">
-                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                    <?=$this->session->userdata('message')?>
-                                </div>
+                            <div class="alert alert-success alert-dismissible m-0">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <?=$this->session->userdata('message')?>
+                            </div>
                             </div>
                             <?php } 
                             $data_session = array(
@@ -48,18 +48,20 @@ function nominal($angka){
                                     <span class="text"><span class="fas fa-user-plus"></span> Add Customer</span>
                                 </a>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    
+                                        <table style="overflow:scroll; display:block;"  class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
                                                     <th>Action</th>
-                                                    <th>No Order</th>
-                                                    <th>Name</th>
-                                                    <th>Address</th>
-                                                    <th>Resident Address</th>
-                                                    <th>Phone</th>
-                                                    <th>Date Created</th>
-                                                    <th>Created By</th>
+                                                    <!-- <th style="min-width:100px;">Id User</th> -->
+                                                    <th style="min-width:100px;">No Order</th>
+                                                    <th style="min-width:100px;">Name</th>
+                                                    <th style="min-width:100px;">Address</th>
+                                                    <th style="min-width:100px;">Resident Address</th>
+                                                    <th style="min-width:100px;">Phone</th>
+                                                    <th style="min-width:100px;">Date Created</th>
+                                                    <th style="min-width:100px;">Created By</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -67,10 +69,11 @@ function nominal($angka){
                                                 <tr>
                                                     <td><?=$no?></td>
                                                     <td>
-                                                    <a href="<?=base_url()?>master/customer/<?=$a->c_id?>/" class="btn btn-primary btn-circle btn-sm mr-2"><i class="fas fa-info"></i></a>
-                                                    <a href="#" data-toggle="modal" data-target="#deleteModal<?=$a->c_id?>" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a>
+                                                    <a href="<?=base_url()?>master/customer/<?=$a->c_id?>/" class="btn btn-primary btn-circle btn-sm mr-2"><i class="fas fa-info"></i>
+                                                    <a href="#" data-toggle="modal" data-target="#deleteModal<?=$a->c_id?>" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i>
                                                     </td>
-                                                    <td><?=$a->c_no_order?></td>
+                                                     <!-- <td><?=$a->c_id_number?></td> -->
+                                                     <td><?=$a->c_no_order?></td>
                                                     <td><?=$a->c_name?></td>
                                                     <td><?=$a->c_address?></td>
                                                     <td><?=$a->c_resident_address?></td>
@@ -98,7 +101,13 @@ function nominal($angka){
                                             <?php } ?>
                                             </tbody>
                                         </table>
+                                        
+
+
                                     </div>
+
+
+                                    
                                 </div>
                             </div>
                         </div>
@@ -114,18 +123,15 @@ function nominal($angka){
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
+        </div>
+
+    </div>
+
+</div>
 <script type="text/javascript">
-    // Menginisialisasi DataTable dengan fitur pencarian, pagination, dan show entries
-    $(document).ready(function() {
-        $('#dataTable').DataTable({
-            paging: true, // Aktifkan pagination
-            searching: true, // Aktifkan fitur pencarian
-            lengthChange: true, // Aktifkan fitur show entries
-            autoWidth: false, // Nonaktifkan auto-resize kolom
-        });
-    });
+    // Call the dataTables jQuery plugin
+$(document).ready(function() {
+  $('#dataTable').DataTable();
+});
 </script>

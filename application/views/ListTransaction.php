@@ -1,9 +1,3 @@
-<?php 
-function nominal($valuengka){
-    $jd = number_format($valuengka, 0, ',', '.');
-    return $jd;
-}
-?>
 <div class="col-md-12" style="margin-top: 110px;">
     <div style="color: #fff; margin-top: -30px;">
         <a style="color: #fff; text-decoration: none;" href="<?=base_url()?>dashboard/" class="fa fa-home"></a>
@@ -15,8 +9,6 @@ function nominal($valuengka){
     <br />
     <div class="col-md-12" style="padding: 0px 150px;">
         <div class="row">
-            
-
             <div class="col-md-12" style="padding: 10px 10px;">
                 <div class="row">
                     <div class="col-md-12">
@@ -29,28 +21,28 @@ function nominal($valuengka){
                                     </div>
                                     <div class="col-md-6 text-right">
                                         <a href="<?= base_url('transaction') ?>" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> Add Transaction</a>
+                                        <!-- Sweet Alert Modal Trigger -->
+                                        <button class="btn btn-sm btn-warning" onclick="updateAllStatus()"><i class="fa fa-trash"></i> Clear Data</button>
                                     </div>
                                 </div>
-                                
                             </div>
                             <!-- Card Content - Collapse -->
                             <div class="collapse show" id="collapseCardExample" style="">
                                 <div class="card-body">
-                                <?php if($this->session->userdata('status')=='success'){ ?>
-                            <div style="margin: 15px 0px">
-                            <div class="alert alert-success alert-dismissible m-0">
-                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                            <?=$this->session->userdata('message')?>
-                            </div>
-                            </div>
-                            <?php } 
-                            $data_session = array(
-                                'status' => '',
-                                'message' => "",
-                            );
-                            $this->session->set_userdata($data_session); ?>
+                                    <?php if($this->session->userdata('status')=='success'){ ?>
+                                    <div style="margin: 15px 0px">
+                                        <div class="alert alert-success alert-dismissible m-0">
+                                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                            <?=$this->session->userdata('message')?>
+                                        </div>
+                                    </div>
+                                    <?php } 
+                                    $data_session = array(
+                                        'status' => '',
+                                        'message' => "",
+                                    );
+                                    $this->session->set_userdata($data_session); ?>
                                     <div class="table-responsive">
-                                        
                                         <table style="overflow: scroll;" class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                             <thead style="text-align: center">
                                                 <tr>
@@ -65,29 +57,6 @@ function nominal($valuengka){
                                                     <th>Price Total</th>
                                                 </tr>
                                             </thead>
-                                            
-                                        
-                                            <tbody>
-                                                <?php foreach($transaction as $key => $value){ ?>
-                                                <tr>
-                                                    <td style="text-align: center"><?=$key+1?></td>
-                                                    <td style="text-align: center">
-                                                        <a href="<?= base_url('transaction/redirect/'.$value->t_no_order) ?>"  class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title="Lanjutkan Transaction"><i class="fa fa-arrow-right"></i></a>
-                                                        <!-- <div onclick="deleteData('<?= $value->t_no_order ?>')" class="btn btn-danger btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title="Hapus Transaksi"><i class="fa fa-trash"></i></div> -->
-                                                    </td>
-                                                    <td style="text-align: center"><?=$value->t_type?></td>
-                                                    <td><?=$value->t_no_order?></td>
-                                                    <td>ONPROCESS</td>
-                                                    <td><?=$value->t_date_created?></td>
-                                                    <td><?=$value->t_paid_by?></td>
-                                                    <td style="text-align: center"><?=$value->t_qtt?></td>
-                                                    <td style="text-align: right">
-                                                        IDR
-                                                        <?=nominal($value->t_price_total)?>
-                                                    </td>
-                                                </tr>
-                                                <?php } ?>
-                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -107,23 +76,112 @@ function nominal($valuengka){
         </div>
     </div>
 </div>
+
 <script>
+    function clearData() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'All transaction data will be cleared and cannot be restored!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, clear it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect ke backend untuk action clear data
+                window.location.href = "<?= base_url('transaction/clearData') ?>";
+            }
+        });
+    }
+
     function deleteData(no_order){
         Swal.fire({
-            title: "Apakah anda yakin?",
-            text: "Transaksi yang dihapus tidak dapat dikembalikan!",
+            title: "Are you sure?",
+            text: "The transaction will be deleted and cannot be restored!",
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: "Batal Hapus",
-            denyButtonText: `Hapus`,
+            confirmButtonText: "Cancel",
+            denyButtonText: `Delete`,
         }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
             if (result.isDenied) {
-                window.location.href = "<?= base_url('transaction/delete-transaction/') ?>"+no_order;
-            } else{
+                window.location.href = "<?= base_url('transaction/delete-transaction/') ?>" + no_order;
+            } else {
                 Swal.close();
             }
         });
+    }
 
+    $('#dataTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "<?= base_url('transaction/getTransactions') ?>",
+            type: "POST",
+        },
+        columns: [
+            { data: 'no', orderable: false, searchable: false },
+            { data: 'action', orderable: false, searchable: false },
+            { data: 'transaction' },
+            { data: 'no_order' },
+            { data: 'status' },
+            { data: 'date' },
+            { data: 'customer' },
+            { data: 'qty' },
+            {
+                data: 'price_total',
+                render: function (data, type, row) {
+                    if (type === 'display' || type === 'filter') {
+                        // Format angka dengan koma
+                        return 'IDR ' + new Intl.NumberFormat('id-ID').format(data || 0);
+                    }
+                    return data;
+                }
+            }
+        ]
+    });
+
+    function updateAllStatus() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This will update the status of all transactions to SELESAI.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url('transaction/updateAllStatus') ?>",
+                    method: "POST",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'All transactions have been updated to SELESAI.',
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: response.message || 'An error occurred while updating data.',
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to process the request. Please try again.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
     }
 </script>

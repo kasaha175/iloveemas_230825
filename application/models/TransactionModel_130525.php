@@ -2,68 +2,8 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-	class TransactionModel extends CI_Model
+class TransactionModel extends CI_Model
 {
-    /**
-     * Mendapatkan data transaksi berdasarkan pagination dan pencarian
-     * 
-     * @param int $start Offset data (untuk paginasi)
-     * @param int $length Jumlah data per halaman
-     * @param string $search Kata kunci pencarian
-     * @return array Daftar transaksi
-     */
-    public function getTransactions($start, $length, $search)
-    {
-        // Pencarian (jika ada kata kunci)
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('t_no_order', $search);
-            $this->db->or_like('t_type', $search);
-            $this->db->or_like('t_status', $search);
-            $this->db->or_like('t_paid_by', $search);
-            $this->db->group_end();
-        }
-
-        // Pagination
-        $this->db->limit($length, $start);
-
-        // Ambil data dari view all_transaction
-        return $this->db->get('all_transaction')->result();
-    }
-
-    /**
-     * Mendapatkan total semua data transaksi (tanpa filter pencarian)
-     * 
-     * @return int Total semua data
-     */
-    public function getTotalRecords()
-    {
-        // Hitung total data dari view all_transaction
-        return $this->db->count_all('all_transaction');
-    }
-
-    /**
-     * Mendapatkan total data transaksi berdasarkan pencarian
-     * 
-     * @param string $search Kata kunci pencarian
-     * @return int Total data yang sesuai pencarian
-     */
-    public function getFilteredRecords($search)
-    {
-        // Filter pencarian (jika ada kata kunci)
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('t_no_order', $search);
-            $this->db->or_like('t_type', $search);
-            $this->db->or_like('t_status', $search);
-            $this->db->or_like('t_paid_by', $search);
-            $this->db->group_end();
-        }
-
-        // Hitung total data dari view all_transaction yang sesuai pencarian
-        return $this->db->count_all_results('all_transaction');
-    }
-
 
 	function buyCheckout($data)
 	{
@@ -304,36 +244,4 @@ if (!defined('BASEPATH'))
 		WHERE a.ti_t_id='$idTransaction'  AND b.t_visible=1");
 		return $query;
 	}
-
-	public function updateAllToSelesai() {
-        // Mulai transaksi
-        $this->db->trans_begin();
-
-        // Ambil semua data no_order dari tb_transaction
-        $transactions = $this->db->select('t_no_order')->get('tb_transaction')->result_array();
-
-        foreach ($transactions as $transaction) {
-            $no_order = $transaction['t_no_order'];
-
-            // Update tb_transaction
-            $this->db->where('t_no_order', $no_order)
-                     ->update('tb_transaction', ['t_status' => 'SELESAI']);
-
-            // Update tb_transaction_sell
-            $this->db->where('t_no_order', $no_order)
-                     ->update('tb_transaction_sell', ['t_status' => 'SELESAI']);
-        }
-
-        // Cek apakah ada error selama transaksi
-        if ($this->db->trans_status() === FALSE) {
-            $this->db->trans_rollback();
-            throw new Exception('Failed to update data.');
-        }
-
-        // Commit transaksi jika tidak ada error
-        $this->db->trans_commit();
-        return true;
-    }
-
-	
 }

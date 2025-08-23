@@ -294,25 +294,44 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
 	}
-	function buy()
+		
+	public function buy()
 	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
+		$idUser   = $this->session->userdata("idUser");
 		$this->data["title"] = "TRANSACTION BUY";
-			// echo "<pre>";
-            // print_r ($authUser);
-            // echo "</pre>";
-			// die();
+
 		if ($authUser == true) {
+
+			// ambil user login
 			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			//$this->data['data'] = $this->MaterialModel->materialData('Buy')->result();
+
+			// ambil id_transaction dan no_order dari GET atau POST
+			$this->data['id_transaction']        = $this->input->get_post("id_transaction");
+			$this->data['id_transaction_detail'] = $this->input->get_post("id_transaction_detail");
+			$this->data['no_order']              = $this->input->get_post("no_order");
+
+			// ambil idCustomer dari session
+			$idCustomer = $this->session->userdata("idCustomer");
+
+			if (!empty($idCustomer)) {
+				// ambil data customer lengkap
+				$this->data['customer'] = $this->MasterModel
+					->customerDatas($idCustomer)
+					->row_array();
+			} else {
+				$this->data['customer'] = null;
+			}
+
+			// load view
 			$this->data['content'] = $this->load->view('Buy', $this->data, true);
 			$this->load->view("UserTemplate", $this->data);
-		}
-		else {
+
+		} else {
 			redirect(base_url());
 		}
 	}
+
 	function newCustomer(){
 		$authUser = $this->session->userdata("authUser");
 		$idUser = $this->session->userdata("idUser");
@@ -1146,23 +1165,46 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}	
 	}
-    function sell()
-	{
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION SELL";
-		if ($authUser == true) {
-			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			$type = $this->UserModel->userDataById($idUser)->row("u_rule");
-			$id = $this->input->get('id');
-			$this->data['data'] = $this->MaterialModel->materialData('Sell')->result();
-			$this->data['content'] = $this->load->view('Sell', $this->data, true);
-			$this->load->view("UserTemplate", $this->data);
-		}
-		else {
-			redirect(base_url());
-		}
-	}
+    public function sell()
+{
+    $authUser = $this->session->userdata("authUser");
+    $idUser   = $this->session->userdata("idUser");
+    $this->data["title"] = "TRANSACTION SELL";
+
+    if ($authUser == true) {
+
+        // ambil user login
+        $this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+
+        // ambil id_transaction dan no_order dari GET atau POST
+        $this->data['id_transaction']        = $this->input->get_post("id_transaction");
+        $this->data['id_transaction_detail'] = $this->input->get_post("id_transaction_detail");
+        $this->data['no_order']              = $this->input->get_post("no_order");
+
+        // ambil idCustomer dari session
+        $idCustomer = $this->session->userdata("idCustomer");
+
+        if (!empty($idCustomer)) {
+            // ambil data customer lengkap
+            $this->data['customer'] = $this->MasterModel
+                ->customerDatas($idCustomer)
+                ->row_array();
+        } else {
+            $this->data['customer'] = null;
+        }
+
+        // ambil data material untuk transaksi SELL
+        $this->data['data'] = $this->MaterialModel->materialData('Sell')->result();
+
+        // load view
+        $this->data['content'] = $this->load->view('Sell', $this->data, true);
+        $this->load->view("UserTemplate", $this->data);
+
+    } else {
+        redirect(base_url());
+    }
+}
+
 	function sellCart()
 	{
 		$authUser = $this->session->userdata("authUser");
@@ -1182,6 +1224,8 @@ class TransactionController extends CI_Controller
 				$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
 				$this->data['potongan'] = $this->MaterialModel->potonganData($idMaterial)->result();
 				$this->data['carat'] = $this->MaterialModel->caratData($idMaterial)->result();
+				  // isi cart dari session
+        		$this->data['cartContents'] = $this->cart->contents();
 				$this->data['content'] = $this->load->view('SellCart', $this->data, true);
 				$this->load->view("UserTemplate", $this->data);
 			}
@@ -1615,37 +1659,45 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}	
 	}
-	function sellDeleteTransaction(){
+	public function sellDeleteTransaction()
+	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
+		$idUser   = $this->session->userdata("idUser");
+
 		if ($authUser == true) {
 			$idTransaction = $this->uri->segment(3);
-			$this->TransactionModel->sellDeleteTransaction($idTransaction);
+
+			$this->TransactionModel->sellDeleteTransaction($idTransaction, $idUser);
+
 			$data_session = array(
-				'status' => 'success',
+				'status'  => 'success',
 				'message' => "Delete transaction is success!!",
 			);
 			$this->session->set_userdata($data_session); 
+
 			redirect(base_url()."report/sell/");
-		}
-		else {
+		} else {
 			redirect(base_url());
 		}
 	}
-	function buyDeleteTransaction(){
+	public function buyDeleteTransaction()
+	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
+		$idUser   = $this->session->userdata("idUser");
+
 		if ($authUser == true) {
 			$idTransaction = $this->uri->segment(3);
-			$this->TransactionModel->buyDeleteTransaction($idTransaction);
+
+			$this->TransactionModel->buyDeleteTransaction($idTransaction, $idUser);
+
 			$data_session = array(
-				'status' => 'success',
+				'status'  => 'success',
 				'message' => "Delete transaction is success!!",
 			);
 			$this->session->set_userdata($data_session); 
+
 			redirect(base_url()."report/buy/");
-		}
-		else {
+		} else {
 			redirect(base_url());
 		}
 	}
@@ -1721,94 +1773,199 @@ class TransactionController extends CI_Controller
 	}
 
 	public function getTransactions()
+	{
+		$this->load->model('TransactionModel');
+		$start = intval($this->input->post('start'));
+		$length = intval($this->input->post('length'));
+		$search = $this->input->post('search')['value'] ?? '';
+
+		$transactions = $this->TransactionModel->getTransactions($start, $length, $search);
+		$totalRecords = $this->TransactionModel->getTotalRecords();
+		$filteredRecords = $this->TransactionModel->getFilteredRecords($search);
+
+		// Tambahkan default value jika price_total tidak ada
+		$data = [];
+		foreach ($transactions as $key => $transaction) {
+			$data[] = [
+				'no' => $start + $key + 1,
+				'action' => '<a href="' . base_url('transaction/redirect/' . $transaction->t_no_order) . '" class="btn btn-primary btn-sm">Action</a>',
+				'transaction' => $transaction->t_type ?? 'N/A',
+				'no_order' => $transaction->t_no_order ?? 'N/A',
+				'status' => $transaction->t_status ?? 'N/A',
+				'date' => $transaction->t_date_created ?? 'N/A',
+				'customer' => $transaction->t_paid_by ?? 'N/A',
+				'qty' => intval($transaction->t_qtt ?? 0),
+				'price_total' => $transaction->t_price_total ?? 0
+			];
+		}
+
+		// Log untuk debugging
+		log_message('debug', json_encode($data));
+
+		echo json_encode([
+			'draw' => intval($this->input->post('draw')),
+			'recordsTotal' => $totalRecords,
+			'recordsFiltered' => $filteredRecords,
+			'data' => $data
+		]);
+	}
+
+	public function getCustomers()
+	{
+		$search = $this->input->get('search'); // Kata kunci pencarian
+		$page = $this->input->get('page'); // Halaman untuk pagination
+		$limit = 10; // Jumlah data per halaman
+		$offset = ($page - 1) * $limit;
+
+		// Query untuk mengambil data pelanggan
+		$this->db->select('c_id, c_name, c_id_number');
+		if (!empty($search)) {
+			$this->db->like('c_name', $search); // Filter berdasarkan nama pelanggan
+			$this->db->or_like('c_id_number', $search); // Filter berdasarkan nomor ID pelanggan
+		}
+		$this->db->limit($limit, $offset);
+		$query = $this->db->get('tb_customer'); // Ganti 'tb_customer' dengan nama tabel Anda
+
+		$results = $query->result();
+
+		// Hitung total data untuk pagination
+		$total = $this->db->from('tb_customer')->count_all_results();
+
+		// Struktur data yang sesuai dengan Select2
+		$data = [
+			'results' => $results,
+			'pagination' => [
+				'more' => ($offset + $limit) < $total // Cek apakah ada halaman berikutnya
+			]
+		];
+
+		// Kirim data dalam format JSON
+		echo json_encode($data);
+	}
+
+	public function updateAllStatus() {
+		$this->load->model('TransactionModel'); // Pastikan model sudah dibuat
+		try {
+			// Proses update status di model
+			$result = $this->TransactionModel->updateAllToSelesai();
+
+			// Kirimkan respons sukses
+			echo json_encode([
+				'success' => true,
+				'message' => 'All transactions have been updated to SELESAI.'
+			]);
+		} catch (Exception $e) {
+			// Kirimkan respons error
+			echo json_encode([
+				'success' => false,
+				'message' => $e->getMessage()
+			]);
+		}
+	}
+
+	public function buyVoid($idTransaction)
+	{
+		$authUser = $this->session->userdata("authUser");
+		$idUser   = $this->session->userdata("idUser");
+
+		if ($authUser == true) {
+			$this->TransactionModel->buyVoidTransaction($idTransaction, $idUser);
+
+			$this->session->set_flashdata('status', 'success');
+			$this->session->set_flashdata('message', 'Transaction has been voided!');
+			redirect(base_url("report/buy/"));
+		} else {
+			redirect(base_url());
+		}
+	}
+
+	public function buyRevision($idTransaction)
 {
-    $this->load->model('TransactionModel');
-    $start = intval($this->input->post('start'));
-    $length = intval($this->input->post('length'));
-    $search = $this->input->post('search')['value'] ?? '';
+    $authUser = $this->session->userdata("authUser");
+    $idUser   = $this->session->userdata("idUser");
 
-    $transactions = $this->TransactionModel->getTransactions($start, $length, $search);
-    $totalRecords = $this->TransactionModel->getTotalRecords();
-    $filteredRecords = $this->TransactionModel->getFilteredRecords($search);
-
-    // Tambahkan default value jika price_total tidak ada
-    $data = [];
-    foreach ($transactions as $key => $transaction) {
-        $data[] = [
-            'no' => $start + $key + 1,
-            'action' => '<a href="' . base_url('transaction/redirect/' . $transaction->t_no_order) . '" class="btn btn-primary btn-sm">Action</a>',
-            'transaction' => $transaction->t_type ?? 'N/A',
-            'no_order' => $transaction->t_no_order ?? 'N/A',
-            'status' => $transaction->t_status ?? 'N/A',
-            'date' => $transaction->t_date_created ?? 'N/A',
-            'customer' => $transaction->t_paid_by ?? 'N/A',
-            'qty' => intval($transaction->t_qtt ?? 0),
-            'price_total' => $transaction->t_price_total ?? 0
-        ];
+    if (!$authUser) {
+        redirect(base_url());
+        return;
     }
 
-    // Log untuk debugging
-    log_message('debug', json_encode($data));
+    $reason = $this->input->post('revision_reason', true);
 
-    echo json_encode([
-        'draw' => intval($this->input->post('draw')),
-        'recordsTotal' => $totalRecords,
-        'recordsFiltered' => $filteredRecords,
-        'data' => $data
-    ]);
-}
+    // 1. Update status ke REVISION
+    $this->TransactionModel->updateTransactionStatus(
+        'buy',
+        $idTransaction,
+        'REVISION',
+        $reason,
+        $idUser
+    );
 
-public function getCustomers()
-{
-    $search = $this->input->get('search'); // Kata kunci pencarian
-    $page = $this->input->get('page'); // Halaman untuk pagination
-    $limit = 10; // Jumlah data per halaman
-    $offset = ($page - 1) * $limit;
+    // 2. Ambil data transaksi header
+    $this->db->where('t_id', $idTransaction);
+    $transaction = $this->db->get('tb_transaction')->row_array();
 
-    // Query untuk mengambil data pelanggan
-    $this->db->select('c_id, c_name, c_id_number');
-    if (!empty($search)) {
-        $this->db->like('c_name', $search); // Filter berdasarkan nama pelanggan
-        $this->db->or_like('c_id_number', $search); // Filter berdasarkan nomor ID pelanggan
+    if (empty($transaction)) {
+        show_error("Transaksi dengan ID {$idTransaction} tidak ditemukan.", 404);
+        return;
     }
-    $this->db->limit($limit, $offset);
-    $query = $this->db->get('tb_customer'); // Ganti 'tb_customer' dengan nama tabel Anda
 
-    $results = $query->result();
-
-    // Hitung total data untuk pagination
-    $total = $this->db->from('tb_customer')->count_all_results();
-
-    // Struktur data yang sesuai dengan Select2
-    $data = [
-        'results' => $results,
-        'pagination' => [
-            'more' => ($offset + $limit) < $total // Cek apakah ada halaman berikutnya
-        ]
-    ];
-
-    // Kirim data dalam format JSON
-    echo json_encode($data);
-}
-
-public function updateAllStatus() {
-    $this->load->model('TransactionModel'); // Pastikan model sudah dibuat
-    try {
-        // Proses update status di model
-        $result = $this->TransactionModel->updateAllToSelesai();
-
-        // Kirimkan respons sukses
-        echo json_encode([
-            'success' => true,
-            'message' => 'All transactions have been updated to SELESAI.'
-        ]);
-    } catch (Exception $e) {
-        // Kirimkan respons error
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
+    // ✅ 3. Update session customer berdasarkan transaksi
+    if (!empty($transaction['t_customer_id'])) {
+        $this->session->set_userdata("idCustomer", $transaction['t_customer_id']);
     }
+
+    // 4. Ambil data detail item
+    $this->db->where('ti_t_id', $idTransaction);
+    $items = $this->db->get('tb_transaction_items')->result_array();
+
+    // 5. Ambil ulang customer dari session yang sudah di-update
+    $idCustomer = $this->session->userdata("idCustomer");
+    $customer   = !empty($idCustomer)
+        ? $this->MasterModel->customerDatas($idCustomer)->row_array()
+        : null;
+
+    // 6. Persiapkan data untuk view
+    $this->data["title"]       = "TRANSACTION BUY (REVISION)";
+    $this->data['userData']    = $this->UserModel->userDataById($idUser)->result();
+    $this->data['transaction'] = $transaction;
+    $this->data['items']       = $items;
+    $this->data['reason']      = $reason;
+    $this->data['customer']    = $customer;
+    $this->data['sessionData'] = $this->session->userdata();
+
+    // 7. Render view
+    $this->data['content'] = $this->load->view('Buy', $this->data, true);
+    $this->load->view("UserTemplate", $this->data);
 }
+
+
+	// ========== SELL ==========
+	public function sellVoid($idTransaction)
+	{
+		$authUser = $this->session->userdata("authUser");
+		$idUser   = $this->session->userdata("idUser");
+
+		if ($authUser == true) {
+			$this->TransactionModel->sellVoidTransaction($idTransaction, $idUser);
+
+			$this->session->set_flashdata('status', 'success');
+			$this->session->set_flashdata('message', 'Transaction has been voided!');
+			redirect(base_url("report/sell/"));
+		} else {
+			redirect(base_url());
+		}
+	}
+
+	public function sellRevision($idTransaction)
+	{
+		$reason = $this->input->post('revision_reason');
+		$idUser = $this->session->userdata("idUser");
+
+		// update status & alasan revisi
+		$this->TransactionModel->updateTransactionStatus('sell', $idTransaction, 'REVISION', $reason, $idUser);
+
+		// redirect ke halaman cart
+		redirect(base_url("transaction/sell/" . $idTransaction));
+	}
 
 }

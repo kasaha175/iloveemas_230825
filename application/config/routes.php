@@ -29,6 +29,8 @@ $route['transaction/buy-checkout'] = 'TransactionController/buyCheckout';
 $route['report/buy-print/(:any)'] = 'TransactionController/buyPrint/$1';
 $route['transaction/buy-delete-transaction/(:any)'] = 'TransactionController/buyDeleteTransaction/$1';
 $route['transaction/chart-destroy'] = 'TransactionController/chartDestroy';
+$route['transaction/buy-void/(:any)'] = 'TransactionController/buyVoid/$1';
+$route['transaction/buy-revision/(:any)'] = 'TransactionController/buyRevision/$1';
 
 
 $route['transaction/sell'] = 'TransactionController/sell';
@@ -43,6 +45,8 @@ $route['transaction/select-customer/(:any)'] = 'TransactionController/selectCust
 $route['transaction/new-customer'] = 'TransactionController/newCustomer';
 $route['transaction/new-customer-process'] = 'TransactionController/newCustomerProcess';
 $route['report/sell-print/(:any)'] = 'TransactionController/sellPrint/$1';
+$route['transaction/sell-void/(:any)'] = 'TransactionController/sellVoid/$1';
+$route['transaction/sell-revision/(:any)'] = 'TransactionController/sellRevision/$1';
 
 
 //archive

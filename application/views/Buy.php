@@ -16,8 +16,31 @@
     </nav>
     <h3 class="text-center text-white">BUY</h3>
     <h3 class="text-center text-white">Choose Material</h3>
+    
     <br>
     <div class="container">
+        <?php
+echo "<pre>";
+echo "===== DEBUG DATA BUY =====\n";
+
+echo "\nUSER DATA:\n";
+print_r($userData ?? []);
+
+echo "\nID TRANSACTION:\n";
+var_dump($id_transaction ?? null);
+
+echo "\nID TRANSACTION DETAIL:\n";
+var_dump($id_transaction_detail ?? null);
+
+echo "\nNO ORDER:\n";
+var_dump($no_order ?? null);
+
+echo "\nCUSTOMER:\n";
+print_r($customer ?? []);
+
+echo "===== END DEBUG =====\n";
+echo "</pre>";
+?>
         <div class="row">
             <div class="col-md-12 mt-3 mb-5">
                 <a href="<?=base_url()?>transaction/" class="btn btn-light btn-icon-split btn-lg">

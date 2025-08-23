@@ -33,6 +33,48 @@
 			</div>
 		</div>
 		<div class="row">
+<?php
+echo "<pre>";
+echo "===== DEBUG DATA SELLCART =====\n";
+
+// session customer id langsung
+echo "\nSESSION DATA:\n";
+print_r($this->session->userdata());
+
+$idCustomer = $this->session->userdata("idCustomer");
+echo "\nID CUSTOMER (dari session): ";
+var_dump($idCustomer);
+
+// data dari controller
+if (isset($userData)) {
+    echo "\nUSER DATA:\n";
+    print_r($userData);
+}
+
+if (isset($id_transaction)) {
+    echo "\nID TRANSACTION:\n";
+    var_dump($id_transaction);
+}
+
+if (isset($no_order)) {
+    echo "\nNO ORDER:\n";
+    var_dump($no_order);
+}
+
+if (isset($customer)) {
+    echo "\nCUSTOMER DATA (dari MasterModel->customerDatas):\n";
+    print_r($customer);
+}
+
+// isi cart CodeIgniter
+echo "\nCART CONTENTS:\n";
+print_r($this->cart->contents());
+
+echo "===== END DEBUG =====\n";
+echo "</pre>";
+?>
+
+
 			<div class="col-md-4">
 				<div class="row">
 					<div class="col-md-12">

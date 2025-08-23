@@ -155,13 +155,15 @@ if (!defined('BASEPATH'))
 		}
 		return $query;
 	}
-	function sellDeleteTransaction($idTransaction)
+	public function sellDeleteTransaction($idTransaction, $idUser)
 	{
-		$query = $this->db->query("UPDATE
-		tb_transaction_sell a
-		SET a.t_visible=0
-		WHERE a.t_id='$idTransaction'");
-		return $query;
+		$this->db->where('t_id', $idTransaction);
+		return $this->db->update('tb_transaction_sell', [
+			't_visible'   => 0,
+			'is_delete'   => 1,            // opsional: supaya jelas statusnya
+			'deleted_at'  => date('Y-m-d H:i:s'),
+			'deleted_by'  => $idUser
+		]);
 	}
 	function buyTransactionGraph($year, $material)
 	{
@@ -225,13 +227,14 @@ if (!defined('BASEPATH'))
 		}
 		return $data;
 	}
-	function buyDeleteTransaction($idTransaction)
+	public function buyDeleteTransaction($idTransaction, $idUser)
 	{
-		$query = $this->db->query("UPDATE
-		tb_transaction a
-		SET a.t_visible=0
-		WHERE a.t_id='$idTransaction'");
-		return $query;
+		return $this->db->update('tb_transaction', [
+			't_visible'  => 0,
+			'is_delete'  => 1, // supaya jelas status delete
+			'deleted_at' => date('Y-m-d H:i:s'),
+			'deleted_by' => $idUser
+		], ['t_id' => $idTransaction]);
 	}
 	function buyTransactionData($idTransaction)
 	{
@@ -335,5 +338,67 @@ if (!defined('BASEPATH'))
         return true;
     }
 
+	// BUY
+	public function buyVoidTransaction($idTransaction, $idUser)
+	{
+		return $this->db->query("
+			UPDATE tb_transaction 
+			SET t_status = 'VOID',
+				is_delete = '1',
+				deleted_at = NOW(),
+				deleted_by = '$idUser'
+			WHERE t_id = '$idTransaction'
+		");
+	}
+
+	public function buyRevisionTransaction($idTransaction, $idUser, $reason)
+	{
+		return $this->db->query("
+			UPDATE tb_transaction 
+			SET t_status = 'REVISION',
+				t_alasan = ".$this->db->escape($reason).",
+				deleted_at = NOW(),
+				deleted_by = '$idUser'
+			WHERE t_id = '$idTransaction'
+		");
+	}
+
+	// SELL
+	public function sellVoidTransaction($idTransaction, $idUser)
+	{
+		return $this->db->query("
+			UPDATE tb_transaction_sell 
+			SET t_status = 'VOID',
+				is_delete = '1',
+				deleted_at = NOW(),
+				deleted_by = '$idUser'
+			WHERE t_id = '$idTransaction'
+		");
+	}
+
+	public function sellRevisionTransaction($idTransaction, $idUser, $reason)
+	{
+		return $this->db->query("
+			UPDATE tb_transaction_sell 
+			SET t_status = 'REVISION',
+				t_alasan = ".$this->db->escape($reason).",
+				deleted_at = NOW(),
+				deleted_by = '$idUser'
+			WHERE t_id = '$idTransaction'
+		");
+	}
+
+	public function updateTransactionStatus($type, $idTransaction, $status, $reason, $idUser)
+	{
+		$table = $type == 'buy' ? 'tb_transaction' : 'tb_transaction_sell';
+
+		$this->db->where('t_id', $idTransaction);
+		$this->db->update($table, [
+			't_status' => $status,
+			't_revision_reason' => $reason,
+			'updated_at' => date('Y-m-d H:i:s'),
+			'updated_by' => $idUser
+		]);
+	}
 	
 }

@@ -19,19 +19,6 @@
     <br>
     <div class="container">
         <div class="row">
-            <?php
-echo "<pre>";
-
-// semua variabel yang dilempar
-print_r($userData ?? []);
-print_r($id_transaction ?? '');
-print_r($id_transaction_detail ?? '');
-print_r($no_order ?? '');
-print_r($customer ?? []);
-print_r($data ?? []);
-
-echo "</pre>";
-?>
             <div class="col-md-12 mt-3 mb-5">
                 <a href="<?=base_url()?>transaction/" class="btn btn-light btn-icon-split btn-lg">
                     <span class="icon text-white-50">

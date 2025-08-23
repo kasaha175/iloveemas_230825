@@ -270,6 +270,8 @@ function nominal($angka){
       </div>
       <div class="modal-body">
         <form id="revisionForm" method="post">
+          <input type="hidden" id="revision_id" name="revision_id">
+          <input type="hidden" id="revision_no_order" name="revision_no_order">
           <p id="revisionMessage"></p>
           <div class="form-group">
             <label>Reason for Revision</label>
@@ -300,14 +302,19 @@ function nominal($angka){
     }
 
     function openRevisionModal(id, noOrder) {
-        $('#revisionMessage').html(
-            'Request revision for transaction <b>ID: ' + id + '</b> with No Order <b>' + noOrder + '</b>'
-        );
-        // arahkan ke controller redirect dengan parameter no_order
-        $('#revisionForm').attr('action', "<?= base_url('transaction/redirect/') ?>" + noOrder);
+      $('#revisionMessage').html(
+          'Request revision for transaction <b>ID: ' + id + '</b> with No Order <b>' + noOrder + '</b>'
+      );
 
-        $('#globalModalRevision').modal('show');
-    }
+      // isi hidden input
+      $('#revision_id').val(id);
+      $('#revision_no_order').val(noOrder);
+
+      // arahkan ke controller redirect dengan parameter no_order
+      $('#revisionForm').attr('action', "<?= base_url('transaction/redirect/') ?>" + noOrder);
+
+      $('#globalModalRevision').modal('show');
+  }
 
   function submitKonfirmasi() {
     Swal.fire({

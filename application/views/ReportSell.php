@@ -252,10 +252,10 @@ function openRevisionModal(id, noOrder) {
         'Request revision for transaction <b>ID: ' + id + '</b> with No Order <b>' + noOrder + '</b>'
     );
 
-    // arahkan ke redirectTransaction
-    $('#revisionForm').attr('action', "<?= base_url('transaction/redirect/') ?>" + noOrder);
+    $('#revision_id').val(id);
+    $('#revision_no_order').val(noOrder);
 
-    // pastikan id modal sesuai dengan HTML di reportsell.php
+    $('#revisionForm').attr('action', "<?= base_url('transaction/redirect/') ?>" + noOrder);
     $('#modalRevision').modal('show');
 }
 

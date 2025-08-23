@@ -54,96 +54,58 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
     }
-	function redirectTransaction($no_order)
-    {
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION";
-		if ($authUser == true) {
-			$this->session->unset_userdata('idCustomer');
-			$this->session->unset_userdata('idTransaction');
-			$this->cart->destroy();
-			$this->db->where('t_no_order', $no_order);
-			$transaction = $this->db->get('all_transaction')->row();
-			if($transaction->t_type == 'SELL'){
-				$this->db->where('t_no_order', $no_order);
-				$cek_tr = $this->db->get('tb_transaction_sell')->row();
-				
-				$id = $cek_tr->t_customer;
-				$data_session = array(
-					'idCustomer' => $id,
-					'idTransaction' => $cek_tr->t_id,
-					'jenis_transaksi' => 'sell'
-				);
-				$this->session->set_userdata($data_session);
-				$this->db->where('ti_t_id', $cek_tr->t_id);
-				$barang = $this->db->get('tb_transaction_items')->result();
-				foreach($barang as $key => $value){
-					
-					$data = array(
-						'id' => $value->ti_id,
-						'qty' => $value->ti_weight,
-						'price' => $value->ti_price,
-						'prices' => $value->ti_price,
-						'name' => 'T-Shirt',
-						'materialName' => $value->ti_material,
-						'materialType' => $value->ti_material_type,
-						'carat' => $value->ti_carat,
-						'weight' => $value->ti_weight,
-						'priceTotal' => $value->ti_price_total,
-					);
-					
-					$this->cart->insert($data);
-					// echo "<pre>";
-					// print_r($data);
-					// echo "</pre>";
-				}
-				redirect(base_url('transaction/sell/'));
-			}
-			else{
-				$this->db->where('t_no_order', $no_order);
-				$cek_tr = $this->db->get('tb_transaction')->row();
-				$id = $cek_tr->t_customer;
-				$data_session = array(
-					'idCustomer' => $id,
-					'idTransaction' => $cek_tr->t_id,
-					'jenis_transaksi' => 'buy'
-				);
-				$this->session->set_userdata($data_session);
-				$this->db->where('ti_t_id', $cek_tr->t_id);
-				$barang = $this->db->get('tb_transaction_items')->result();
-				foreach($barang as $key => $value){
-					
-					$data = array(
-						'id' => $value->ti_id,
-						'qty' => $value->ti_weight,
-						'price' => $value->ti_price,
-						'prices' => $value->ti_price,
-						'name' => 'T-Shirt',
-						'materialName' => $value->ti_material,
-						'materialType' => $value->ti_material_type,
-						'carat' => $value->ti_carat,
-						'weight' => $value->ti_weight,
-						'priceTotal' => $value->ti_price_total,
-					);
-					
-					$this->cart->insert($data);
-					// echo "<pre>";
-					// print_r($data);
-					// echo "</pre>";
-				}
-				// echo "<pre>";
-				// 	print_r($this->cart->contents());
-				// 	echo "</pre>";
-				// print_r($this->cart->contents());
+	public function redirectTransaction($no_order)
+{
+    $authUser = $this->session->userdata("authUser");
+    $idUser   = $this->session->userdata("idUser");
+    $this->data["title"] = "TRANSACTION";
 
-				redirect(base_url('transaction/buy/'));
-			}
-		}
-		else {
-			redirect(base_url());
-		}
+    if ($authUser != true) {
+        redirect(base_url());
+        return;
     }
+
+    // Reset session lama
+    $this->session->unset_userdata('idCustomer');
+    $this->session->unset_userdata('idTransaction');
+    $this->session->unset_userdata('no_order');
+
+    // Cari transaksi di all_transaction
+    $transaction = $this->db->where('t_no_order', $no_order)
+                            ->get('all_transaction')
+                            ->row();
+
+    if ($transaction->t_type == 'SELL') {
+        $cek_tr = $this->db->where('t_no_order', $no_order)
+                           ->get('tb_transaction_sell')
+                           ->row();
+
+        // simpan ke session
+        $this->session->set_userdata([
+            'idCustomer'      => $cek_tr->t_customer,
+            'idTransaction'   => $cek_tr->t_id,
+            'no_order'        => $cek_tr->t_no_order,
+            'jenis_transaksi' => 'sell'
+        ]);
+
+        redirect(base_url('transaction/sell/'));
+
+    } else { // BUY
+        $cek_tr = $this->db->where('t_no_order', $no_order)
+                           ->get('tb_transaction')
+                           ->row();
+
+        $this->session->set_userdata([
+            'idCustomer'      => $cek_tr->t_customer,
+            'idTransaction'   => $cek_tr->t_id,
+            'no_order'        => $cek_tr->t_no_order,
+            'jenis_transaksi' => 'buy'
+        ]);
+
+        redirect(base_url('transaction/buy/'));
+    }
+}
+
 	function confirmEdit(){
 		$datapost = $this->input->post();
 		$idUser = $this->session->userdata("idUser");
@@ -1205,38 +1167,87 @@ class TransactionController extends CI_Controller
     }
 }
 
-	function sellCart()
-	{
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION SELL";
-		if ($authUser == true) {
-			$idMaterial = $this->uri->segment(3);
-			$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial,'Sell')->row("m_name");
-			if (!empty($materialName)) {
-				$idCustomer = $this->session->userdata("idCustomer");
-				if(empty($idCustomer)){
-					$idCustomer = 7;
-				}
-				$this->data['nameCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
-				$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-				$this->data['materianName'] = $materialName;
-				$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
-				$this->data['potongan'] = $this->MaterialModel->potonganData($idMaterial)->result();
-				$this->data['carat'] = $this->MaterialModel->caratData($idMaterial)->result();
-				  // isi cart dari session
-        		$this->data['cartContents'] = $this->cart->contents();
-				$this->data['content'] = $this->load->view('SellCart', $this->data, true);
-				$this->load->view("UserTemplate", $this->data);
-			}
-			else {
-				redirect(base_url() . "transaction/sell/");
-			}
-		}
-		else {
-			redirect(base_url());
-		}
-	}
+public function sellCart()
+{
+    $authUser = $this->session->userdata("authUser");
+    $idUser   = $this->session->userdata("idUser");
+    $this->data["title"] = "TRANSACTION SELL";
+
+    if ($authUser != true) {
+        redirect(base_url());
+        return;
+    }
+
+    // Ambil data dari session
+    $idCustomer    = $this->session->userdata("idCustomer");
+    $idTransaction = $this->session->userdata("idTransaction");
+    $noOrder       = $this->session->userdata("no_order");
+
+
+    // ============================
+    // MODE REVISI → ambil detail dari DB
+    // ============================
+    if (!empty($idTransaction) || !empty($noOrder)) {
+        if (!empty($idTransaction)) {
+            $this->db->where('ti_t_id', $idTransaction);
+        }
+        if (!empty($noOrder)) {
+            // join ke tb_transaction_sell untuk filter by no_order
+            $this->db->join('tb_transaction_sell ts', 'ts.t_id = tis.ti_t_id', 'left');
+            $this->db->where('ts.t_no_order', $noOrder);
+        }
+
+        $barang = $this->db->get('tb_transaction_items_sell tis')->result_array();
+
+        // simpan ke data untuk view
+        $this->data['cartContents'] = $barang;
+        $this->data['nameCustomer'] = $this->MasterModel
+                                           ->customerDatas($idCustomer)
+                                           ->row("c_name");
+        $this->data['userData']     = $this->UserModel
+                                           ->userDataById($idUser)
+                                           ->result();
+
+        $this->data['content'] = $this->load->view('SellCart', $this->data, true);
+        $this->load->view("UserTemplate", $this->data);
+        return;
+    }
+
+    // ============================
+    // MODE NORMAL → tambah material baru
+    // ============================
+    $idMaterial   = $this->uri->segment(3);
+    $materialName = $this->MaterialModel
+                         ->materialDataBy('m_id', $idMaterial, 'Sell')
+                         ->row("m_name");
+
+    if (!empty($materialName)) {
+        if (empty($idCustomer)) {
+            $idCustomer = 7; // default
+        }
+
+        $this->data['nameCustomer'] = $this->MasterModel
+                                           ->customerDatas($idCustomer)
+                                           ->row("c_name");
+        $this->data['userData']     = $this->UserModel
+                                           ->userDataById($idUser)
+                                           ->result();
+        $this->data['materianName'] = $materialName;
+        $this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
+        $this->data['potongan']     = $this->MaterialModel->potonganData($idMaterial)->result();
+        $this->data['carat']        = $this->MaterialModel->caratData($idMaterial)->result();
+
+        // isi cart dari CI Cart (transaksi baru)
+        $this->data['cartContents'] = $this->cart->contents();
+
+        $this->data['content'] = $this->load->view('SellCart', $this->data, true);
+        $this->load->view("UserTemplate", $this->data);
+    } else {
+        redirect(base_url("transaction/sell/"));
+    }
+}
+
+
 	function sellAddToCart()
 	{
 		$authUser = $this->session->userdata("authUser");

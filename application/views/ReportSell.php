@@ -105,7 +105,7 @@ function nominal($angka){
                                                     <div 
                                                         data-toggle="modal" 
                                                         data-target="#modalEdit" 
-                                                        class="btn btn-warning btn-circle btn-sm" onclick="openModalEdit(<?= $a->t_id ?>)"><i class="fa fa-pencil"></i>
+                                                        class="btn btn-warning btn-circle btn-sm" onclick="openModalEdit(<?= $a->t_id ?>)"><i class="fas fa-edit"></i>
                                                     </div>
                                                      </td>
                                                     <td><?=$a->t_no_order?></td>

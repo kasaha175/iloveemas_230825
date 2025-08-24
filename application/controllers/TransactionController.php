@@ -54,96 +54,159 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
     }
-	function redirectTransaction($no_order)
-    {
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION";
-		if ($authUser == true) {
-			$this->session->unset_userdata('idCustomer');
-			$this->session->unset_userdata('idTransaction');
-			$this->cart->destroy();
-			$this->db->where('t_no_order', $no_order);
-			$transaction = $this->db->get('all_transaction')->row();
-			if($transaction->t_type == 'SELL'){
-				$this->db->where('t_no_order', $no_order);
-				$cek_tr = $this->db->get('tb_transaction_sell')->row();
-				
-				$id = $cek_tr->t_customer;
-				$data_session = array(
-					'idCustomer' => $id,
-					'idTransaction' => $cek_tr->t_id,
-					'jenis_transaksi' => 'sell'
-				);
-				$this->session->set_userdata($data_session);
-				$this->db->where('ti_t_id', $cek_tr->t_id);
-				$barang = $this->db->get('tb_transaction_items')->result();
-				foreach($barang as $key => $value){
-					
-					$data = array(
-						'id' => $value->ti_id,
-						'qty' => $value->ti_weight,
-						'price' => $value->ti_price,
-						'prices' => $value->ti_price,
-						'name' => 'T-Shirt',
-						'materialName' => $value->ti_material,
-						'materialType' => $value->ti_material_type,
-						'carat' => $value->ti_carat,
-						'weight' => $value->ti_weight,
-						'priceTotal' => $value->ti_price_total,
-					);
-					
-					$this->cart->insert($data);
-					// echo "<pre>";
-					// print_r($data);
-					// echo "</pre>";
-				}
-				redirect(base_url('transaction/sell/'));
-			}
-			else{
-				$this->db->where('t_no_order', $no_order);
-				$cek_tr = $this->db->get('tb_transaction')->row();
-				$id = $cek_tr->t_customer;
-				$data_session = array(
-					'idCustomer' => $id,
-					'idTransaction' => $cek_tr->t_id,
-					'jenis_transaksi' => 'buy'
-				);
-				$this->session->set_userdata($data_session);
-				$this->db->where('ti_t_id', $cek_tr->t_id);
-				$barang = $this->db->get('tb_transaction_items')->result();
-				foreach($barang as $key => $value){
-					
-					$data = array(
-						'id' => $value->ti_id,
-						'qty' => $value->ti_weight,
-						'price' => $value->ti_price,
-						'prices' => $value->ti_price,
-						'name' => 'T-Shirt',
-						'materialName' => $value->ti_material,
-						'materialType' => $value->ti_material_type,
-						'carat' => $value->ti_carat,
-						'weight' => $value->ti_weight,
-						'priceTotal' => $value->ti_price_total,
-					);
-					
-					$this->cart->insert($data);
-					// echo "<pre>";
-					// print_r($data);
-					// echo "</pre>";
-				}
-				// echo "<pre>";
-				// 	print_r($this->cart->contents());
-				// 	echo "</pre>";
-				// print_r($this->cart->contents());
-
-				redirect(base_url('transaction/buy/'));
-			}
-		}
-		else {
+	public function redirectTransaction($no_order)
+	{
+		// Pastikan user login
+		if (!$this->session->userdata('authUser')) {
 			redirect(base_url());
+			return;
 		}
-    }
+
+		$this->data['title'] = 'TRANSACTION';
+
+		// Bersihkan sesi/cart lama
+		$this->session->unset_userdata([
+			'idCustomer', 'idTransaction', 'jenis_transaksi', 'noOrder', 'no_order'
+		]);
+		$this->cart->destroy();
+
+		// Ambil tipe transaksi dari tabel gabungan
+		$transaction = $this->db->where('t_no_order', $no_order)
+								->get('all_transaction')->row();
+
+		if (!$transaction) {
+			// Tidak ditemukan – kembali aman
+			redirect(base_url('transaction-list'));
+			return;
+		}
+
+		$type = strtoupper(trim($transaction->t_type)); // BUY atau SELL
+
+		if ($type === 'SELL') {
+			// Header SELL
+			$cek_tr = $this->db->where('t_no_order', $no_order)
+							->get('tb_transaction_sell')->row();
+			if (!$cek_tr) {
+				redirect(base_url('transaction-list'));
+				return;
+			}
+
+			// Simpan session dasar
+			$this->session->set_userdata([
+				'idCustomer'      => $cek_tr->t_customer,
+				'idTransaction'   => $cek_tr->t_id,
+				'jenis_transaksi' => 'sell',
+				'noOrder'         => $no_order,
+				'no_order'        => $no_order, // kompatibilitas
+			]);
+
+			// Detail items
+			$barang = $this->db->where('ti_t_id', $cek_tr->t_id)
+							->get('tb_transaction_items')->result();
+
+			foreach ($barang as $item) {
+				$isDiamond = strcasecmp(trim($item->ti_material), 'DIAMOND') === 0;
+
+				// qty untuk cart wajib numerik > 0
+				$qty = $isDiamond
+					? 1
+					: ((is_numeric($item->ti_weight) && (float)$item->ti_weight > 0) ? (float)$item->ti_weight : 0);
+
+				if ($qty <= 0) {
+					log_message('error', 'Cart insert skipped (invalid qty SELL): ti_id=' . $item->ti_id . ', weight=' . $item->ti_weight);
+					continue;
+				}
+
+				$price      = (float)$item->ti_price;
+				$priceTotal = (isset($item->ti_price_total) && is_numeric($item->ti_price_total))
+								? (float)$item->ti_price_total
+								: $price * $qty;
+
+				$ok = $this->cart->insert([
+					'id'    => $item->ti_id,
+					'qty'   => $qty,
+					'price' => $price,
+					'name'  => $item->ti_material ?: 'Item',
+					'options' => [
+						'materialName'  => $item->ti_material,
+						'materialType'  => $item->ti_material_type,
+						'carat'         => $item->ti_carat,
+						// untuk display di view: '-' jika diamond
+						'weight'        => $isDiamond ? '-' : (string)$item->ti_weight,
+						// raw numeric jika perlu perhitungan
+						'raw_weight'    => $isDiamond ? null : (float)$item->ti_weight,
+						'priceTotal'    => $priceTotal,
+					],
+				]);
+
+				if (!$ok) {
+					log_message('error', 'Cart insert failed (SELL): '. json_encode($item));
+				}
+			}
+
+			redirect(base_url('transaction/sell/'));
+			return;
+		}
+
+		// BUY
+		$cek_tr = $this->db->where('t_no_order', $no_order)
+						->get('tb_transaction')->row();
+		if (!$cek_tr) {
+			redirect(base_url('transaction-list'));
+			return;
+		}
+
+		$this->session->set_userdata([
+			'idCustomer'      => $cek_tr->t_customer,
+			'idTransaction'   => $cek_tr->t_id,
+			'jenis_transaksi' => 'buy',
+			'noOrder'         => $no_order,
+			'no_order'        => $no_order, // kompatibilitas
+		]);
+
+		$barang = $this->db->where('ti_t_id', $cek_tr->t_id)
+						->get('tb_transaction_items')->result();
+
+		foreach ($barang as $item) {
+			$isDiamond = strcasecmp(trim($item->ti_material), 'DIAMOND') === 0;
+
+			$qty = $isDiamond
+				? 1
+				: ((is_numeric($item->ti_weight) && (float)$item->ti_weight > 0) ? (float)$item->ti_weight : 0);
+
+			if ($qty <= 0) {
+				log_message('error', 'Cart insert skipped (invalid qty BUY): ti_id=' . $item->ti_id . ', weight=' . $item->ti_weight);
+				continue;
+			}
+
+			$price      = (float)$item->ti_price;
+			$priceTotal = (isset($item->ti_price_total) && is_numeric($item->ti_price_total))
+							? (float)$item->ti_price_total
+							: $price * $qty;
+
+			$ok = $this->cart->insert([
+				'id'    => $item->ti_id,
+				'qty'   => $qty,
+				'price' => $price,
+				'name'  => $item->ti_material ?: 'Item',
+				'options' => [
+					'materialName'  => $item->ti_material,
+					'materialType'  => $item->ti_material_type,
+					'carat'         => $item->ti_carat,
+					'weight'        => $isDiamond ? '-' : (string)$item->ti_weight,
+					'raw_weight'    => $isDiamond ? null : (float)$item->ti_weight,
+					'priceTotal'    => $priceTotal,
+				],
+			]);
+
+			if (!$ok) {
+				log_message('error', 'Cart insert failed (BUY): '. json_encode($item));
+			}
+		}
+
+		redirect(base_url('transaction/buy/'));
+	}
+
 	function confirmEdit(){
 		$datapost = $this->input->post();
 		$idUser = $this->session->userdata("idUser");
@@ -165,6 +228,7 @@ class TransactionController extends CI_Controller
 			echo json_encode([
 				'status' => 'berhasil',
 				'no_transaksi' => $cek_data->t_no_order,
+				'id' =>	$cek_data->t_id,
 			]);
 			// $this->redirectTransaction($cek_data->t_no_order);
 		}

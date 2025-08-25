@@ -15,6 +15,173 @@ class TransactionController extends CI_Controller
 		$this->load->library('Pdf');
 		$this->load->library('cart');
     }
+
+	// === HELPER: hitung total per baris, kompatibel lama/baru ===
+	private function _cartLineTotal(array $row): float
+	{
+		// urutan: options.price_total → options.priceTotal → top-level priceTotal → subtotal
+		if (isset($row['options']['price_total']) && is_numeric($row['options']['price_total'])) {
+			return (float)$row['options']['price_total'];
+		}
+		if (isset($row['options']['priceTotal']) && is_numeric($row['options']['priceTotal'])) {
+			return (float)$row['options']['priceTotal'];
+		}
+		if (isset($row['priceTotal']) && is_numeric($row['priceTotal'])) {
+			return (float)$row['priceTotal'];
+		}
+		return (float)$row['subtotal'];
+	}
+
+	// === HELPER: normalkan SEMUA item di cart: qty=1, berat di options, total di options ===
+	private function _normalizeCartForBuy(): void
+	{
+		$contents = $this->cart->contents();
+		foreach ($contents as $row) {
+			$opt = $row['options'] ?? [];
+
+			// ambil identitas
+			$matName = $opt['materialName'] ?? ($row['materialName'] ?? $row['name'] ?? 'Item');
+			$matType = $opt['materialType'] ?? ($row['materialType'] ?? '-');
+			$carat   = $opt['carat']        ?? ($row['carat'] ?? '');
+			$types   = $opt['types']        ?? ($row['types'] ?? null);
+
+			// berat: dari options.weight_raw, atau dari top-level 'weight'
+			$weightRaw = null;
+			if (isset($opt['weight_raw'])) {
+				$weightRaw = ($opt['weight_raw'] === null || $opt['weight_raw'] === '') ? null : (float)$opt['weight_raw'];
+			} elseif (isset($row['weight']) && is_numeric($row['weight'])) {
+				$weightRaw = (float)$row['weight'];
+			} elseif (isset($opt['weight']) && is_numeric($opt['weight'])) {
+				$weightRaw = (float)$opt['weight'];
+			}
+
+			// tampilkan berat
+			$weightDisp = ($weightRaw === null ? '-' : (string)$weightRaw);
+
+			// harga per unit (per gram/unit)
+			$priceUnit = (float)$row['price'];
+
+			// total baris
+			$lineTotal = null;
+			if (isset($opt['price_total']) && is_numeric($opt['price_total'])) {
+				$lineTotal = (float)$opt['price_total'];
+			} elseif (isset($opt['priceTotal']) && is_numeric($opt['priceTotal'])) {
+				$lineTotal = (float)$opt['priceTotal'];
+			} elseif (isset($row['priceTotal']) && is_numeric($row['priceTotal'])) {
+				$lineTotal = (float)$row['priceTotal'];
+			} else {
+				// fallback hitung manual: diamond (tanpa berat) = priceUnit * 1
+				$lineTotal = round($priceUnit * ($weightRaw === null ? 1 : $weightRaw));
+			}
+
+			// update row: qty fix 1 + options standar
+			$this->cart->update([
+				'rowid'   => $row['rowid'],
+				'qty'     => 1,
+				'options' => array_merge($opt, [
+					'materialName' => $matName,
+					'materialType' => $matType,
+					'carat'        => $carat,
+					'types'        => $types,
+					'weight'       => $weightDisp,
+					'weight_raw'   => $weightRaw,
+					'price_total'  => $lineTotal,
+					'priceTotal'   => $lineTotal, // kompat lama
+				]),
+				// kompat lama jika view/logic masih baca top-level:
+				'materialName' => $matName,
+				'materialType' => $matType,
+				'carat'        => $carat,
+				'weight'       => $weightDisp,
+				'types'        => $types,
+				'priceTotal'   => $lineTotal,
+			]);
+		}
+	}
+
+	// === HELPER: hitung total & qty dari cart (pakai _cartLineTotal) ===
+	private function _cartTotalsBuy(): array
+	{
+		$total = 0.0; $qtt = 0;
+		foreach ($this->cart->contents() as $r) {
+			$total += $this->_cartLineTotal($r);
+			$qtt   += 1;
+		}
+		return [$total, $qtt];
+	}
+
+	// === HELPER: tulis ulang detail BUY ke DB dari cart (options-first) ===
+	private function _writeBuyDetailsFromCart(int $idTransaction): void
+	{
+		$this->db->where('ti_t_id', $idTransaction)->delete('tb_transaction_items');
+
+		foreach ($this->cart->contents() as $a) {
+			$opt = $a['options'] ?? [];
+			$row = [
+				'ti_t_id'          => $idTransaction,
+				'ti_material'      => $opt['materialName'] ?? ($a['materialName'] ?? $a['name']),
+				'ti_material_type' => $opt['materialType'] ?? ($a['materialType'] ?? '-'),
+				'ti_carat'         => $opt['carat'] ?? ($a['carat'] ?? ''),
+				'ti_weight'        => array_key_exists('weight_raw', $opt) ? $opt['weight_raw'] : (is_numeric($a['weight'] ?? null) ? (float)$a['weight'] : null),
+				'ti_price'         => (float)$a['price'], // per gram/unit
+				'ti_high_low'      => (string)($opt['types'] ?? ($a['types'] ?? '')),
+				'ti_price_total'   => $this->_cartLineTotal($a),
+				'ti_date_created'  => $this->dateToday,
+			];
+			$this->TransactionModel->buyCheckoutItems($row);
+		}
+	}
+
+	// Total satu baris cart: utamakan options.price_total
+	private function _cartLineTotalSell(array $row): float
+	{
+		if (isset($row['options']['price_total']) && is_numeric($row['options']['price_total'])) {
+			return (float)$row['options']['price_total'];
+		}
+		if (isset($row['options']['priceTotal']) && is_numeric($row['options']['priceTotal'])) {
+			return (float)$row['options']['priceTotal'];
+		}
+		if (isset($row['priceTotal']) && is_numeric($row['priceTotal'])) {
+			return (float)$row['priceTotal'];
+		}
+		return (float)$row['subtotal'];
+	}
+
+	// Hitung total & qtt untuk SELL
+	private function _cartTotalsSell(): array
+	{
+		$total = 0.0; $qtt = 0;
+		foreach ($this->cart->contents() as $r) {
+			$total += $this->_cartLineTotalSell($r);
+			$qtt   += 1;
+		}
+		return [$total, $qtt];
+	}
+
+	// Tulis ulang detail SELL ke DB dari cart (options-first)
+	private function _writeSellDetailsFromCart(int $idTransaction): void
+	{
+		$this->db->where('ti_t_id', $idTransaction)->delete('tb_transaction_items_sell');
+		foreach ($this->cart->contents() as $a) {
+			$opt  = $a['options'] ?? [];
+			$line = $this->_cartLineTotalSell($a);
+
+			$dataItems = [
+				'ti_t_id'          => $idTransaction,
+				'ti_material'      => $opt['materialName'] ?? ($a['materialName'] ?? $a['name'] ?? 'Item'),
+				'ti_material_type' => $opt['materialType'] ?? ($a['materialType'] ?? '-'),
+				'ti_carat'         => $opt['carat'] ?? ($a['carat'] ?? ''),
+				'ti_weight'        => array_key_exists('raw_weight', $opt) ? $opt['raw_weight']
+										: (is_numeric($a['weight'] ?? null) ? (float)$a['weight'] : null),
+				'ti_price'         => (float)$a['price'],   // per gram / per item, sesuai cabang
+				'ti_price_total'   => $line,
+				'ti_date_created'  => $this->dateToday,
+			];
+			$this->TransactionModel->sellCheckoutItems($dataItems);
+		}
+	}
+
+
     function index()
     {
 		$authUser = $this->session->userdata("authUser");
@@ -41,7 +208,7 @@ class TransactionController extends CI_Controller
 				
 			}
 			if(@$this->input->get('dateEnd')){
-				$this->db->where('t_date_created =<', $this->input->get('dateEnd'));
+				$this->db->where('t_date_created <=', $this->input->get('dateEnd'));
 				
 			}
 			$this->db->where('t_status !=', 'SELESAI');
@@ -488,728 +655,427 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
 	}
-	function buyAddToCart(){
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$idMaterial = $this->input->post('idMaterial');
-			$dt = $this->input->post();
-			$types = $this->input->post('types');
-			$materialType = $this->input->post('materialType');
-			$carat = $this->input->post('carat');
-			$weight = $this->input->post('weight');
-			$percentage = $this->input->post('percentage');
-			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial,'Buy')->row("m_name");
-			//formula
-			$rtiAU = abs($this->MaterialModel->formulaData()->row("f_rti_au"));
-			$rtiAG = abs($this->MaterialModel->formulaData()->row("f_rti_ag"));
-			$rtiPT = abs($this->MaterialModel->formulaData()->row("f_rti_pt"));
-			$rtiRU = abs($this->MaterialModel->formulaData()->row("f_rti_ru"));
-			$rtiTA = abs($this->MaterialModel->formulaData()->row("f_rti_ta"));
-			$AUpotonganrulow = $this->MasterModel->formulasData('rti-ru-low')->row('a');
-			$AUpotonganruhigh = $this->MasterModel->formulasData('rti-ru')->row('a');
-			$AUpotonganK24 = $this->MasterModel->formulasData('rti-au')->row('a');
-			$AUpotonganK2499 = $this->MasterModel->formulasData('rti-au')->row('h');
-			$AUpresentasePotonganK24 = $this->MasterModel->formulasData('rti-au')->row('b');
-			$AUpresentasePotonganCustProf = $this->MasterModel->formulasData('rti-au')->row('f');
-			$AUpresentaseLMBaru = $this->MasterModel->formulasData('rti-au')->row('d');
-			$AUpresentaseLMLama = $this->MasterModel->formulasData('rti-au')->row('e');
-			$AUpotonganubs = $this->MasterModel->formulasData('rti-au')->row('g');
-			$AUgb_99 = $this->MasterModel->formulasData('rti-au')->row('gb_99');
-			$AUgb_99_9 = $this->MasterModel->formulasData('rti-au')->row('gb_99_9');
-			$potongan_lm = $this->MasterModel->formulasData('rti-au')->row('potongan_lm');
-			$AGpresentasePotonganAG = $this->MasterModel->formulasData('rti-ag')->row('a');
-			$AGpresentasePotonganAGLow = $this->MasterModel->formulasData('rti-ag-low')->row('a');
-			$PTpresentasePotonganPt = $this->MasterModel->formulasData('rti-pt')->row('a');
-			$PTpresentasePotonganPtLow = $this->MasterModel->formulasData('rti-pt-low')->row('a');
-			$PTpresentasePotonganPd = $this->MasterModel->formulasData('rti-pt')->row('b');
-			$PTpresentasePotonganPdLow = $this->MasterModel->formulasData('rti-pt-low')->row('b');
-			$PTpresentasePotonganRh = $this->MasterModel->formulasData('rti-pt')->row('c');
-			$PTpresentasePotonganRhLow = $this->MasterModel->formulasData('rti-pt-low')->row('c');
-			$PTpresentasePotonganIr = $this->MasterModel->formulasData('rti-pt')->row('d');
-			$PTpresentasePotonganIrLow = $this->MasterModel->formulasData('rti-pt-low')->row('d');
-			
-			//cart
-			
-			foreach($this->cart->contents() as $a) {
-				$idLast = ($a['id']);
-			}
-			if (!empty($idLast)) {
-				$idLast = $idLast + 1;
-			}
-			else {
-				$idLast = 1;
-			}
-			if ($idMaterial != 1) {
-				if ($idMaterial == 2) {
-					if ($carat == '24(99.9)') {
-						$price = round($rtiAU + $AUpotonganK2499);
-						// $price = round(($rtiAU + ($rtiAU * - (16/100))) * $percentage/100);
-						// $priceTotal = ($price * $weight);
-					}
-					else if ($carat == '24(99)') {
-						$price = round($rtiAU + $AUpotonganK24);
-					}
-					else if ($carat == 23) {
-						 $price = round((0.958 * $rtiAU) + (0.958 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 22) {
-						 $price = round((0.916 * $rtiAU) + (0.916 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 21) {
-						$price = round((0.875 * $rtiAU) + (0.875 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 20) {
-						$price = round((0.833 * $rtiAU) + (0.833 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 19) {
-						$price = round((0.791 * $rtiAU) + (0.791 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 18) {
-						$price = round((0.75 * $rtiAU) + (0.75 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 17) {
-						$price = round((0.708 * $rtiAU) + (0.708 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 16) {
-						$price = round((0.666 * $rtiAU) + (0.666 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 15) {
-						$price = round((0.625 * $rtiAU) + (0.625 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 14) {
-						$price = round((0.583 * $rtiAU) + (0.583 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 13) {
-						$price = round((0.541 * $rtiAU) + (0.541 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 12) {
-						$price = round((0.5 * $rtiAU) + (0.5 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 11) {
-						$price = round((0.458 * $rtiAU) + (0.458 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 10) {
-						$price = round((0.416 * $rtiAU) + (0.416 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 9) {
-						$price = round((0.375 * $rtiAU) + (0.375 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 8) {
-						$price = round((0.333 * $rtiAU) + (0.333 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 7) {
-						$price = round((0.291 * $rtiAU) + (0.291 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 6) {
-						$price = round((0.25 * $rtiAU) + (0.25 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 5) {
-						$price = round((0.208 * $rtiAU) + (0.208 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 4) {
-						$price = round((0.166 * $rtiAU) + (0.166 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else if ($carat == 3) {
-						$price = round((0.125 * $rtiAU) + (0.125 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}else if ($carat == 2) {
-						$price = round((0.083 * $rtiAU) + (0.083 * $rtiAU*($AUpresentasePotonganK24/100)));
-					}
-					else {
-						$price = 1;
-					}
-					$priceTotal = round($price * $weight);
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => $carat,
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 3){
-					
-					// Rumus Lama
-					// // if($weight<1){
-					// 	$pricepergram = $rtiAU + $AUpresentaseLMBaru;
-					// 	$price = $pricepergram*$weight;
-						
-					// // }else{
-					// // 	$price = $rtiAU;
-					// // 	$priceTotal = round($price * $weight);
-					// // }
-					// End Rumus Lama
-					// Rumus Baru
-					$tahun_potongan = $this->input->post('tahun_potongan');
-					$harga_potongan = json_decode($potongan_lm, true)[$tahun_potongan];
-					$pricepergram = $rtiAU + $harga_potongan;
-					$price = $pricepergram*$weight;
-					
-					// End Rumus Baru
-					$priceTotal = round($price);
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $pricepergram,
-						'prices' => $pricepergram,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => $tahun_potongan,
-						'carat' => '24',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 4){
-					// if($weight<1){
-                		$pricepergram = $rtiAU + $AUpresentaseLMLama;
-						$price = $pricepergram*$weight;
-						$priceTotal = round($price);
-					// }else{
-					// 	$price = $rtiAU + $AUpresentaseLMLama;
-					// 	$priceTotal = round($price * $weight);
-					// }
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $pricepergram,
-						'prices' => $pricepergram,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => '-',
-						'carat' => '24',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 5){
-					// echo $AGpresentasePotonganAGLow;
-					// die;
-					if($types=='high'){
-						// echo $types;die;
-						// if ($carat == 1000) { 
-						// 	$price = round($rtiAG + ($rtiAG * $AGpresentasePotonganAG/100));
-						// }
-						// else if ($carat == 925) {
-						// 	$price = round((0.925 * $rtiAG) + (0.925  * $rtiAG * ($AGpresentasePotonganAG/100)));
-						// }
-						// else if ($carat == 900) {
-						// 	$price = round((0.90 * $rtiAG) + (0.90  * $rtiAG * ($AGpresentasePotonganAG/100)));
-						// }else if ($carat == 500) {
-						// 	$price = round((0.50 * $rtiAG) + (0.50  * $rtiAG * ($AGpresentasePotonganAG/100)));
-						// }
-						// else {
-					       echo $price = floor((($carat/100) * $rtiAG) + floor(($carat/100)  * $rtiAG * ($AGpresentasePotonganAG/100)));
-						// }
-					}else{
-						// if ($carat == 1000) { 
-						// 	$price = round($rtiAG + ($rtiAG * $AGpresentasePotonganAGLow/100));
-						// }
-						// else if ($carat == 925) {
-						// 	$price = round((0.925 * $rtiAG) + (0.925  * $rtiAG * ($AGpresentasePotonganAGLow/100)));
-						// }
-						// else if ($carat == 900) {
-						// 	$price = round((0.90 * $rtiAG) + (0.90  * $rtiAG * ($AGpresentasePotonganAGLow/100)));
-						// }else if ($carat == 500) {
-						// 	$price = round((0.50 * $rtiAG) + (0.50  * $rtiAG * ($AGpresentasePotonganAGLow/100)));
-						// }
-						// else {
-					        $price = round((($carat/100) * $rtiAG) + round(($carat/100)  * $rtiAG * ($AGpresentasePotonganAGLow/100)));
-						// }
-					}
-					$priceTotal = round($price * $weight);
-	               // echo $carat;
-	               // die;
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'types' => $types,
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => 'Ag '.$carat.' %',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 6){
-					if($types=='high'){
-						if($percentage<100){
-							// $price = floor((($percentage/100) * $rtiPT) - (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPt/100)));
-							// $price = floor(($percentage/100) * floor(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPt/100)));
-							// 99.98% * (373.052 - (373.052*-15%))
-							$price = floor(($percentage/100) * floor($rtiPT + ($rtiPT * ($PTpresentasePotonganPt/100))));
-							$priceTotal = floor($price * $weight);	
-						}else{
-							// $price = round((($percentage/100) * $rtiPT) - (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPt/100)));
-							// $price = round(($percentage/100) * round(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPt/100)));
-							$price = round($rtiPT + ($rtiPT * ($PTpresentasePotonganPt/100)));
-							$priceTotal = round($price * $weight);	
-						}
-					}else{
-						if($percentage<100){
-							// $price = floor((($percentage/100) * $rtiPT) - (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPt/100)));
-							// $price = floor(($percentage/100) * floor(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPt/100)));
-							// 99.98% * (373.052 - (373.052*-15%))
-							$price = floor(($percentage/100) * floor($rtiPT + ($rtiPT * ($PTpresentasePotonganPtLow/100))));
-							$priceTotal = floor($price * $weight);	
-						}else{
-							// $price = round((($percentage/100) * $rtiPT) - (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPt/100)));
-							// $price = round(($percentage/100) * round(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPt/100)));
-							$price = round($rtiPT + ($rtiPT * ($PTpresentasePotonganPtLow/100)));
-							$priceTotal = round($price * $weight);	
-						}
-					}
-                	$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'types' => $types,
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => 'Pt '.$percentage.' %',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 7){
-					if($types=='high'){
-						if($percentage<100){
-						//	persentase * (rti pt + (rti pt* potongan))
-						//  $weight.' '.$percentage;
-						// $price = ((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPd/100)));
-						$price = floor(($percentage/100) * floor(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPd/100)));
-						$priceTotal = floor($price * $weight);	
-						}else{
-						// $price = round((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPd/100)));
-						$price = round(($percentage/100) * round(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPd/100)));
-						$priceTotal = round($price * $weight);	
-						}
-					}else{
-						if($percentage<100){
-							//	persentase * (rti pt + (rti pt* potongan))
-							//  $weight.' '.$percentage;
-							// $price = ((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPd/100)));
-							$price = floor(($percentage/100) * floor(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPdLow/100)));
-							$priceTotal = floor($price * $weight);	
-							}else{
-							// $price = round((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganPd/100)));
-							$price = round(($percentage/100) * round(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganPdLow/100)));
-							$priceTotal = round($price * $weight);	
-							}
-					}
-                	$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'types' => $types,
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => 'Pd '.$percentage.' %',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 8){
-					// $price = (($percentage/100) * $rtiPT) - (($percentage/100) * $rtiPT *  ($PTpresentasePotonganIr/100));
-					// -	Harga platinum 	= RTI Pt – (harga RTI Pt x 15 %) 
-					// -	Rumus ir 		= harga platinum - (harga platinum x 30%) 
-					// Rumus : total price 	= persentasi*(harga platinum-(harga platinum*potongan harga))
-					// = 69.3%*(349009-(349009*30%))
-					// = 169304
-					if($types=='high'){
-						// if($percentage<100){
-							$pricePlatinum = floor($rtiPT + ($rtiPT * ($PTpresentasePotonganPt/100)));
-							
-							
-							$price = round(($rtiPT + ($rtiPT * ($PTpresentasePotonganIr/100))) * $percentage/100);
-							// 451625 +/- (451625 * (80/100)) *100 / 100
-							$priceTotal = ($price * $weight);	
-						// }else{
-						// 	$priceold = $rtiPT * 40 / 100 * $percentage / 100;
-						// 	// $pricePlatinum = round($rtiPT + ($rtiPT * -($PTpresentasePotonganPt/100)));
-						// 	$price = floor($rtiPT - $priceold);
-						// 	echo "<pre>";
-						// 	print_r ($rtiPT);
-						// 	echo "</pre>";
-						// 	$priceTotal = round($price * $weight);	
-						// }
-					}else{
-						// if($percentage<100){
-							// $pricePlatinum = floor($rtiPT + ($rtiPT * -($PTpresentasePotonganPt/100)));
-							$price = round(($rtiPT + ($rtiPT * ($PTpresentasePotonganIrLow/100))) * $percentage/100);
-							$priceTotal = ($price * $weight);	
-						// }else{
-						// 	$pricePlatinum = round($rtiPT + ($rtiPT * -($PTpresentasePotonganPtLow/100)));
-						// 	$price = round(($percentage/100) * round($pricePlatinum - ($pricePlatinum * ($PTpresentasePotonganIrLow/100))));
-						// 	$priceTotal = round($price * $weight);	
-						// }
-					}
-					// 	die;
-                	$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'types' => $types,
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => 'Ir '.$percentage.' %',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 9){
-					if($types=='high'){
-						if($percentage<100){
-						// $price = floor((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganRh/100)));
-						$price = floor(($percentage/100) * floor(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganRh/100)));
-						$priceTotal = floor($price * $weight);	
-						}else{
-						// $price = round((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganRh/100)));
-						$price = round(($percentage/100) * round(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganRh/100)));
-						$priceTotal = round($price * $weight);	
-						}
-					}else{
-						if($percentage<100){
-							// $price = floor((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganRh/100)));
-							$price = floor(($percentage/100) * floor(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganRhLow/100)));
-							$priceTotal = floor($price * $weight);	
-							}else{
-							// $price = round((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganRh/100)));
-							$price = round(($percentage/100) * round(($rtiPT) +  (($rtiPT) * $PTpresentasePotonganRhLow/100)));
-							$priceTotal = round($price * $weight);	
-							}
-					}
-                	$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'types' => $types,
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => 'Rh '.$percentage.' %',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-                }else if ($idMaterial == 10){
-					// if($percentage<100){
-					// // $price = floor((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganRh/100)));
-					// // echo $price = floor(($rtiAU/100) - floor((($rtiAU/100)-$AUpresentasePotonganCustProf)));
-					// // echo $rtiAU;
-					// $price = floor($rtiAU - ($rtiAU * ($AUpresentasePotonganCustProf/100)));
-					// // $price = floor((($percentage/100) * ($price)));
-					// $priceTotal = $price * $weight; 	
-					// }else{
-					// // $price = round((($percentage/100) * $rtiPT) + (($percentage/100) * $rtiPT *  ($PTpresentasePotonganRh/100)));
-					// $price = round($rtiAU - ($rtiAU * ($AUpresentasePotonganCustProf/100)));
-					// $price = round((($percentage/100) * ($price)));
-					// $priceTotal = $price * $weight; 	
-					// }
-					$price = ($rtiAU + ($rtiAU * $AUpresentasePotonganCustProf/100)) * $percentage/100;
-					$priceTotal = ($price * $weight);	
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => $materialType,
-						'carat' => 'Au '.$percentage.' %',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-				}else if ($idMaterial == 17){
-					$price = ($rtiAU + $AUpotonganubs);
-					$priceTotal = $price*$weight;
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => '-',
-						'carat' => '',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-				}else if ($idMaterial == 19){
-					if($types == 'high'){
-						$pricepergram = floor((($percentage/100) * $rtiRU) + floor(($percentage/100)  * $rtiRU * ($AUpotonganruhigh/100)));
-					}
-					else{
-						$pricepergram = floor((($percentage/100) * $rtiRU) + floor(($percentage/100)  * $rtiRU * ($AUpotonganrulow/100)));
-					}
-					
-					$price = $pricepergram*$weight;
-					
-					// End Rumus Baru
-					$priceTotal = round($price);
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $pricepergram,
-						'prices' => $pricepergram,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'types' => $types,
-						'materialType' => '-',
-						'carat' => 'RU '.$percentage.'%',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-				}
-				else if ($idMaterial == 21){
-					
-					
-					$pricepergram = $rtiTA * $percentage / 100; 
-					$priceTotal = $pricepergram * $weight; 
-					
-					// End Rumus Baru
-					$priceTotal = round($priceTotal);
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $pricepergram,
-						'prices' => $pricepergram,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => '-',
-						'carat' => $percentage."%",
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-				}
-				else if ($idMaterial == 23){
-					if ($carat == '24(99.9)') {
-						
-
-						$pricepergram = $rtiAU + $AUgb_99_9;
-						// $price = round(($rtiAU + ($rtiAU * - (16/100))) * $percentage/100);
-						// $priceTotal = ($price * $weight);
-					}
-					else{
-						$pricepergram = $rtiAU + $AUgb_99;
-					}
-					$price = $pricepergram*$weight;
-					
-					// End Rumus Baru
-					$priceTotal = round($price);
-					$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $pricepergram,
-						'prices' => $pricepergram,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => '-',
-						'carat' => 'K'.$carat,
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-				}
-				
-			}else{
-				$weight = 1;
-				$price = $this->input->post('price');
-				$priceTotal = $price * $weight; 	
-				$data = array(
-					'id' => $idLast,
-					'qty' => $weight,
-					'price' => $price,
-					'prices' => $price,
-					'name' => 'T-Shirt',
-					'materialName' => $materialName,
-					'materialType' => '-',
-					'carat' => '-',
-					'weight' => '-',
-					'priceTotal' => $priceTotal,
-				);
-			}
-			// if($idMaterial <= 10 || $idMaterial == 17){
-			$this->cart->insert($data);
-			// }
-			// Add To Transaction
-			
-			$idTransaction = $this->session->userdata("idTransaction");
-			$total = 0;
-			$qtt = 0;
-			foreach($this->cart->contents() as $a){
-				$total = $total + $a["priceTotal"];
-				$qtt=$qtt+1;
-			}
-			if(!$idTransaction){
-				$idCustomer = $this->session->userdata("idCustomer");
-				if(empty($idCustomer)){
-					$idCustomer = 7;
-				}
-				$this->data['nameCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
-				$this->data['phoneCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_phone");
-				
-				$year = date('Y',strtotime($this->dateToday));
-				$noOrder = $this->db->query("SELECT COUNT(*) as count FROM tb_transaction WHERE YEAR(t_date_created)='$year'")->row('count');
-				if(!empty($noOrder)){
-					$noOrderNew = "PB-".substr(date('Y',strtotime($this->dateToday)),2).date('m',strtotime($this->dateToday))."-".($noOrder+1);
-				}else{
-					$noOrderNew = "PB-".substr(date('Y',strtotime($this->dateToday)),2).date('m',strtotime($this->dateToday))."-1";
-				}
-				$data = array(
-					't_no_order' => $noOrderNew,
-					't_date_created' => $this->dateToday,
-					't_status' => 'PROSES',
-					't_created_at' => date('H:i:s',strtotime($this->dateToday)),
-					't_created_by' => $idUser,
-					't_customer' => $idCustomer,
-					't_phone' => $this->data['phoneCustomer'],
-					't_note' => '',
-					't_type' => 'BUY',
-					't_paid_by' => $this->data['nameCustomer'],
-					't_receive_by' => $idUser,
-					't_price_total' => $total,
-					't_qtt' => $qtt,
-					't_visible' => 1,
-				);
-				$idTransaction = $this->TransactionModel->buyCheckout($data);
-				$data_session = array(
-					'idTransaction' => $idTransaction,
-					'jenis_transaksi' => "buy"
-				);
-				$this->session->set_userdata($data_session);
-			}
-			else{
-				$data = array(
-					't_price_total' => $total,
-					't_qtt' => $qtt,
-				);
-				$this->db->update('tb_transaction', $data, ['t_id' => $idTransaction]);
-			}
-			$this->db->where('ti_t_id', $idTransaction);
-			$this->db->delete('tb_transaction_items');
-			foreach($this->cart->contents() as $a){
-				$dataItems = array(
-					'ti_t_id' => $idTransaction,
-					'ti_material' => $a['materialName'],
-					'ti_material_type' => $a['materialType'],
-					'ti_carat' => $a['carat'],
-					'ti_weight' => $a['weight'],
-					'ti_price' => $a['prices'],
-					'ti_high_low' => strval($a['types']),
-					'ti_price_total' => $a['priceTotal'],
-					'ti_date_created' => $this->dateToday,
-				);
-				$this->TransactionModel->buyCheckoutItems($dataItems);
-			}
-			// echo "<pre>";
-			// print_r ($idTransaction);
-			// echo "</pre>";
-			redirect(base_url()."transaction/buy/$idMaterial/?t=$types");
-		}else {
-			redirect(base_url());
-		}
-	}
-	function buyAddToCartReset()
+	
+	public function buyAddToCart()
 	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$idMaterial = $this->input->get('idMaterial');
-			$idRow = $this->input->get('idRow');
-			$t = $this->input->get('t');
-			// die;
-			$idTransaction = $this->session->userdata("idTransaction");
-			$this->db->where('ti_t_id', $idTransaction);
-			$this->db->delete('tb_transaction_items');
-			
-			if (!empty($idRow)) {
-				$qty = 0;
-				$array = array(
-					'rowid' => $idRow,
-					'qty' => $qty
-				);
-				print_r($array);
-				$this->cart->update($array);
-				foreach($this->cart->contents() as $a){
-					$dataItems = array(
-						'ti_t_id' => $idTransaction,
-						'ti_material' => $a['materialName'],
-						'ti_material_type' => $a['materialType'],
-						'ti_carat' => $a['carat'],
-						'ti_weight' => $a['weight'],
-						'ti_price' => $a['prices'],
-						'ti_high_low' => strval($a['types']),
-						'ti_price_total' => $a['priceTotal'],
-						'ti_date_created' => $this->dateToday,
-					);
-					$this->TransactionModel->buyCheckoutItems($dataItems);
+		$idUser   = $this->session->userdata("idUser");
+		if (!$authUser) { return redirect(base_url()); }
+
+		$idMaterial  = (int)$this->input->post('idMaterial');
+		$types       = $this->input->post('types');         // high/low (opsional)
+		$materialType= $this->input->post('materialType');  // bisa tahun potongan, dsb
+		$carat       = $this->input->post('carat');         // bisa '24(99.9)' atau persen
+		$weight      = $this->input->post('weight');        // string input
+		$percentage  = $this->input->post('percentage');    // persen utk Pt/Pd/Rh/Ir/Ru/Ta
+
+		$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+		$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial, 'Buy')->row("m_name");
+
+		// === Ambil formula (tetap dari kode aslinya) ===
+		$rtiAU = abs($this->MaterialModel->formulaData()->row("f_rti_au"));
+		$rtiAG = abs($this->MaterialModel->formulaData()->row("f_rti_ag"));
+		$rtiPT = abs($this->MaterialModel->formulaData()->row("f_rti_pt"));
+		$rtiRU = abs($this->MaterialModel->formulaData()->row("f_rti_ru"));
+		$rtiTA = abs($this->MaterialModel->formulaData()->row("f_rti_ta"));
+
+		$AUpotonganrulow   = $this->MasterModel->formulasData('rti-ru-low')->row('a');
+		$AUpotonganruhigh  = $this->MasterModel->formulasData('rti-ru')->row('a');
+
+		$AUpotonganK24     = $this->MasterModel->formulasData('rti-au')->row('a');
+		$AUpotonganK2499   = $this->MasterModel->formulasData('rti-au')->row('h');
+		$AUpresentasePotonganK24 = $this->MasterModel->formulasData('rti-au')->row('b');
+		$AUpresentasePotonganCustProf = $this->MasterModel->formulasData('rti-au')->row('f');
+		$AUpresentaseLMBaru = $this->MasterModel->formulasData('rti-au')->row('d');
+		$AUpresentaseLMLama = $this->MasterModel->formulasData('rti-au')->row('e');
+		$AUpotonganubs     = $this->MasterModel->formulasData('rti-au')->row('g');
+		$AUgb_99           = $this->MasterModel->formulasData('rti-au')->row('gb_99');
+		$AUgb_99_9         = $this->MasterModel->formulasData('rti-au')->row('gb_99_9');
+		$potongan_lm       = $this->MasterModel->formulasData('rti-au')->row('potongan_lm');
+
+		$AGpresentasePotonganAG     = $this->MasterModel->formulasData('rti-ag')->row('a');
+		$AGpresentasePotonganAGLow  = $this->MasterModel->formulasData('rti-ag-low')->row('a');
+
+		$PTpresentasePotonganPt     = $this->MasterModel->formulasData('rti-pt')->row('a');
+		$PTpresentasePotonganPtLow  = $this->MasterModel->formulasData('rti-pt-low')->row('a');
+		$PTpresentasePotonganPd     = $this->MasterModel->formulasData('rti-pt')->row('b');
+		$PTpresentasePotonganPdLow  = $this->MasterModel->formulasData('rti-pt-low')->row('b');
+		$PTpresentasePotonganRh     = $this->MasterModel->formulasData('rti-pt')->row('c');
+		$PTpresentasePotonganRhLow  = $this->MasterModel->formulasData('rti-pt-low')->row('c');
+		$PTpresentasePotonganIr     = $this->MasterModel->formulasData('rti-pt')->row('d');
+		$PTpresentasePotonganIrLow  = $this->MasterModel->formulasData('rti-pt-low')->row('d');
+
+		// === Siapkan variabel normalisasi cart ===
+		$rowId      = uniqid('i');          // id baris cart
+		$priceUnit  = 0.0;                  // harga per gram / per unit
+		$weightRaw  = null;                 // null = item unit (diamond), float = gram
+		$caratLabel = '';                   // label yang ditampilkan di tabel
+		$typeLabel  = $materialType ?? '-'; // default '-'
+
+		// === Hitung price/gram (atau unit) & set label sesuai material ===
+		if ($idMaterial != 1) { // bukan DIAMOND
+			// berat wajib numerik > 0 untuk item berbasis berat
+			$weightRaw = (is_numeric($weight) && (float)$weight > 0) ? (float)$weight : 0;
+			if ($weightRaw <= 0) {
+				// skip item invalid
+				$this->session->set_userdata([
+					'status'  => 'danger',
+					'message' => 'Berat tidak valid.',
+				]);
+				return redirect(base_url("transaction/buy/$idMaterial/?t=$types"));
+			}
+
+			if ($idMaterial == 2) { // EMAS PER PERHIASAN (KARAT)
+				if ($carat == '24(99.9)')      $priceUnit = round($rtiAU + $AUpotonganK2499);
+				else if ($carat == '24(99)')   $priceUnit = round($rtiAU + $AUpotonganK24);
+				else if ($carat == 23)         $priceUnit = round((0.958 * $rtiAU) + (0.958 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 22)         $priceUnit = round((0.916 * $rtiAU) + (0.916 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 21)         $priceUnit = round((0.875 * $rtiAU) + (0.875 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 20)         $priceUnit = round((0.833 * $rtiAU) + (0.833 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 19)         $priceUnit = round((0.791 * $rtiAU) + (0.791 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 18)         $priceUnit = round((0.75  * $rtiAU) + (0.75  * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 17)         $priceUnit = round((0.708 * $rtiAU) + (0.708 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 16)         $priceUnit = round((0.666 * $rtiAU) + (0.666 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 15)         $priceUnit = round((0.625 * $rtiAU) + (0.625 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 14)         $priceUnit = round((0.583 * $rtiAU) + (0.583 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 13)         $priceUnit = round((0.541 * $rtiAU) + (0.541 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 12)         $priceUnit = round((0.5   * $rtiAU) + (0.5   * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 11)         $priceUnit = round((0.458 * $rtiAU) + (0.458 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 10)         $priceUnit = round((0.416 * $rtiAU) + (0.416 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 9)          $priceUnit = round((0.375 * $rtiAU) + (0.375 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 8)          $priceUnit = round((0.333 * $rtiAU) + (0.333 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 7)          $priceUnit = round((0.291 * $rtiAU) + (0.291 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 6)          $priceUnit = round((0.25  * $rtiAU) + (0.25  * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 5)          $priceUnit = round((0.208 * $rtiAU) + (0.208 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 4)          $priceUnit = round((0.166 * $rtiAU) + (0.166 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 3)          $priceUnit = round((0.125 * $rtiAU) + (0.125 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else if ($carat == 2)          $priceUnit = round((0.083 * $rtiAU) + (0.083 * $rtiAU*($AUpresentasePotonganK24/100)));
+				else                            $priceUnit = 1;
+				$caratLabel = (string)$carat;
+			}
+			else if ($idMaterial == 3) { // LM BARU
+				$tahun_potongan = $this->input->post('tahun_potongan');
+				$harga_potongan = json_decode($potongan_lm, true)[$tahun_potongan];
+				$priceUnit  = $rtiAU + $harga_potongan;
+				$typeLabel  = $tahun_potongan;
+				$caratLabel = '24';
+			}
+			else if ($idMaterial == 4) { // LM LAMA
+				$priceUnit  = $rtiAU + $AUpresentaseLMLama;
+				$typeLabel  = '-';
+				$caratLabel = '24';
+			}
+			else if ($idMaterial == 5) { // SILVER (Ag)
+				if ($types === 'high') {
+					$priceUnit = floor((($carat/100) * $rtiAG) + floor(($carat/100) * $rtiAG * ($AGpresentasePotonganAG/100)));
+				} else {
+					$priceUnit = round((($carat/100) * $rtiAG) + round(($carat/100) * $rtiAG * ($AGpresentasePotonganAGLow/100)));
 				}
+				$caratLabel = 'Ag '.$carat.' %';
+			}
+			else if ($idMaterial == 6) { // Pt
+				if ($types === 'high') {
+					if ($percentage < 100) $priceUnit = floor(($percentage/100) * floor($rtiPT + ($rtiPT * ($PTpresentasePotonganPt/100))));
+					else                    $priceUnit = round($rtiPT + ($rtiPT * ($PTpresentasePotonganPt/100)));
+				} else {
+					if ($percentage < 100) $priceUnit = floor(($percentage/100) * floor($rtiPT + ($rtiPT * ($PTpresentasePotonganPtLow/100))));
+					else                    $priceUnit = round($rtiPT + ($rtiPT * ($PTpresentasePotonganPtLow/100)));
+				}
+				$caratLabel = 'Pt '.$percentage.' %';
+			}
+			else if ($idMaterial == 7) { // Pd
+				if ($types === 'high') {
+					if ($percentage < 100) $priceUnit = floor(($percentage/100) * floor(($rtiPT) + (($rtiPT) * $PTpresentasePotonganPd/100)));
+					else                    $priceUnit = round(($percentage/100) * round(($rtiPT) + (($rtiPT) * $PTpresentasePotonganPd/100)));
+				} else {
+					if ($percentage < 100) $priceUnit = floor(($percentage/100) * floor(($rtiPT) + (($rtiPT) * $PTpresentasePotonganPdLow/100)));
+					else                    $priceUnit = round(($percentage/100) * round(($rtiPT) + (($rtiPT) * $PTpresentasePotonganPdLow/100)));
+				}
+				$caratLabel = 'Pd '.$percentage.' %';
+			}
+			else if ($idMaterial == 8) { // Ir
+				if ($types === 'high') {
+					$priceUnit = round(($rtiPT + ($rtiPT * ($PTpresentasePotonganIr/100))) * $percentage/100);
+				} else {
+					$priceUnit = round(($rtiPT + ($rtiPT * ($PTpresentasePotonganIrLow/100))) * $percentage/100);
+				}
+				$caratLabel = 'Ir '.$percentage.' %';
+			}
+			else if ($idMaterial == 9) { // Rh
+				if ($types === 'high') {
+					if ($percentage < 100) $priceUnit = floor(($percentage/100) * floor(($rtiPT) + (($rtiPT) * $PTpresentasePotonganRh/100)));
+					else                    $priceUnit = round(($percentage/100) * round(($rtiPT) + (($rtiPT) * $PTpresentasePotonganRh/100)));
+				} else {
+					if ($percentage < 100) $priceUnit = floor(($percentage/100) * floor(($rtiPT) + (($rtiPT) * $PTpresentasePotonganRhLow/100)));
+					else                    $priceUnit = round(($percentage/100) * round(($rtiPT) + (($rtiPT) * $PTpresentasePotonganRhLow/100)));
+				}
+				$caratLabel = 'Rh '.$percentage.' %';
+			}
+			else if ($idMaterial == 10) { // Au %
+				$priceUnit  = ($rtiAU + ($rtiAU * $AUpresentasePotonganCustProf/100)) * $percentage/100;
+				$caratLabel = 'Au '.$percentage.' %';
+			}
+			else if ($idMaterial == 17) { // UBS (per gram)
+				$priceUnit  = ($rtiAU + $AUpotonganubs);
+				$typeLabel  = '-';
+				$caratLabel = '';
+			}
+			else if ($idMaterial == 19) { // Ru
+				if ($types == 'high') $priceUnit = floor((($percentage/100) * $rtiRU) + floor(($percentage/100) * $rtiRU * ($AUpotonganruhigh/100)));
+				else                  $priceUnit = floor((($percentage/100) * $rtiRU) + floor(($percentage/100) * $rtiRU * ($AUpotonganrulow/100)));
+				$typeLabel  = $types;
+				$caratLabel = 'RU '.$percentage.'%';
+			}
+			else if ($idMaterial == 21) { // Ta
+				$priceUnit  = $rtiTA * $percentage / 100;
+				$typeLabel  = '-';
+				$caratLabel = $percentage.'%';
+			}
+			else if ($idMaterial == 23) { // Gold Bar GB
+				$priceUnit  = ($carat == '24(99.9)') ? ($rtiAU + $AUgb_99_9) : ($rtiAU + $AUgb_99);
+				$typeLabel  = '-';
+				$caratLabel = 'K'.$carat;
 			}
 			else {
-				$this->cart->destroy();
+				// default fallback
+				$priceUnit = (float)$rtiAU;
 			}
-			redirect(base_url() . "transaction/buy/$idMaterial/?t=$t");
+
+			// === Insert ke cart (qty = 1, total di options) ===
+			$lineTotal = round($priceUnit * $weightRaw);
+
+			$this->cart->insert([
+				'id'    => $rowId,
+				'qty'   => 1,
+				'price' => (float)$priceUnit,          // per gram
+				'name'  => $materialName ?: 'Item',
+				'options' => [
+					'materialName' => $materialName,
+					'materialType' => $typeLabel,
+					'carat'        => $caratLabel,
+					'types'        => $types ?: null,
+					'weight'       => (string)$weightRaw,
+					'weight_raw'   => $weightRaw,
+					'price_total'  => $lineTotal,
+					'priceTotal'   => $lineTotal,      // kompat lama
+				],
+				// kompat lama (kalau masih ada view lama yang baca top-level)
+				'materialName' => $materialName,
+				'materialType' => $typeLabel,
+				'carat'        => $caratLabel,
+				'weight'       => (string)$weightRaw,
+				'types'        => $types ?: null,
+				'prices'       => (float)$priceUnit,
+				'priceTotal'   => $lineTotal,
+			]);
 		}
 		else {
-			redirect(base_url());
+			// === DIAMOND / item tanpa berat: harga langsung ===
+			$priceUnit  = (float)$this->input->post('price');
+			$weightRaw  = null; // penanda unit item (bukan berbasis gram)
+			$caratLabel = '-';
+			$typeLabel  = '-';
+
+			$this->cart->insert([
+				'id'    => $rowId,
+				'qty'   => 1,
+				'price' => $priceUnit,           // langsung harga baris
+				'name'  => $materialName ?: 'Item', // "DIAMOND"
+				'options' => [
+					'materialName' => $materialName,
+					'materialType' => $typeLabel,
+					'carat'        => $caratLabel,
+					'types'        => $types ?: null,
+					'weight'       => '-',       // tidak ada berat
+					'weight_raw'   => null,
+					'price_total'  => $priceUnit,
+					'priceTotal'   => $priceUnit,
+				],
+				// kompat lama
+				'materialName' => $materialName,
+				'materialType' => $typeLabel,
+				'carat'        => $caratLabel,
+				'weight'       => '-',
+				'types'        => $types ?: null,
+				'prices'       => $priceUnit,
+				'priceTotal'   => $priceUnit,
+			]);
 		}
-    }
-    function buyCheckout(){
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$idTransaction = $this->session->userdata("idTransaction");
-			$this->db->where('ti_t_id', $idTransaction);
-			$this->db->delete('tb_transaction_items');
-			$biayaAdmin = $this->input->get('operator').''.$this->input->get('biayaAdmin');
-			$total = 0;
-			$qtt = 0;
-			foreach($this->cart->contents() as $a){
-				$total = $total + $a["priceTotal"];
-				$qtt=$qtt+1;
+
+		// === Hitung total & qty dari cart (pakai options.price_total bila ada) ===
+		$total = 0.0; $qtt = 0;
+		foreach ($this->cart->contents() as $a) {
+			$line = 0.0;
+			if (isset($a['options']['price_total']) && is_numeric($a['options']['price_total'])) {
+				$line = (float)$a['options']['price_total'];
+			} elseif (isset($a['options']['priceTotal']) && is_numeric($a['options']['priceTotal'])) {
+				$line = (float)$a['options']['priceTotal'];
+			} elseif (isset($a['priceTotal']) && is_numeric($a['priceTotal'])) {
+				$line = (float)$a['priceTotal'];
+			} else {
+				$line = (float)$a['subtotal'];
 			}
-			$data = array(
-				't_status' => 'CHECKOUT',
+			$total += $line;
+			$qtt   += 1;
+		}
+
+		// === Buat/update header transaksi BUY ===
+		$idTransaction = $this->session->userdata("idTransaction");
+		if (!$idTransaction) {
+			$idCustomer = $this->session->userdata("idCustomer");
+			if (empty($idCustomer)) { $idCustomer = 7; }
+
+			$this->data['nameCustomer']  = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
+			$this->data['phoneCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_phone");
+
+			$year    = date('Y', strtotime($this->dateToday));
+			$noOrder = $this->db->query("SELECT COUNT(*) as count FROM tb_transaction WHERE YEAR(t_date_created)='$year'")->row('count');
+			$noOrderNew = "PB-".substr($year,2).date('m',strtotime($this->dateToday))."-".(($noOrder?:0)+1);
+
+			$header = [
+				't_no_order'     => $noOrderNew,
+				't_date_created' => $this->dateToday,
+				't_status'       => 'PROSES',
+				't_created_at'   => date('H:i:s', strtotime($this->dateToday)),
+				't_created_by'   => $idUser,
+				't_customer'     => $idCustomer,
+				't_phone'        => $this->data['phoneCustomer'],
+				't_note'         => '',
+				't_type'         => 'BUY',
+				't_paid_by'      => $this->data['nameCustomer'],
+				't_receive_by'   => $idUser,
+				't_price_total'  => $total,
+				't_qtt'          => $qtt,
+				't_visible'      => 1,
+			];
+			$idTransaction = $this->TransactionModel->buyCheckout($header);
+			$this->session->set_userdata([
+				'idTransaction'   => $idTransaction,
+				'jenis_transaksi' => "buy",
+			]);
+		} else {
+			$this->db->update('tb_transaction', [
 				't_price_total' => $total,
-				't_price_admin' => $biayaAdmin,
-				't_qtt' => $qtt,
-			);
-			$this->db->update('tb_transaction', $data, ['t_id' => $idTransaction]);
-			foreach($this->cart->contents() as $a){
-				$dataItems = array(
-					'ti_t_id' => $idTransaction,
-					'ti_material' => $a['materialName'],
-					'ti_material_type' => $a['materialType'],
-					'ti_carat' => $a['carat'],
-					'ti_weight' => $a['weight'],
-					'ti_price' => $a['prices'],
-					'ti_high_low' => strval($a['types']),
-					'ti_price_total' => $a['priceTotal'],
-					'ti_date_created' => $this->dateToday,
-				);
-				$this->TransactionModel->buyCheckoutItems($dataItems);
-			}
-			$this->session->unset_userdata('idCustomer');
-			$this->cart->destroy();
-			$data_session = array(
-				'status' => 'success',
-				'message' => "Checkout no order  <b>".$noOrderNew."</b> is success!!",
-			);
-			$this->session->set_userdata($data_session);
-			redirect(base_url()."report/buy-print/$idTransaction/");
+				't_qtt'         => $qtt,
+			], ['t_id' => $idTransaction]);
 		}
-		else {
-			redirect(base_url());
-		}	
+
+		// === Tulis ulang detail dari cart ke DB (options-first) ===
+		$this->db->where('ti_t_id', $idTransaction)->delete('tb_transaction_items');
+		foreach ($this->cart->contents() as $a) {
+			$opt = $a['options'] ?? [];
+			// total baris
+			$line = isset($opt['price_total']) ? (float)$opt['price_total']
+				: (isset($opt['priceTotal']) ? (float)$opt['priceTotal']
+				: (isset($a['priceTotal'])   ? (float)$a['priceTotal'] : (float)$a['subtotal']));
+			$dataItems = [
+				'ti_t_id'          => $idTransaction,
+				'ti_material'      => $opt['materialName'] ?? ($a['materialName'] ?? $a['name']),
+				'ti_material_type' => $opt['materialType'] ?? ($a['materialType'] ?? '-'),
+				'ti_carat'         => $opt['carat'] ?? ($a['carat'] ?? ''),
+				'ti_weight'        => array_key_exists('weight_raw', $opt) ? $opt['weight_raw']
+									: (is_numeric($a['weight'] ?? null) ? (float)$a['weight'] : null),
+				'ti_price'         => (float)$a['price'], // per gram/unit
+				'ti_high_low'      => (string)($opt['types'] ?? ($a['types'] ?? '')),
+				'ti_price_total'   => $line,
+				'ti_date_created'  => $this->dateToday,
+			];
+			$this->TransactionModel->buyCheckoutItems($dataItems);
+		}
+
+		// kembali ke halaman cart material
+		redirect(base_url()."transaction/buy/$idMaterial/?t=$types");
 	}
+
+	public function buyAddToCartReset()
+	{
+		$authUser = $this->session->userdata("authUser");
+		if (!$authUser) { return redirect(base_url()); }
+
+		$idMaterial = $this->input->get('idMaterial');
+		$idRow      = $this->input->get('idRow');   // optional: hapus satu item
+		$t          = $this->input->get('t');       // high/low dsb (tetap diteruskan ke view)
+
+		$idTransaction = (int)$this->session->userdata("idTransaction");
+
+		// Hapus di cart
+		if (!empty($idRow)) {
+			$this->cart->update([
+				'rowid' => $idRow,
+				'qty'   => 0
+			]);
+		} else {
+			$this->cart->destroy();
+		}
+
+		// Normalisasi sisa cart
+		$this->_normalizeCartForBuy();
+
+		// Sinkronkan header + detail (jika masih ada transaksi berjalan)
+		if ($idTransaction) {
+			// total & qty
+			list($total, $qtt) = $this->_cartTotalsBuy();
+
+			// update header
+			$this->db->update('tb_transaction', [
+				't_price_total' => $total,
+				't_qtt'         => $qtt,
+			], ['t_id' => $idTransaction]);
+
+			// tulis ulang detail
+			$this->_writeBuyDetailsFromCart($idTransaction);
+		}
+
+		redirect(base_url("transaction/buy/$idMaterial/?t=$t"));
+	}
+
+    public function buyCheckout()
+	{
+		$authUser = $this->session->userdata("authUser");
+		$idUser   = $this->session->userdata("idUser");
+		if (!$authUser) { return redirect(base_url()); }
+
+		$idTransaction = (int)$this->session->userdata("idTransaction");
+		if (!$idTransaction) { return redirect(base_url('transaction/buy')); }
+
+		// Normalisasi cart lebih dulu (qty=1, total per baris terset rapi)
+		$this->_normalizeCartForBuy();
+
+		// Admin fee numerik (operator + / -)
+		$op  = $this->input->get('operator');             // '+' atau '-'
+		$adm = (float)$this->input->get('biayaAdmin');     // bisa kosong
+		$biayaAdmin = ($op === '-') ? -abs($adm) : abs($adm);
+
+		// Total & qty dari cart
+		list($total, $qtt) = $this->_cartTotalsBuy();
+
+		// Update header
+		$this->db->update('tb_transaction', [
+			't_status'      => 'CHECKOUT',
+			't_price_total' => $total,
+			't_price_admin' => $biayaAdmin,
+			't_qtt'         => $qtt,
+		], ['t_id' => $idTransaction]);
+
+		// Tulis detail
+		$this->_writeBuyDetailsFromCart($idTransaction);
+
+		// Ambil no order untuk pesan sukses
+		$noOrder = $this->db->select('t_no_order')->where('t_id', $idTransaction)
+					->get('tb_transaction')->row('t_no_order');
+
+		// Bereskan sesi/cart
+		$this->session->unset_userdata('idCustomer');
+		$this->cart->destroy();
+
+		$this->session->set_userdata([
+			'status'  => 'success',
+			'message' => "Checkout no order <b>".htmlspecialchars($noOrder)."</b> is success!!",
+		]);
+
+		redirect(base_url("report/buy-print/$idTransaction/"));
+	}
+
     function sell()
 	{
 		$authUser = $this->session->userdata("authUser");
@@ -1257,428 +1123,259 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
 	}
-	function sellAddToCart()
+	
+	public function sellAddToCart()
 	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$idMaterial = $this->input->post('idMaterial');
-			$materialType = $this->input->post('materialType');
-			$carat = $this->input->post('carat');
-			$weight = $this->input->post('weight');
-			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial,'Sell')->row("m_name");
-			foreach($this->cart->contents() as $a) {
-				$idLast = ($a['id']);
-			}
-			if (!empty($idLast)) {
-				$idLast = $idLast + 1;
-			}
-			else {
-				$idLast = 1;
-			}
-			$rtiAU = $this->MaterialModel->formulaData()->row("f_rti_au_sell");
-			$rtiUbs = $this->MaterialModel->formulaData()->row("f_material_ubs_sell");
-			$AUtambahAUG = $this->MasterModel->formulasData('material-au')->row('g');
-			$AUPotongan = $this->MasterModel->formulasData('material-au')->row('a');
-			$potongan_ubs = $this->MasterModel->formulasData('material-ubs')->row('a');
-			$potongan_lm = $this->MasterModel->formulasData('lm')->row('potongan_lm');
-			$rtiAG = $this->MaterialModel->formulaData()->row("f_rti_ag_sell");
-			$LMpresentaseLMBaru = $this->MasterModel->formulasData('lm')->row('b');
-			$LMpresentaseLMLama = $this->MasterModel->formulasData('lm')->row('a');
-            if($idMaterial==16){
-				$price = round($rtiAG);
-				$priceTotal = round($price * $weight);
-				$data = array(
-					'id' => $idLast,
-					'qty' => $weight,
-					'price' => $price,
-					'prices' => $price,
-					'name' => 'T-Shirt',
-					'materialName' => $materialName,
-					'materialType' => '-',
-					'carat' => '100%',
-					'weight' => $weight,
-					'priceTotal' => $priceTotal,
-				);
-            }else if($idMaterial == 18){
-				$price = ($rtiUbs + $potongan_ubs);
-				$priceTotal = $price*$weight;
-				$data = array(
-					'id' => $idLast,
-					'qty' => $weight,
-					'price' => $price,
-					'prices' => $price,
-					'name' => 'T-Shirt',
-					'materialName' => $materialName,
-					'materialType' => '-',
-					'carat' => '',
-					'weight' => $weight,
-					'priceTotal' => $priceTotal,
-				);
-	        }else if($idMaterial==15){
-				$pricePergram = $rtiAU + $AUPotongan;
-				$priceTotal = $pricePergram * $weight;
-				$data = array(
-					'id' => $idLast,
-					'qty' => $weight,
-					'price' => $pricePergram,
-					'prices' => $pricePergram,
-					'name' => 'T-Shirt',
-					'materialName' => $materialName,
-					'materialType' => '-',
-					'carat' => '24',
-					'weight' => $weight,
-					'priceTotal' => $priceTotal,
-				);
-                $price = $rtiAU;
-	        }else if($idMaterial==14){
-					if($weight==0.5){
-						$price = $this->MaterialModel->formulaData()->row("f_nol5");
-					}else if($weight==1){
-						$price = $this->MaterialModel->formulaData()->row("f_1");
-					}else if($weight==2){
-						$price = $this->MaterialModel->formulaData()->row("f_2");
-					}else if($weight==2.5){
-						$price = $this->MaterialModel->formulaData()->row("f_2_coma_5");
-					}else if($weight==3){
-						$price = $this->MaterialModel->formulaData()->row("f_3");
-					}else if($weight==5){
-						$price = $this->MaterialModel->formulaData()->row("f_5");
-					}else if($weight==10){
-						$price = $this->MaterialModel->formulaData()->row("f_10");
-					}else if($weight==25){
-						$price = $this->MaterialModel->formulaData()->row("f_25");
-					}else if($weight==50){
-						$price = $this->MaterialModel->formulaData()->row("f_50");
-					}else if($weight==100){
-						$price = $this->MaterialModel->formulaData()->row("f_100");
-					}else if($weight==250){
-						$price = $this->MaterialModel->formulaData()->row("f_250");
-					}else if($weight==500){
-						$price = $this->MaterialModel->formulaData()->row("f_500");
-					}else if($weight==1000){
-						$price = $this->MaterialModel->formulaData()->row("f_1000");
-					}else{
-						$price = 1;	
-					}
-					if($weight == 0.5){
-						// $weightTemp = 1;	
-						// $price = $price - $LMpresentaseLMLama;
-						// $priceTotal = ($price * $weightTemp);
-						$priceTotal = $price + ($LMpresentaseLMLama*0.5);
-						$price = $priceTotal;
-						}else{
-						$price = $price + $LMpresentaseLMLama;
-						$priceTotal = round(($price * $weight));
-					}
-						$data = array(
-						'id' => $idLast,
-						'qty' => $weight,
-						'price' => $price,
-						'prices' => $price,
-						'name' => 'T-Shirt',
-						'materialName' => $materialName,
-						'materialType' => '-',
-						'carat' => '24',
-						'weight' => $weight,
-						'priceTotal' => $priceTotal,
-					);
-	        }else if($idMaterial==13){
-				/*
-				Rumus Lama
-				if($weight==0.5){
-					$price = $this->MaterialModel->formulaData()->row("f_nol5");
-				}else if($weight==1){
-					$price = $this->MaterialModel->formulaData()->row("f_1");
-				}else if($weight==2){
-					$price = $this->MaterialModel->formulaData()->row("f_2");
-				}else if($weight==2.5){
-					$price = $this->MaterialModel->formulaData()->row("f_2_coma_5");
-				}else if($weight==3){
-					$price = $this->MaterialModel->formulaData()->row("f_3");
-				}else if($weight==5){
-					$price = $this->MaterialModel->formulaData()->row("f_5");
-				}else if($weight==10){
-					$price = $this->MaterialModel->formulaData()->row("f_10");
-				}else if($weight==25){
-					$price = $this->MaterialModel->formulaData()->row("f_25");
-				}else if($weight==50){
-					$price = $this->MaterialModel->formulaData()->row("f_50");
-				}else if($weight==100){
-					$price = $this->MaterialModel->formulaData()->row("f_100");
-				}else if($weight==250){
-					$price = $this->MaterialModel->formulaData()->row("f_250");
-				}else if($weight==500){
-					$price = $this->MaterialModel->formulaData()->row("f_500");
-				}else if($weight==1000){
-					$price = $this->MaterialModel->formulaData()->row("f_1000");
-				}else{
-					$price = 1;	
-				}
-				if($weight == 0.5){
-					// $weightTemp = 1;	
-					// $price = $price - $LMpresentaseLMBaru;
-					// $priceTotal = ($price * $weightTemp);
-					$priceTotal = round($price - ($LMpresentaseLMBaru*0.5));
-					$price = $priceTotal;
-				}else{
-					$price = $price - $LMpresentaseLMBaru;
-					$priceTotal = round(($price * $weight));
-				} 
-				End Rumus Lama
-				*/
-				/* Rumus Baru */
-				// $this->db->where('id', $this->input->post('id_potongan'));
-				// $cek_harga = $this->db->get('tb_potongan')->row();
-				// print_r($this->input->post('id_potongan'));
-				// $pricepergram = $AUtambahAUG + $cek_harga->harga_buy;
-				// $price = $pricepergram*$weight;
-				if($weight==0.5){
-					$get_price = $this->MaterialModel->formulaData()->row("f_nol5");
-				}else if($weight==1){
-					$get_price = $this->MaterialModel->formulaData()->row("f_1"); 
-				}else if($weight==2){
-					$get_price = $this->MaterialModel->formulaData()->row("f_2");
-				}else if($weight==2.5){
-					$get_price = $this->MaterialModel->formulaData()->row("f_2_coma_5");
-				}else if($weight==3){
-					$get_price = $this->MaterialModel->formulaData()->row("f_3");
-				}else if($weight==5){
-					$get_price = $this->MaterialModel->formulaData()->row("f_5");
-				}else if($weight==10){
-					$get_price = $this->MaterialModel->formulaData()->row("f_10");
-				}else if($weight==25){
-					$get_price = $this->MaterialModel->formulaData()->row("f_25");
-				}else if($weight==50){
-					$get_price = $this->MaterialModel->formulaData()->row("f_50");
-				}else if($weight==100){
-					$get_price = $this->MaterialModel->formulaData()->row("f_100");
-				}else if($weight==250){
-					$get_price = $this->MaterialModel->formulaData()->row("f_250");
-				}else if($weight==500){
-					$get_price = $this->MaterialModel->formulaData()->row("f_500");
-				}else if($weight==1000){
-					$get_price = $this->MaterialModel->formulaData()->row("f_1000");
-				}else{
-					$price = $rtiAU;	
-				}
-				$tahun_potongan = $this->input->post('tahun_potongan');
-				$harga_potongan = json_decode($potongan_lm, true)[$tahun_potongan];
-				$pricepergram = $get_price + $harga_potongan;
+		$idUser   = $this->session->userdata("idUser");
+		if (!$authUser) { return redirect(base_url()); }
 
+		$idMaterial   = (int)$this->input->post('idMaterial');
+		$materialType = $this->input->post('materialType'); // bisa '-' / tahun / dsb
+		$carat        = $this->input->post('carat');
+		$weight       = $this->input->post('weight');
 
-				
-				// print_r($harga_potongan);
-				// die();
-				$price = $pricepergram*$weight;
-				$priceTotal = round($price);
+		$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+		$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial, 'Sell')->row("m_name");
 
-				/*End Rumus Baru */
-				$data = array(
-					'id' => $idLast,
-					'qty' => $weight,
-					'price' => $pricepergram,
-					'prices' => $pricepergram,
-					'name' => 'T-Shirt',
-					'materialName' => $materialName,
-					'materialType' => $tahun_potongan,
-					'carat' => '24',
-					'weight' => $weight,
-					'priceTotal' => $priceTotal,
-				);
-            }else{
-				$price = 1;
-				$priceTotal = round($price * $weight);
-				$qty = 1;
-				$data = array(
-					'id' => $idLast,
-					'qty' => $qty,
-					'price' => '',
-					'prices' => $price,
-					'name' => 'T-Shirt',
-					'materialName' => $materialName,
-					'materialType' => $materialType,
-					'carat' => '',
-					'weight' => $weight,
-					'priceTotal' => $priceTotal,
-				);
-            }
-            // echo "<pre>";
-            // print_r ($data);
-            // echo "</pre>";
-			$this->cart->insert($data);
-			// Add To Transaction Sell
-			$idTransaction = $this->session->userdata("idTransaction");
-			$total = 0;
-			$qtt = 0;
-			foreach($this->cart->contents() as $a){
-				$total = $total + $a["priceTotal"];
-				$qtt=$qtt+1;
-			}
-			if(!$idTransaction){
-				$idCustomer = $this->session->userdata("idCustomer");
-				if(empty($idCustomer)){
-					$idCustomer = 7;
-				}
-				$this->data['nameCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
-				$this->data['phoneCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_phone");
+		// Ambil formula seperti kode asli
+		$rtiAU = $this->MaterialModel->formulaData()->row("f_rti_au_sell");
+		$rtiUbs= $this->MaterialModel->formulaData()->row("f_material_ubs_sell");
+		$AUtambahAUG = $this->MasterModel->formulasData('material-au')->row('g');
+		$AUPotongan  = $this->MasterModel->formulasData('material-au')->row('a');
+		$potongan_ubs= $this->MasterModel->formulasData('material-ubs')->row('a');
+		$potongan_lm = $this->MasterModel->formulasData('lm')->row('potongan_lm');
+		$rtiAG = $this->MaterialModel->formulaData()->row("f_rti_ag_sell");
+		$LMpresentaseLMBaru = $this->MasterModel->formulasData('lm')->row('b');
+		$LMpresentaseLMLama = $this->MasterModel->formulasData('lm')->row('a');
 
-				
-				$year = date('Y',strtotime($this->dateToday));
-				// $noOrder = $this->TransactionModel->lastDataSell($year)->row('t_id');
-				$noOrder = $this->db->query("SELECT COUNT(*) as count FROM tb_transaction_sell WHERE YEAR(t_date_created)='$year'")->row('count');
-				if(!empty($noOrder)){
-					echo $noOrderNew = "PJ-".substr(date('Y',strtotime($this->dateToday)),2).date('m',strtotime($this->dateToday))."-".($noOrder+1);
-				}else{
-					$noOrderNew = "PJ-".substr(date('Y',strtotime($this->dateToday)),2).date('m',strtotime($this->dateToday))."-1";
-				}
-				$data = array(
-					't_no_order' => $noOrderNew,
-					't_date_created' => $this->dateToday,
-					't_status' => 'PROSES',
-					't_created_at' => date('H:i:s',strtotime($this->dateToday)),
-					't_created_by' => $idUser,
-					't_customer' => $idCustomer,
-					't_phone' => $this->data['phoneCustomer'],
-					't_note' => '',
-					't_type' => 'SELL',
-					't_paid_by' => $this->data['nameCustomer'],
-					't_receive_by' => $idUser,
-					't_price_total' => $total,
-					't_visible' => 1,
-					't_qtt' => $qtt,
-				);
-				$idTransaction = $this->TransactionModel->sellCheckout($data);
-				$data_session = array(
-					'idTransaction' => $idTransaction,
-					'jenis_transaksi' => "sell"
-				);
-				$this->session->set_userdata($data_session);
+		// Validasi & normalisasi weight (SELL semua item punya data)
+		$weightRaw = (is_numeric($weight) && (float)$weight > 0) ? (float)$weight : 0;
+		if ($weightRaw <= 0) {
+			$this->session->set_userdata(['status'=>'danger','message'=>'Berat tidak valid.']);
+			return redirect(base_url("transaction/sell/$idMaterial/"));
+		}
+
+		$rowId      = uniqid('s');
+		$priceUnit  = 0.0;   // per gram / per item (sesuai cabang)
+		$priceTotal = 0.0;   // total baris
+		$typeLabel  = $materialType ?: '-';
+		$caratLabel = '';
+
+		// === Rumus sesuai kode asli per idMaterial ===
+		if ($idMaterial == 16) { // AG 1000?
+			$priceUnit  = round($rtiAG);
+			$priceTotal = round($priceUnit * $weightRaw);
+			$caratLabel = '100%';
+			$typeLabel  = '-';
+		}
+		else if ($idMaterial == 18) { // UBS
+			$priceUnit  = ($rtiUbs + $potongan_ubs);
+			$priceTotal = $priceUnit * $weightRaw;
+			$typeLabel  = '-';
+			$caratLabel = '';
+		}
+		else if ($idMaterial == 15) { // material-au (24)
+			$priceUnit  = $rtiAU + $AUPotongan;     // per gram
+			$priceTotal = $priceUnit * $weightRaw;
+			$typeLabel  = '-';
+			$caratLabel = '24';
+		}
+		else if ($idMaterial == 14) { // LM LAMA tabel harga
+			// ambil harga dasar per keping dari field f_*
+			if ($weightRaw == 0.5)      { $price = $this->MaterialModel->formulaData()->row("f_nol5"); }
+			else if ($weightRaw == 1)   { $price = $this->MaterialModel->formulaData()->row("f_1"); }
+			else if ($weightRaw == 2)   { $price = $this->MaterialModel->formulaData()->row("f_2"); }
+			else if ($weightRaw == 2.5) { $price = $this->MaterialModel->formulaData()->row("f_2_coma_5"); }
+			else if ($weightRaw == 3)   { $price = $this->MaterialModel->formulaData()->row("f_3"); }
+			else if ($weightRaw == 5)   { $price = $this->MaterialModel->formulaData()->row("f_5"); }
+			else if ($weightRaw == 10)  { $price = $this->MaterialModel->formulaData()->row("f_10"); }
+			else if ($weightRaw == 25)  { $price = $this->MaterialModel->formulaData()->row("f_25"); }
+			else if ($weightRaw == 50)  { $price = $this->MaterialModel->formulaData()->row("f_50"); }
+			else if ($weightRaw == 100) { $price = $this->MaterialModel->formulaData()->row("f_100"); }
+			else if ($weightRaw == 250) { $price = $this->MaterialModel->formulaData()->row("f_250"); }
+			else if ($weightRaw == 500) { $price = $this->MaterialModel->formulaData()->row("f_500"); }
+			else if ($weightRaw == 1000){ $price = $this->MaterialModel->formulaData()->row("f_1000"); }
+			else { $price = 1; }
+
+			if ($weightRaw == 0.5) {
+				// khusus 0.5
+				$priceTotal = $price + ($LMpresentaseLMLama*0.5);
+				$priceUnit  = $priceTotal; // per item (keping 0.5)
+			} else {
+				$price      = $price + $LMpresentaseLMLama;
+				$priceUnit  = $price;                 // per gram / per item sesuai tabelmu
+				$priceTotal = round($price * $weightRaw);
 			}
-			else{
-				$data = array(
-					't_price_total' => $total,
-					't_qtt' => $qtt,
-				);
-				$this->db->update('tb_transaction_sell', $data, ['t_id' => $idTransaction]);
-			}
-			$this->db->where('ti_t_id', $idTransaction);
-			$this->db->delete('tb_transaction_items_sell');
-			foreach($this->cart->contents() as $a){
-				$dataItems = array(
-					'ti_t_id' => $idTransaction,
-					'ti_material' => $a['materialName'],
-					'ti_material_type' => $a['materialType'],
-					'ti_carat' => $a['carat'],
-					'ti_weight' => $a['weight'],
-					'ti_price' => $a['prices'],
-					'ti_price_total' => $a['priceTotal'],
-					'ti_date_created' => $this->dateToday,
-				);
-				$this->TransactionModel->sellCheckoutItems($dataItems);
-			}
-			//$this->session->unset_userdata('idCustomer');
-			redirect(base_url()."transaction/sell/$idMaterial/");
+
+			$typeLabel  = '-';
+			$caratLabel = '24';
+		}
+		else if ($idMaterial == 13) { // LM BARU tabel + potongan tahun
+			if     ($weightRaw == 0.5) { $base = $this->MaterialModel->formulaData()->row("f_nol5"); }
+			elseif ($weightRaw == 1)   { $base = $this->MaterialModel->formulaData()->row("f_1"); }
+			elseif ($weightRaw == 2)   { $base = $this->MaterialModel->formulaData()->row("f_2"); }
+			elseif ($weightRaw == 2.5) { $base = $this->MaterialModel->formulaData()->row("f_2_coma_5"); }
+			elseif ($weightRaw == 3)   { $base = $this->MaterialModel->formulaData()->row("f_3"); }
+			elseif ($weightRaw == 5)   { $base = $this->MaterialModel->formulaData()->row("f_5"); }
+			elseif ($weightRaw == 10)  { $base = $this->MaterialModel->formulaData()->row("f_10"); }
+			elseif ($weightRaw == 25)  { $base = $this->MaterialModel->formulaData()->row("f_25"); }
+			elseif ($weightRaw == 50)  { $base = $this->MaterialModel->formulaData()->row("f_50"); }
+			elseif ($weightRaw == 100) { $base = $this->MaterialModel->formulaData()->row("f_100"); }
+			elseif ($weightRaw == 250) { $base = $this->MaterialModel->formulaData()->row("f_250"); }
+			elseif ($weightRaw == 500) { $base = $this->MaterialModel->formulaData()->row("f_500"); }
+			elseif ($weightRaw == 1000){ $base = $this->MaterialModel->formulaData()->row("f_1000"); }
+			else                       { $base = 1; }
+
+			$tahun_potongan = $this->input->post('tahun_potongan');
+			$harga_potongan = json_decode($potongan_lm, true)[$tahun_potongan];
+			$priceUnit  = $base + $harga_potongan;    // mengikuti logika kamu
+			$priceTotal = round($priceUnit * $weightRaw);
+			$typeLabel  = $tahun_potongan;
+			$caratLabel = '24';
 		}
 		else {
-			redirect(base_url());
+			// Cabang lain (kalau ada) → fallback sederhana
+			$priceUnit  = 1;
+			$priceTotal = round($priceUnit * $weightRaw);
+			$caratLabel = (string)($carat ?? '');
 		}
+
+		// === Insert ke cart dengan schema options-first (qty=1) ===
+		$this->cart->insert([
+			'id'    => $rowId,
+			'qty'   => 1,
+			'price' => (float)$priceUnit,
+			'name'  => $materialName ?: 'Item',
+			'options' => [
+				'materialName' => $materialName,
+				'materialType' => $typeLabel,
+				'carat'        => $caratLabel,
+				'weight'       => (string)$weightRaw,
+				'raw_weight'   => $weightRaw,
+				'price_total'  => $priceTotal,
+				'priceTotal'   => $priceTotal, // kompat lama
+			],
+			// kompat lama (kalau ada view lama yang masih baca top-level)
+			'materialName' => $materialName,
+			'materialType' => $typeLabel,
+			'carat'        => $caratLabel,
+			'weight'       => (string)$weightRaw,
+			'prices'       => (float)$priceUnit,
+			'priceTotal'   => $priceTotal,
+		]);
+
+		// === Buat / update header SELL + tulis detail ===
+		list($total, $qtt) = $this->_cartTotalsSell();
+		$idTransaction = $this->session->userdata("idTransaction");
+
+		if (!$idTransaction) {
+			$idCustomer = $this->session->userdata("idCustomer") ?: 7;
+			$this->data['nameCustomer']  = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
+			$this->data['phoneCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_phone");
+
+			$year = date('Y', strtotime($this->dateToday));
+			$noOrder = $this->db->query("SELECT COUNT(*) as count FROM tb_transaction_sell WHERE YEAR(t_date_created)='$year'")->row('count');
+			$noOrderNew = "PJ-".substr($year, 2).date('m', strtotime($this->dateToday))."-".(($noOrder ?: 0) + 1);
+
+
+			$header = [
+				't_no_order'     => $noOrderNew,
+				't_date_created' => $this->dateToday,
+				't_status'       => 'PROSES',
+				't_created_at'   => date('H:i:s', strtotime($this->dateToday)),
+				't_created_by'   => $idUser,
+				't_customer'     => $idCustomer,
+				't_phone'        => $this->data['phoneCustomer'],
+				't_note'         => '',
+				't_type'         => 'SELL',
+				't_paid_by'      => $this->data['nameCustomer'],
+				't_receive_by'   => $idUser,
+				't_price_total'  => $total,
+				't_visible'      => 1,
+				't_qtt'          => $qtt,
+			];
+			$idTransaction = $this->TransactionModel->sellCheckout($header);
+			$this->session->set_userdata(['idTransaction'=>$idTransaction,'jenis_transaksi'=>'sell']);
+		} else {
+			$this->db->update('tb_transaction_sell', ['t_price_total'=>$total,'t_qtt'=>$qtt], ['t_id'=>$idTransaction]);
+		}
+
+		$this->_writeSellDetailsFromCart($idTransaction);
+
+		return redirect(base_url()."transaction/sell/$idMaterial/");
 	}
-	function sellAddToCartReset()
+
+	public function sellAddToCartReset()
 	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$idMaterial = $this->input->get('idMaterial');
-			$idRow = $this->input->get('idRow');
+		if (!$authUser) { return redirect(base_url()); }
 
-			$idTransaction = $this->session->userdata("idTransaction");
-			$this->db->where('ti_t_id', $idTransaction);
-			$this->db->delete('tb_transaction_items_sell');
-			
-			
-			if (!empty($idRow)) {
-				$qty = 0;
-				$array = array(
-					'rowid' => $idRow,
-					'qty' => $qty
-				);
-				print_r($array);
-				$this->cart->update($array);
-				
-				foreach($this->cart->contents() as $a){
-					$dataItems = array(
-						'ti_t_id' => $idTransaction,
-						'ti_material' => $a['materialName'],
-						'ti_material_type' => $a['materialType'],
-						'ti_carat' => $a['carat'],
-						'ti_weight' => $a['weight'],
-						'ti_price' => $a['prices'],
-						'ti_price_total' => $a['priceTotal'],
-						'ti_date_created' => $this->dateToday,
-					);
-					$this->TransactionModel->sellCheckoutItems($dataItems);
-				}
-			}
-			else {
-				$this->cart->destroy();
-			}
-			redirect(base_url() . "transaction/sell/$idMaterial/");
-		}
-		else {
-			redirect(base_url());
-		}
-	}
-	function sellCheckout(){
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$idCustomer = $this->session->userdata("idCustomer");
-			$idTransaction = $this->session->userdata("idTransaction");
-			$this->db->where('ti_t_id', $idTransaction);
-			$this->db->delete('tb_transaction_items_sell');
-			$biayaAdmin = $this->input->get('operator').''.$this->input->get('biayaAdmin');
-			$total = 0;
-			$qtt = 0;
-			foreach($this->cart->contents() as $a){
-				$total = $total + $a["priceTotal"];
-				$qtt=$qtt+1;
-			}
-			
-			$data = array(
-				't_status' => 'CHECKOUT',
-				't_price_total' => $total,
-				't_price_admin' => $biayaAdmin,
-				't_qtt' => $qtt,
-			);
-			$this->db->update('tb_transaction_sell', $data, ['t_id' => $idTransaction]);
-			foreach($this->cart->contents() as $a){
-				$dataItems = array(
-					'ti_t_id' => $idTransaction,
-					'ti_material' => $a['materialName'],
-					'ti_material_type' => $a['materialType'],
-					'ti_carat' => $a['carat'],
-					'ti_weight' => $a['weight'],
-					'ti_price' => $a['prices'],
-					'ti_price_total' => $a['priceTotal'],
-					'ti_date_created' => $this->dateToday,
-				);
-				$this->TransactionModel->sellCheckoutItems($dataItems);
-			}
-			$this->session->unset_userdata('idCustomer');
+		$idMaterial = $this->input->get('idMaterial');
+		$idRow      = $this->input->get('idRow');
+
+		$idTransaction = (int)$this->session->userdata("idTransaction");
+
+		if (!empty($idRow)) {
+			$this->cart->update(['rowid'=>$idRow,'qty'=>0]);
+		} else {
 			$this->cart->destroy();
-			$data_session = array(
-				'status' => 'success',
-				'message' => "Checkout no order  <b>".$noOrderNew."</b> is success!!",
-			);
-			$this->session->set_userdata($data_session);
-			redirect(base_url()."report/sell-print/$idTransaction/");
 		}
-		else {
-			redirect(base_url());
-		}	
+
+		if ($idTransaction) {
+			list($total, $qtt) = $this->_cartTotalsSell();
+			$this->db->update('tb_transaction_sell', ['t_price_total'=>$total,'t_qtt'=>$qtt], ['t_id'=>$idTransaction]);
+			$this->_writeSellDetailsFromCart($idTransaction);
+		}
+
+		return redirect(base_url()."transaction/sell/$idMaterial/");
 	}
+
+	public function sellCheckout()
+	{
+		$authUser = $this->session->userdata("authUser");
+		if (!$authUser) { return redirect(base_url()); }
+
+		$idTransaction = (int)$this->session->userdata("idTransaction");
+		if (!$idTransaction) { return redirect(base_url('transaction/sell')); }
+
+		// Hapus detail lama
+		$this->db->where('ti_t_id', $idTransaction)->delete('tb_transaction_items_sell');
+
+		// Hitung total & qty dari cart (options-first)
+		list($total, $qtt) = $this->_cartTotalsSell();
+
+		// Admin fee
+		$op        = $this->input->get('operator');
+		$admVal    = (float)$this->input->get('biayaAdmin');
+		$biayaAdmin= ($op === '-') ? -abs($admVal) : abs($admVal);
+
+		// Update header
+		$this->db->update('tb_transaction_sell', [
+			't_status'      => 'CHECKOUT',
+			't_price_total' => $total,
+			't_price_admin' => $biayaAdmin,
+			't_qtt'         => $qtt,
+		], ['t_id'=>$idTransaction]);
+
+		// Tulis detail dari cart
+		$this->_writeSellDetailsFromCart($idTransaction);
+
+		// Sukses
+		$this->session->unset_userdata('idCustomer');
+		$this->cart->destroy();
+
+		// ambil no order untuk pesan
+		$noOrder = $this->db->select('t_no_order')->where('t_id',$idTransaction)->get('tb_transaction_sell')->row('t_no_order');
+
+		$this->session->set_userdata([
+			'status'  => 'success',
+			'message' => "Checkout no order <b>".htmlspecialchars($noOrder)."</b> is success!!",
+		]);
+
+		return redirect(base_url()."report/sell-print/$idTransaction/");
+	}
+
 	function sellDeleteTransaction(){
 		$authUser = $this->session->userdata("authUser");
 		$idUser = $this->session->userdata("idUser");

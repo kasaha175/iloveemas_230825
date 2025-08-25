@@ -1,9 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$route['login-process']  = 'AuthController/loginProcess';
-$route['logout-process'] = 'AuthController/logoutProcess';
-$route['dashboard']      = 'HomeController/dashboard';
+$route['login']['get']           = 'AuthController/login';
+$route['login-process']['post']  = 'AuthController/loginProcess';
+$route['login-process']['get']   = 'AuthController/login';   // cegah 405
+$route['logout-process']['get'] = 'AuthController/logoutProcess';
+$route['dashboard']['get']       = 'HomeController/dashboard';
 
 /* ============================= TRANSACTION ============================= */
 $route['transaction']                                = 'TransactionController';

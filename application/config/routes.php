@@ -91,6 +91,9 @@ $route['report/buy/(:any)'] = 'ReportController/buyDetail/$1';
 $route['report/sell'] = 'ReportController/sell';
 $route['report/sell-graph'] = 'ReportController/sellGraph';
 $route['report/sell/(:any)'] = 'ReportController/sellDetail/$1';
+$route['report/buy-print-action/(:num)']  = 'ReportController/buyPrintAction/$1';
+$route['report/sell-print-action/(:num)'] = 'ReportController/sellPrintAction/$1';
+$route['report/test-dompdf'] = 'ReportController/testDompdf';
 
 //default
 $route['default_controller'] = 'HomeController';

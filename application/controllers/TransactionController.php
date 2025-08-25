@@ -102,7 +102,7 @@ class TransactionController extends CI_Controller
 
 			// Detail items
 			$barang = $this->db->where('ti_t_id', $cek_tr->t_id)
-							->get('tb_transaction_items')->result();
+							->get('tb_transaction_items_sell')->result();
 
 			foreach ($barang as $item) {
 				$isDiamond = strcasecmp(trim($item->ti_material), 'DIAMOND') === 0;

@@ -36,16 +36,6 @@ function nominal($angka){
             </div>
         </div>
         <div class="row">
-            <?php
-            // Debug session untuk memastikan noOrder ada atau tidak
-            echo "<pre>";
-            print_r($this->session->userdata());
-            echo "</pre>";
-
-            // Atau kalau hanya ingin cek noOrder saja:
-            echo "<p style='color:yellow;background:#000;padding:5px;'>noOrder: "
-                . $this->session->userdata('noOrder') . "</p>";
-            ?>
             <div class="col-md-4">
                 <div class="row">
                     <div class="col-md-12">

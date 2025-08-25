@@ -6495,3 +6495,2756 @@ INFO - 2025-08-25 19:20:25 --> File loaded: F:\laragon\www\iloveemas\application
 INFO - 2025-08-25 19:20:25 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
 INFO - 2025-08-25 19:20:25 --> Final output sent to browser
 DEBUG - 2025-08-25 19:20:25 --> Total execution time: 0.2017
+INFO - 2025-08-25 12:21:19 --> Config Class Initialized
+INFO - 2025-08-25 12:21:19 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:21:19 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:21:19 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:21:19 --> URI Class Initialized
+INFO - 2025-08-25 12:21:19 --> Router Class Initialized
+INFO - 2025-08-25 12:21:19 --> Output Class Initialized
+INFO - 2025-08-25 12:21:19 --> Security Class Initialized
+DEBUG - 2025-08-25 12:21:19 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:21:19 --> Input Class Initialized
+INFO - 2025-08-25 12:21:19 --> Language Class Initialized
+INFO - 2025-08-25 12:21:19 --> Loader Class Initialized
+INFO - 2025-08-25 12:21:19 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:21:19 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:21:19 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:21:19 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:21:19 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:21:19 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:21:19 --> Cart Class Initialized
+INFO - 2025-08-25 12:21:19 --> Controller Class Initialized
+INFO - 2025-08-25 12:21:19 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:21:19 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:21:19 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:21:19 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:21:19 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:21:19 --> File loaded: F:\laragon\www\iloveemas\application\views\ReportSell.php
+INFO - 2025-08-25 19:21:19 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:21:19 --> Final output sent to browser
+DEBUG - 2025-08-25 19:21:19 --> Total execution time: 0.1558
+INFO - 2025-08-25 12:21:20 --> Config Class Initialized
+INFO - 2025-08-25 12:21:20 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:21:20 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:21:20 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:21:20 --> URI Class Initialized
+DEBUG - 2025-08-25 12:21:20 --> No URI present. Default controller set.
+INFO - 2025-08-25 12:21:20 --> Router Class Initialized
+INFO - 2025-08-25 12:21:20 --> Output Class Initialized
+INFO - 2025-08-25 12:21:20 --> Security Class Initialized
+DEBUG - 2025-08-25 12:21:20 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:21:20 --> Input Class Initialized
+INFO - 2025-08-25 12:21:20 --> Language Class Initialized
+INFO - 2025-08-25 12:21:20 --> Loader Class Initialized
+INFO - 2025-08-25 12:21:20 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:21:20 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:21:20 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:21:20 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:21:20 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:21:21 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:21:21 --> Cart Class Initialized
+INFO - 2025-08-25 12:21:21 --> Controller Class Initialized
+INFO - 2025-08-25 12:21:21 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:21:21 --> Config Class Initialized
+INFO - 2025-08-25 12:21:21 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:21:21 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:21:21 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:21:21 --> URI Class Initialized
+INFO - 2025-08-25 12:21:21 --> Router Class Initialized
+INFO - 2025-08-25 12:21:21 --> Output Class Initialized
+INFO - 2025-08-25 12:21:21 --> Security Class Initialized
+DEBUG - 2025-08-25 12:21:21 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:21:21 --> Input Class Initialized
+INFO - 2025-08-25 12:21:21 --> Language Class Initialized
+INFO - 2025-08-25 12:21:21 --> Loader Class Initialized
+INFO - 2025-08-25 12:21:21 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:21:21 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:21:21 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:21:21 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:21:21 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:21:21 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:21:21 --> Cart Class Initialized
+INFO - 2025-08-25 12:21:21 --> Controller Class Initialized
+INFO - 2025-08-25 12:21:21 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:21:21 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:21:21 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:21:21 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:21:21 --> Final output sent to browser
+DEBUG - 2025-08-25 12:21:21 --> Total execution time: 0.0832
+INFO - 2025-08-25 12:21:38 --> Config Class Initialized
+INFO - 2025-08-25 12:21:38 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:21:38 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:21:38 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:21:38 --> URI Class Initialized
+INFO - 2025-08-25 12:21:38 --> Router Class Initialized
+INFO - 2025-08-25 12:21:38 --> Output Class Initialized
+INFO - 2025-08-25 12:21:38 --> Security Class Initialized
+DEBUG - 2025-08-25 12:21:38 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:21:38 --> Input Class Initialized
+INFO - 2025-08-25 12:21:38 --> Language Class Initialized
+INFO - 2025-08-25 12:21:38 --> Loader Class Initialized
+INFO - 2025-08-25 12:21:38 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:21:38 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:21:38 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:21:38 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:21:38 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:21:38 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:21:38 --> Cart Class Initialized
+INFO - 2025-08-25 12:21:38 --> Controller Class Initialized
+INFO - 2025-08-25 12:21:38 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:21:38 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:21:38 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:21:38 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:21:38 --> Final output sent to browser
+DEBUG - 2025-08-25 12:21:38 --> Total execution time: 0.1018
+INFO - 2025-08-25 12:21:59 --> Config Class Initialized
+INFO - 2025-08-25 12:21:59 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:21:59 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:21:59 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:21:59 --> URI Class Initialized
+INFO - 2025-08-25 12:21:59 --> Router Class Initialized
+INFO - 2025-08-25 12:21:59 --> Output Class Initialized
+INFO - 2025-08-25 12:21:59 --> Security Class Initialized
+DEBUG - 2025-08-25 12:21:59 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:21:59 --> Input Class Initialized
+INFO - 2025-08-25 12:21:59 --> Language Class Initialized
+INFO - 2025-08-25 12:21:59 --> Loader Class Initialized
+INFO - 2025-08-25 12:21:59 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:21:59 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:21:59 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:21:59 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:21:59 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:21:59 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:21:59 --> Cart Class Initialized
+INFO - 2025-08-25 12:21:59 --> Controller Class Initialized
+INFO - 2025-08-25 12:21:59 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:21:59 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:21:59 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:21:59 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:21:59 --> Final output sent to browser
+DEBUG - 2025-08-25 12:21:59 --> Total execution time: 0.1039
+INFO - 2025-08-25 12:22:00 --> Config Class Initialized
+INFO - 2025-08-25 12:22:00 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:00 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:00 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:00 --> URI Class Initialized
+INFO - 2025-08-25 12:22:00 --> Router Class Initialized
+INFO - 2025-08-25 12:22:00 --> Output Class Initialized
+INFO - 2025-08-25 12:22:00 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:00 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:00 --> Input Class Initialized
+INFO - 2025-08-25 12:22:00 --> Language Class Initialized
+INFO - 2025-08-25 12:22:00 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:00 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:00 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:00 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:00 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:00 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:00 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:00 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:00 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:00 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:00 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:00 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:00 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:00 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:00 --> File loaded: F:\laragon\www\iloveemas\application\views\ListTransaction.php
+INFO - 2025-08-25 19:22:00 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:00 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:00 --> Total execution time: 0.2410
+INFO - 2025-08-25 12:22:00 --> Config Class Initialized
+INFO - 2025-08-25 12:22:00 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:00 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:00 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:00 --> URI Class Initialized
+INFO - 2025-08-25 12:22:00 --> Router Class Initialized
+INFO - 2025-08-25 12:22:00 --> Output Class Initialized
+INFO - 2025-08-25 12:22:00 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:00 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:00 --> Input Class Initialized
+INFO - 2025-08-25 12:22:00 --> Language Class Initialized
+INFO - 2025-08-25 12:22:00 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:00 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:00 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:00 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:00 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:00 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:00 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:00 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:00 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:00 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:00 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:00 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:00 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:01 --> Cart class already loaded. Second attempt ignored.
+DEBUG - 2025-08-25 19:22:01 --> [{"no":1,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-1\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-1","status":"SELESAI","date":"2025-05-13 18:19:28","customer":"INDRA-TEST","qty":2,"price_total":"0"},{"no":2,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-2\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-2","status":"SELESAI","date":"2025-05-13 18:51:04","customer":"DIVA DEVINA","qty":1,"price_total":"1725620"},{"no":3,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-3\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-3","status":"SELESAI","date":"2025-05-13 19:20:05","customer":"DIVA DEVINA","qty":1,"price_total":"17256200"},{"no":4,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-4\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-4","status":"SELESAI","date":"2025-05-23 00:01:28","customer":"DIVA DEVINA","qty":1,"price_total":"8128100"},{"no":5,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-5\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-5","status":"SELESAI","date":"2025-05-24 08:15:27","customer":"DIVA DEVINA","qty":0,"price_total":"0"},{"no":6,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-6\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-6","status":"SELESAI","date":"2025-05-24 10:54:54","customer":"GILANG PRIYATMOKO NUR","qty":1,"price_total":"882783"},{"no":7,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-7\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-7","status":"SELESAI","date":"2025-05-24 10:56:02","customer":"KHOLIPAH","qty":2,"price_total":"10401396"},{"no":8,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-8\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-8","status":"SELESAI","date":"2025-05-24 11:16:08","customer":"NOVIA AMALIA","qty":1,"price_total":"167557"},{"no":9,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-9\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-9","status":"SELESAI","date":"2025-05-24 11:21:37","customer":"HAERUL ANWAR","qty":3,"price_total":"3213858"},{"no":10,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-10\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-10","status":"SELESAI","date":"2025-05-24 11:32:57","customer":"HAERUL ANWAR","qty":0,"price_total":"0"}]
+INFO - 2025-08-25 19:22:01 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:01 --> Total execution time: 0.2635
+INFO - 2025-08-25 12:22:01 --> Config Class Initialized
+INFO - 2025-08-25 12:22:01 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:01 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:01 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:01 --> URI Class Initialized
+INFO - 2025-08-25 12:22:01 --> Router Class Initialized
+INFO - 2025-08-25 12:22:01 --> Output Class Initialized
+INFO - 2025-08-25 12:22:01 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:01 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:01 --> Input Class Initialized
+INFO - 2025-08-25 12:22:01 --> Language Class Initialized
+INFO - 2025-08-25 12:22:02 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:02 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:02 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:02 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:02 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:02 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:02 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:02 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:02 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:02 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:02 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:02 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:02 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:02 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:02 --> File loaded: F:\laragon\www\iloveemas\application\views\CustomerSelect.php
+INFO - 2025-08-25 19:22:02 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:02 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:02 --> Total execution time: 0.2103
+INFO - 2025-08-25 12:22:05 --> Config Class Initialized
+INFO - 2025-08-25 12:22:05 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:05 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:05 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:05 --> URI Class Initialized
+INFO - 2025-08-25 12:22:05 --> Router Class Initialized
+INFO - 2025-08-25 12:22:05 --> Output Class Initialized
+INFO - 2025-08-25 12:22:05 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:05 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:05 --> Input Class Initialized
+INFO - 2025-08-25 12:22:05 --> Language Class Initialized
+INFO - 2025-08-25 12:22:05 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:05 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:05 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:05 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:05 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:05 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:05 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:05 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:05 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:05 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:05 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:05 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:05 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:05 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:05 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:05 --> Total execution time: 0.1335
+INFO - 2025-08-25 12:22:06 --> Config Class Initialized
+INFO - 2025-08-25 12:22:06 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:06 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:06 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:06 --> URI Class Initialized
+INFO - 2025-08-25 12:22:06 --> Router Class Initialized
+INFO - 2025-08-25 12:22:06 --> Output Class Initialized
+INFO - 2025-08-25 12:22:06 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:06 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:06 --> Input Class Initialized
+INFO - 2025-08-25 12:22:06 --> Language Class Initialized
+INFO - 2025-08-25 12:22:06 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:06 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:06 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:06 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:06 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:06 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:06 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:06 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:06 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:06 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:06 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:06 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:06 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:06 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:06 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:06 --> Total execution time: 0.1411
+INFO - 2025-08-25 12:22:07 --> Config Class Initialized
+INFO - 2025-08-25 12:22:07 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:07 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:07 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:07 --> URI Class Initialized
+INFO - 2025-08-25 12:22:07 --> Router Class Initialized
+INFO - 2025-08-25 12:22:07 --> Output Class Initialized
+INFO - 2025-08-25 12:22:07 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:07 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:07 --> Input Class Initialized
+INFO - 2025-08-25 12:22:07 --> Language Class Initialized
+INFO - 2025-08-25 12:22:07 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:07 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:07 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:07 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:07 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:07 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:08 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:08 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:08 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:08 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:08 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:08 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:08 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:08 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:08 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:08 --> Total execution time: 0.1347
+INFO - 2025-08-25 12:22:08 --> Config Class Initialized
+INFO - 2025-08-25 12:22:08 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:08 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:08 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:08 --> URI Class Initialized
+INFO - 2025-08-25 12:22:08 --> Router Class Initialized
+INFO - 2025-08-25 12:22:08 --> Output Class Initialized
+INFO - 2025-08-25 12:22:08 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:08 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:08 --> Input Class Initialized
+INFO - 2025-08-25 12:22:08 --> Language Class Initialized
+INFO - 2025-08-25 12:22:08 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:08 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:08 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:08 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:08 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:08 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:08 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:08 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:08 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:08 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:08 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:08 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:08 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:08 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:08 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:08 --> Total execution time: 0.1386
+INFO - 2025-08-25 12:22:08 --> Config Class Initialized
+INFO - 2025-08-25 12:22:08 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:09 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:09 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:09 --> URI Class Initialized
+INFO - 2025-08-25 12:22:09 --> Router Class Initialized
+INFO - 2025-08-25 12:22:09 --> Output Class Initialized
+INFO - 2025-08-25 12:22:09 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:09 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:09 --> Input Class Initialized
+INFO - 2025-08-25 12:22:09 --> Language Class Initialized
+INFO - 2025-08-25 12:22:09 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:09 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:09 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:09 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:09 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:09 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:09 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:09 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:09 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:09 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:09 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:09 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:09 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:09 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:09 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:09 --> Total execution time: 0.1322
+INFO - 2025-08-25 12:22:09 --> Config Class Initialized
+INFO - 2025-08-25 12:22:09 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:09 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:09 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:09 --> URI Class Initialized
+INFO - 2025-08-25 12:22:09 --> Router Class Initialized
+INFO - 2025-08-25 12:22:09 --> Output Class Initialized
+INFO - 2025-08-25 12:22:09 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:09 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:09 --> Input Class Initialized
+INFO - 2025-08-25 12:22:09 --> Language Class Initialized
+INFO - 2025-08-25 12:22:09 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:09 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:09 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:09 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:09 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:09 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:09 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:09 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:09 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:09 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:09 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:09 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:09 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:09 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:09 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:09 --> Total execution time: 0.1337
+INFO - 2025-08-25 12:22:10 --> Config Class Initialized
+INFO - 2025-08-25 12:22:10 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:10 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:10 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:10 --> URI Class Initialized
+INFO - 2025-08-25 12:22:10 --> Router Class Initialized
+INFO - 2025-08-25 12:22:10 --> Output Class Initialized
+INFO - 2025-08-25 12:22:10 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:10 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:10 --> Input Class Initialized
+INFO - 2025-08-25 12:22:10 --> Language Class Initialized
+INFO - 2025-08-25 12:22:10 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:10 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:10 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:10 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:10 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:10 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:10 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:10 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:10 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:10 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:10 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:10 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:10 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:10 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:10 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:10 --> Total execution time: 0.1441
+INFO - 2025-08-25 12:22:11 --> Config Class Initialized
+INFO - 2025-08-25 12:22:11 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:11 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:11 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:11 --> URI Class Initialized
+INFO - 2025-08-25 12:22:11 --> Router Class Initialized
+INFO - 2025-08-25 12:22:11 --> Output Class Initialized
+INFO - 2025-08-25 12:22:11 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:11 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:11 --> Input Class Initialized
+INFO - 2025-08-25 12:22:11 --> Language Class Initialized
+INFO - 2025-08-25 12:22:11 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:11 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:11 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:11 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:11 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:11 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:11 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:11 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:11 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:11 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:11 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:11 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:11 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:11 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:11 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:11 --> Total execution time: 0.2035
+INFO - 2025-08-25 12:22:12 --> Config Class Initialized
+INFO - 2025-08-25 12:22:12 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:12 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:12 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:12 --> URI Class Initialized
+INFO - 2025-08-25 12:22:12 --> Router Class Initialized
+INFO - 2025-08-25 12:22:12 --> Output Class Initialized
+INFO - 2025-08-25 12:22:12 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:12 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:12 --> Input Class Initialized
+INFO - 2025-08-25 12:22:12 --> Language Class Initialized
+INFO - 2025-08-25 12:22:12 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:12 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:12 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:12 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:12 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:12 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:12 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:12 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:12 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:12 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:12 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:12 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:12 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:12 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:12 --> File loaded: F:\laragon\www\iloveemas\application\views\Buy.php
+INFO - 2025-08-25 19:22:12 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:12 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:12 --> Total execution time: 0.1516
+INFO - 2025-08-25 12:22:13 --> Config Class Initialized
+INFO - 2025-08-25 12:22:13 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:13 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:13 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:13 --> URI Class Initialized
+INFO - 2025-08-25 12:22:13 --> Router Class Initialized
+INFO - 2025-08-25 12:22:13 --> Output Class Initialized
+INFO - 2025-08-25 12:22:13 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:13 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:13 --> Input Class Initialized
+INFO - 2025-08-25 12:22:13 --> Language Class Initialized
+INFO - 2025-08-25 12:22:13 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:13 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:13 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:13 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:13 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:13 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:13 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:13 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:13 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:13 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:13 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:13 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:13 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:13 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:13 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:22:13 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:13 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:13 --> Total execution time: 0.1402
+INFO - 2025-08-25 12:22:18 --> Config Class Initialized
+INFO - 2025-08-25 12:22:18 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:18 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:18 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:18 --> URI Class Initialized
+INFO - 2025-08-25 12:22:18 --> Router Class Initialized
+INFO - 2025-08-25 12:22:18 --> Output Class Initialized
+INFO - 2025-08-25 12:22:18 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:18 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:18 --> Input Class Initialized
+INFO - 2025-08-25 12:22:18 --> Language Class Initialized
+INFO - 2025-08-25 12:22:18 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:18 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:18 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:18 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:18 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:18 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:18 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:18 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:18 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:18 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:18 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:18 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:18 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:18 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:18 --> Config Class Initialized
+INFO - 2025-08-25 12:22:18 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:18 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:18 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:18 --> URI Class Initialized
+INFO - 2025-08-25 12:22:18 --> Router Class Initialized
+INFO - 2025-08-25 12:22:18 --> Output Class Initialized
+INFO - 2025-08-25 12:22:18 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:18 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:18 --> Input Class Initialized
+INFO - 2025-08-25 12:22:18 --> Language Class Initialized
+INFO - 2025-08-25 12:22:18 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:18 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:18 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:18 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:18 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:18 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:18 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:18 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:18 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:18 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:18 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:18 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:18 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:18 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:18 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:22:18 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:18 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:18 --> Total execution time: 0.1599
+INFO - 2025-08-25 12:22:20 --> Config Class Initialized
+INFO - 2025-08-25 12:22:20 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:20 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:20 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:20 --> URI Class Initialized
+INFO - 2025-08-25 12:22:20 --> Router Class Initialized
+INFO - 2025-08-25 12:22:20 --> Output Class Initialized
+INFO - 2025-08-25 12:22:20 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:20 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:20 --> Input Class Initialized
+INFO - 2025-08-25 12:22:20 --> Language Class Initialized
+INFO - 2025-08-25 12:22:20 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:20 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:20 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:20 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:20 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:20 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:20 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:20 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:20 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:20 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:20 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:20 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:20 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:20 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:20 --> File loaded: F:\laragon\www\iloveemas\application\views\Buy.php
+INFO - 2025-08-25 19:22:20 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:20 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:20 --> Total execution time: 0.1635
+INFO - 2025-08-25 12:22:21 --> Config Class Initialized
+INFO - 2025-08-25 12:22:21 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:21 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:21 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:21 --> URI Class Initialized
+INFO - 2025-08-25 12:22:21 --> Router Class Initialized
+INFO - 2025-08-25 12:22:21 --> Output Class Initialized
+INFO - 2025-08-25 12:22:21 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:21 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:21 --> Input Class Initialized
+INFO - 2025-08-25 12:22:21 --> Language Class Initialized
+INFO - 2025-08-25 12:22:21 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:21 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:21 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:21 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:21 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:21 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:21 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:21 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:21 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:21 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:21 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:21 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:21 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:22 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:22 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:22:22 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:22 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:22 --> Total execution time: 0.2093
+INFO - 2025-08-25 12:22:25 --> Config Class Initialized
+INFO - 2025-08-25 12:22:25 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:25 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:25 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:25 --> URI Class Initialized
+INFO - 2025-08-25 12:22:25 --> Router Class Initialized
+INFO - 2025-08-25 12:22:25 --> Output Class Initialized
+INFO - 2025-08-25 12:22:25 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:25 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:25 --> Input Class Initialized
+INFO - 2025-08-25 12:22:25 --> Language Class Initialized
+INFO - 2025-08-25 12:22:25 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:25 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:25 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:25 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:25 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:25 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:25 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:25 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:25 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:25 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:25 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:25 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:25 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:25 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:26 --> Config Class Initialized
+INFO - 2025-08-25 12:22:26 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:26 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:26 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:26 --> URI Class Initialized
+INFO - 2025-08-25 12:22:26 --> Router Class Initialized
+INFO - 2025-08-25 12:22:26 --> Output Class Initialized
+INFO - 2025-08-25 12:22:26 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:26 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:26 --> Input Class Initialized
+INFO - 2025-08-25 12:22:26 --> Language Class Initialized
+INFO - 2025-08-25 12:22:26 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:26 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:26 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:26 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:26 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:26 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:26 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:26 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:26 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:26 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:26 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:26 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:26 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:26 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:26 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:22:26 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:26 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:26 --> Total execution time: 0.1444
+INFO - 2025-08-25 12:22:37 --> Config Class Initialized
+INFO - 2025-08-25 12:22:37 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:37 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:37 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:37 --> URI Class Initialized
+INFO - 2025-08-25 12:22:37 --> Router Class Initialized
+INFO - 2025-08-25 12:22:37 --> Output Class Initialized
+INFO - 2025-08-25 12:22:37 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:37 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:37 --> Input Class Initialized
+INFO - 2025-08-25 12:22:37 --> Language Class Initialized
+INFO - 2025-08-25 12:22:37 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:37 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:37 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:37 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:37 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:37 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:37 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:37 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:37 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:37 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:37 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:37 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:37 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:38 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:38 --> File loaded: F:\laragon\www\iloveemas\application\views\Buy.php
+INFO - 2025-08-25 19:22:38 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:38 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:38 --> Total execution time: 0.1771
+INFO - 2025-08-25 12:22:39 --> Config Class Initialized
+INFO - 2025-08-25 12:22:39 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:39 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:39 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:39 --> URI Class Initialized
+INFO - 2025-08-25 12:22:39 --> Router Class Initialized
+INFO - 2025-08-25 12:22:39 --> Output Class Initialized
+INFO - 2025-08-25 12:22:39 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:39 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:39 --> Input Class Initialized
+INFO - 2025-08-25 12:22:39 --> Language Class Initialized
+INFO - 2025-08-25 12:22:39 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:39 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:39 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:39 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:39 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:39 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:39 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:39 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:39 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:39 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:39 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:39 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:39 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:39 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:39 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:22:39 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:39 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:39 --> Total execution time: 0.1890
+INFO - 2025-08-25 12:22:44 --> Config Class Initialized
+INFO - 2025-08-25 12:22:44 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:44 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:44 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:44 --> URI Class Initialized
+INFO - 2025-08-25 12:22:44 --> Router Class Initialized
+INFO - 2025-08-25 12:22:44 --> Output Class Initialized
+INFO - 2025-08-25 12:22:44 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:44 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:44 --> Input Class Initialized
+INFO - 2025-08-25 12:22:44 --> Language Class Initialized
+INFO - 2025-08-25 12:22:44 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:44 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:44 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:44 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:44 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:44 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:44 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:44 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:44 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:44 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:44 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:44 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:44 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:44 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:45 --> Config Class Initialized
+INFO - 2025-08-25 12:22:45 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:45 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:45 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:45 --> URI Class Initialized
+INFO - 2025-08-25 12:22:45 --> Router Class Initialized
+INFO - 2025-08-25 12:22:45 --> Output Class Initialized
+INFO - 2025-08-25 12:22:45 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:45 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:45 --> Input Class Initialized
+INFO - 2025-08-25 12:22:45 --> Language Class Initialized
+INFO - 2025-08-25 12:22:45 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:45 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:45 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:45 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:45 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:45 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:45 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:45 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:45 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:45 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:45 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:45 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:45 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:45 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:45 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:22:45 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:22:45 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:45 --> Total execution time: 0.2007
+INFO - 2025-08-25 12:22:50 --> Config Class Initialized
+INFO - 2025-08-25 12:22:50 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:50 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:50 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:50 --> URI Class Initialized
+INFO - 2025-08-25 12:22:50 --> Router Class Initialized
+INFO - 2025-08-25 12:22:50 --> Output Class Initialized
+INFO - 2025-08-25 12:22:50 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:50 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:50 --> Input Class Initialized
+INFO - 2025-08-25 12:22:50 --> Language Class Initialized
+INFO - 2025-08-25 12:22:50 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:50 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:50 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:50 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:50 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:50 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:50 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:50 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:50 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:50 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:50 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:50 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:50 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:50 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:50 --> Config Class Initialized
+INFO - 2025-08-25 12:22:50 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:22:50 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:22:50 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:22:50 --> URI Class Initialized
+INFO - 2025-08-25 12:22:50 --> Router Class Initialized
+INFO - 2025-08-25 12:22:50 --> Output Class Initialized
+INFO - 2025-08-25 12:22:50 --> Security Class Initialized
+DEBUG - 2025-08-25 12:22:50 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:22:50 --> Input Class Initialized
+INFO - 2025-08-25 12:22:50 --> Language Class Initialized
+INFO - 2025-08-25 12:22:50 --> Loader Class Initialized
+INFO - 2025-08-25 12:22:50 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:22:50 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:22:50 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:22:50 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:22:50 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:22:50 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:22:50 --> Cart Class Initialized
+INFO - 2025-08-25 12:22:50 --> Controller Class Initialized
+INFO - 2025-08-25 12:22:50 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:22:50 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:22:50 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:22:50 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:22:51 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:22:51 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintBuy.php
+INFO - 2025-08-25 19:22:51 --> Final output sent to browser
+DEBUG - 2025-08-25 19:22:51 --> Total execution time: 0.2165
+INFO - 2025-08-25 12:23:05 --> Config Class Initialized
+INFO - 2025-08-25 12:23:05 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:05 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:05 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:05 --> URI Class Initialized
+INFO - 2025-08-25 12:23:05 --> Router Class Initialized
+INFO - 2025-08-25 12:23:05 --> Output Class Initialized
+INFO - 2025-08-25 12:23:05 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:05 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:05 --> Input Class Initialized
+INFO - 2025-08-25 12:23:05 --> Language Class Initialized
+INFO - 2025-08-25 12:23:05 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:05 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:05 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:05 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:05 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:05 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:05 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:05 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:05 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:05 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:05 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:05 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:05 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:05 --> Cart class already loaded. Second attempt ignored.
+ERROR - 2025-08-25 19:23:05 --> PRINT ACTION HIT type=BUY id=1371
+ERROR - 2025-08-25 19:23:05 --> RAW_IN={"cabang":[{"nama":"I love Emas Makassar","alamat":"Nipah Mall Lt. 1 No. 23A, Panakukang, Kota Makassar, Sulawesi Selatan."},{"nama":"I Love Emas Cikarang","alamat":"AEON Mall Deltamas Lt.2 No. 33B, Kec. Cikarang, Kab. Bekasi, Jawa Barat."}],"payments":["CASH"]}
+ERROR - 2025-08-25 19:23:05 --> PARSED_PAYLOAD={"cabang":[{"nama":"I love Emas Makassar","alamat":"Nipah Mall Lt. 1 No. 23A, Panakukang, Kota Makassar, Sulawesi Selatan."},{"nama":"I Love Emas Cikarang","alamat":"AEON Mall Deltamas Lt.2 No. 33B, Kec. Cikarang, Kab. Bekasi, Jawa Barat."}],"payments":["CASH"]}
+INFO - 2025-08-25 19:23:05 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintBuy.php
+INFO - 2025-08-25 19:23:07 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:07 --> Total execution time: 1.7070
+INFO - 2025-08-25 12:23:08 --> Config Class Initialized
+INFO - 2025-08-25 12:23:08 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:08 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:08 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:08 --> URI Class Initialized
+INFO - 2025-08-25 12:23:08 --> Router Class Initialized
+INFO - 2025-08-25 12:23:08 --> Output Class Initialized
+INFO - 2025-08-25 12:23:08 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:08 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:08 --> Input Class Initialized
+INFO - 2025-08-25 12:23:08 --> Language Class Initialized
+INFO - 2025-08-25 12:23:08 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:08 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:08 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:08 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:08 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:08 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:08 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:08 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:08 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:08 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:08 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:08 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:08 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:08 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:08 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:08 --> Total execution time: 0.1369
+INFO - 2025-08-25 12:23:08 --> Config Class Initialized
+INFO - 2025-08-25 12:23:08 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:08 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:08 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:08 --> URI Class Initialized
+INFO - 2025-08-25 12:23:08 --> Router Class Initialized
+INFO - 2025-08-25 12:23:08 --> Output Class Initialized
+INFO - 2025-08-25 12:23:08 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:08 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:08 --> Input Class Initialized
+INFO - 2025-08-25 12:23:08 --> Language Class Initialized
+INFO - 2025-08-25 12:23:08 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:08 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:08 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:08 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:08 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:08 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:08 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:08 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:08 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:08 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:08 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:23:08 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:23:08 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:23:08 --> Final output sent to browser
+DEBUG - 2025-08-25 12:23:08 --> Total execution time: 0.0832
+INFO - 2025-08-25 12:23:13 --> Config Class Initialized
+INFO - 2025-08-25 12:23:13 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:13 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:13 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:13 --> URI Class Initialized
+INFO - 2025-08-25 12:23:13 --> Router Class Initialized
+INFO - 2025-08-25 12:23:13 --> Output Class Initialized
+INFO - 2025-08-25 12:23:13 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:13 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:13 --> Input Class Initialized
+INFO - 2025-08-25 12:23:13 --> Language Class Initialized
+INFO - 2025-08-25 12:23:13 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:13 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:13 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:13 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:13 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:13 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:13 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:13 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:13 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:13 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:13 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:13 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:13 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:13 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:13 --> File loaded: F:\laragon\www\iloveemas\application\views\Report.php
+INFO - 2025-08-25 19:23:13 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:13 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:13 --> Total execution time: 0.1660
+INFO - 2025-08-25 12:23:14 --> Config Class Initialized
+INFO - 2025-08-25 12:23:14 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:14 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:14 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:14 --> URI Class Initialized
+INFO - 2025-08-25 12:23:14 --> Router Class Initialized
+INFO - 2025-08-25 12:23:14 --> Output Class Initialized
+INFO - 2025-08-25 12:23:14 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:14 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:14 --> Input Class Initialized
+INFO - 2025-08-25 12:23:14 --> Language Class Initialized
+INFO - 2025-08-25 12:23:14 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:14 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:14 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:14 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:14 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:14 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:14 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:14 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:14 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:14 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:14 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:14 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:14 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:15 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:15 --> File loaded: F:\laragon\www\iloveemas\application\views\ReportBuy.php
+INFO - 2025-08-25 19:23:15 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:15 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:15 --> Total execution time: 0.1898
+INFO - 2025-08-25 12:23:17 --> Config Class Initialized
+INFO - 2025-08-25 12:23:17 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:17 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:17 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:17 --> URI Class Initialized
+INFO - 2025-08-25 12:23:17 --> Router Class Initialized
+INFO - 2025-08-25 12:23:17 --> Output Class Initialized
+INFO - 2025-08-25 12:23:17 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:17 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:17 --> Input Class Initialized
+INFO - 2025-08-25 12:23:17 --> Language Class Initialized
+INFO - 2025-08-25 12:23:17 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:17 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:17 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:17 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:17 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:17 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:17 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:17 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:17 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:17 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:17 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:17 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:17 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:17 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:18 --> File loaded: F:\laragon\www\iloveemas\application\views\ReportBuyDetail.php
+INFO - 2025-08-25 19:23:18 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:18 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:18 --> Total execution time: 0.2586
+INFO - 2025-08-25 12:23:24 --> Config Class Initialized
+INFO - 2025-08-25 12:23:24 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:24 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:24 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:24 --> URI Class Initialized
+INFO - 2025-08-25 12:23:24 --> Router Class Initialized
+INFO - 2025-08-25 12:23:24 --> Output Class Initialized
+INFO - 2025-08-25 12:23:24 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:24 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:24 --> Input Class Initialized
+INFO - 2025-08-25 12:23:24 --> Language Class Initialized
+INFO - 2025-08-25 12:23:24 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:24 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:24 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:24 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:24 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:24 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:24 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:24 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:24 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:24 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:24 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:24 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:24 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:25 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:25 --> File loaded: F:\laragon\www\iloveemas\application\views\ReportBuy.php
+INFO - 2025-08-25 19:23:25 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:25 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:25 --> Total execution time: 0.2096
+INFO - 2025-08-25 12:23:31 --> Config Class Initialized
+INFO - 2025-08-25 12:23:31 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:31 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:31 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:31 --> URI Class Initialized
+INFO - 2025-08-25 12:23:31 --> Router Class Initialized
+INFO - 2025-08-25 12:23:31 --> Output Class Initialized
+INFO - 2025-08-25 12:23:31 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:31 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:31 --> Input Class Initialized
+INFO - 2025-08-25 12:23:31 --> Language Class Initialized
+INFO - 2025-08-25 12:23:31 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:31 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:31 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:31 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:31 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:31 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:31 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:31 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:31 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:31 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:31 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:31 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:31 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:31 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:31 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:31 --> Total execution time: 0.2169
+INFO - 2025-08-25 12:23:32 --> Config Class Initialized
+INFO - 2025-08-25 12:23:32 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:32 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:32 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:32 --> URI Class Initialized
+INFO - 2025-08-25 12:23:32 --> Router Class Initialized
+INFO - 2025-08-25 12:23:32 --> Output Class Initialized
+INFO - 2025-08-25 12:23:32 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:32 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:32 --> Input Class Initialized
+INFO - 2025-08-25 12:23:32 --> Language Class Initialized
+INFO - 2025-08-25 12:23:32 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:32 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:32 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:32 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:32 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:32 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:32 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:32 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:32 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:32 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:32 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:32 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:32 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:32 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:32 --> Config Class Initialized
+INFO - 2025-08-25 12:23:32 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:32 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:32 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:32 --> URI Class Initialized
+INFO - 2025-08-25 12:23:32 --> Router Class Initialized
+INFO - 2025-08-25 12:23:32 --> Output Class Initialized
+INFO - 2025-08-25 12:23:32 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:32 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:32 --> Input Class Initialized
+INFO - 2025-08-25 12:23:32 --> Language Class Initialized
+INFO - 2025-08-25 12:23:32 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:32 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:32 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:32 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:32 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:32 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:32 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:32 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:32 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:32 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:32 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:32 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:32 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:32 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:32 --> File loaded: F:\laragon\www\iloveemas\application\views\Buy.php
+INFO - 2025-08-25 19:23:32 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:32 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:32 --> Total execution time: 0.1866
+INFO - 2025-08-25 12:23:33 --> Config Class Initialized
+INFO - 2025-08-25 12:23:33 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:33 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:33 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:33 --> URI Class Initialized
+INFO - 2025-08-25 12:23:33 --> Router Class Initialized
+INFO - 2025-08-25 12:23:33 --> Output Class Initialized
+INFO - 2025-08-25 12:23:33 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:33 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:33 --> Input Class Initialized
+INFO - 2025-08-25 12:23:33 --> Language Class Initialized
+INFO - 2025-08-25 12:23:33 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:33 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:33 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:33 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:33 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:33 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:33 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:33 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:33 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:33 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:33 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:33 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:33 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:33 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:33 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:23:33 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:33 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:33 --> Total execution time: 0.3741
+INFO - 2025-08-25 12:23:39 --> Config Class Initialized
+INFO - 2025-08-25 12:23:39 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:39 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:39 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:39 --> URI Class Initialized
+INFO - 2025-08-25 12:23:39 --> Router Class Initialized
+INFO - 2025-08-25 12:23:39 --> Output Class Initialized
+INFO - 2025-08-25 12:23:39 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:39 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:39 --> Input Class Initialized
+INFO - 2025-08-25 12:23:39 --> Language Class Initialized
+INFO - 2025-08-25 12:23:39 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:39 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:39 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:39 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:39 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:39 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:39 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:39 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:39 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:39 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:39 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:39 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:39 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:39 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:39 --> Config Class Initialized
+INFO - 2025-08-25 12:23:39 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:39 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:39 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:39 --> URI Class Initialized
+INFO - 2025-08-25 12:23:39 --> Router Class Initialized
+INFO - 2025-08-25 12:23:39 --> Output Class Initialized
+INFO - 2025-08-25 12:23:39 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:39 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:39 --> Input Class Initialized
+INFO - 2025-08-25 12:23:39 --> Language Class Initialized
+INFO - 2025-08-25 12:23:39 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:39 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:39 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:39 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:39 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:39 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:39 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:39 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:39 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:39 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:39 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:39 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:39 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:39 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:39 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:23:39 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:23:39 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:39 --> Total execution time: 0.1786
+INFO - 2025-08-25 12:23:44 --> Config Class Initialized
+INFO - 2025-08-25 12:23:44 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:44 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:44 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:44 --> URI Class Initialized
+INFO - 2025-08-25 12:23:44 --> Router Class Initialized
+INFO - 2025-08-25 12:23:44 --> Output Class Initialized
+INFO - 2025-08-25 12:23:44 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:44 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:44 --> Input Class Initialized
+INFO - 2025-08-25 12:23:44 --> Language Class Initialized
+INFO - 2025-08-25 12:23:44 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:44 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:44 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:44 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:44 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:44 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:44 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:44 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:44 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:44 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:44 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:44 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:44 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:44 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:45 --> Config Class Initialized
+INFO - 2025-08-25 12:23:45 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:45 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:45 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:45 --> URI Class Initialized
+INFO - 2025-08-25 12:23:45 --> Router Class Initialized
+INFO - 2025-08-25 12:23:45 --> Output Class Initialized
+INFO - 2025-08-25 12:23:45 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:45 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:45 --> Input Class Initialized
+INFO - 2025-08-25 12:23:45 --> Language Class Initialized
+INFO - 2025-08-25 12:23:45 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:45 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:45 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:45 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:45 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:45 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:45 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:45 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:45 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:45 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:45 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:45 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:45 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:45 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:23:45 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintBuy.php
+INFO - 2025-08-25 19:23:45 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:45 --> Total execution time: 0.2345
+INFO - 2025-08-25 12:23:58 --> Config Class Initialized
+INFO - 2025-08-25 12:23:58 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:23:58 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:23:58 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:23:58 --> URI Class Initialized
+INFO - 2025-08-25 12:23:58 --> Router Class Initialized
+INFO - 2025-08-25 12:23:58 --> Output Class Initialized
+INFO - 2025-08-25 12:23:58 --> Security Class Initialized
+DEBUG - 2025-08-25 12:23:58 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:23:58 --> Input Class Initialized
+INFO - 2025-08-25 12:23:58 --> Language Class Initialized
+INFO - 2025-08-25 12:23:58 --> Loader Class Initialized
+INFO - 2025-08-25 12:23:58 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:23:58 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:23:58 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:23:58 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:23:58 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:23:58 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:23:58 --> Cart Class Initialized
+INFO - 2025-08-25 12:23:58 --> Controller Class Initialized
+INFO - 2025-08-25 12:23:58 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:23:58 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:23:58 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:23:58 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:23:58 --> Cart class already loaded. Second attempt ignored.
+ERROR - 2025-08-25 19:23:58 --> PRINT ACTION HIT type=BUY id=1371
+ERROR - 2025-08-25 19:23:58 --> RAW_IN={"cabang":[{"nama":"I Love Emas BSD ","alamat":"AEON Mall BSD Lt.2 No 58, Jl. BSD Raya Utama, Pagedangan, Kec. Pagedangan, Kab. Tangerang, Banten 15339."}],"payments":["CASH"]}
+ERROR - 2025-08-25 19:23:58 --> PARSED_PAYLOAD={"cabang":[{"nama":"I Love Emas BSD ","alamat":"AEON Mall BSD Lt.2 No 58, Jl. BSD Raya Utama, Pagedangan, Kec. Pagedangan, Kab. Tangerang, Banten 15339."}],"payments":["CASH"]}
+INFO - 2025-08-25 19:23:58 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintBuy.php
+INFO - 2025-08-25 19:23:59 --> Final output sent to browser
+DEBUG - 2025-08-25 19:23:59 --> Total execution time: 0.7081
+INFO - 2025-08-25 12:24:00 --> Config Class Initialized
+INFO - 2025-08-25 12:24:00 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:00 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:00 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:00 --> URI Class Initialized
+INFO - 2025-08-25 12:24:00 --> Router Class Initialized
+INFO - 2025-08-25 12:24:00 --> Output Class Initialized
+INFO - 2025-08-25 12:24:00 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:00 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:00 --> Input Class Initialized
+INFO - 2025-08-25 12:24:00 --> Language Class Initialized
+INFO - 2025-08-25 12:24:00 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:00 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:00 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:00 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:00 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:00 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:00 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:00 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:00 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:00 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:00 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:00 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:00 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:00 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:00 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:00 --> Total execution time: 0.1253
+INFO - 2025-08-25 12:24:00 --> Config Class Initialized
+INFO - 2025-08-25 12:24:00 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:00 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:00 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:00 --> URI Class Initialized
+INFO - 2025-08-25 12:24:00 --> Router Class Initialized
+INFO - 2025-08-25 12:24:00 --> Output Class Initialized
+INFO - 2025-08-25 12:24:00 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:00 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:00 --> Input Class Initialized
+INFO - 2025-08-25 12:24:00 --> Language Class Initialized
+INFO - 2025-08-25 12:24:00 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:00 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:00 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:00 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:00 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:00 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:00 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:00 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:00 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:00 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:00 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:24:00 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:24:00 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:24:00 --> Final output sent to browser
+DEBUG - 2025-08-25 12:24:00 --> Total execution time: 0.0879
+INFO - 2025-08-25 12:24:03 --> Config Class Initialized
+INFO - 2025-08-25 12:24:03 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:03 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:03 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:03 --> URI Class Initialized
+INFO - 2025-08-25 12:24:03 --> Router Class Initialized
+INFO - 2025-08-25 12:24:03 --> Output Class Initialized
+INFO - 2025-08-25 12:24:03 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:03 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:03 --> Input Class Initialized
+INFO - 2025-08-25 12:24:03 --> Language Class Initialized
+INFO - 2025-08-25 12:24:03 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:03 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:03 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:03 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:03 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:03 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:03 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:03 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:03 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:03 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:03 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:03 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:03 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:03 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:03 --> File loaded: F:\laragon\www\iloveemas\application\views\Report.php
+INFO - 2025-08-25 19:24:03 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:03 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:03 --> Total execution time: 0.1716
+INFO - 2025-08-25 12:24:05 --> Config Class Initialized
+INFO - 2025-08-25 12:24:05 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:05 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:05 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:05 --> URI Class Initialized
+INFO - 2025-08-25 12:24:05 --> Router Class Initialized
+INFO - 2025-08-25 12:24:05 --> Output Class Initialized
+INFO - 2025-08-25 12:24:05 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:05 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:05 --> Input Class Initialized
+INFO - 2025-08-25 12:24:05 --> Language Class Initialized
+INFO - 2025-08-25 12:24:05 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:05 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:05 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:05 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:05 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:05 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:05 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:05 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:05 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:05 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:05 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:24:05 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:24:05 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:24:05 --> Final output sent to browser
+DEBUG - 2025-08-25 12:24:05 --> Total execution time: 0.0910
+INFO - 2025-08-25 12:24:06 --> Config Class Initialized
+INFO - 2025-08-25 12:24:06 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:06 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:06 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:06 --> URI Class Initialized
+INFO - 2025-08-25 12:24:06 --> Router Class Initialized
+INFO - 2025-08-25 12:24:06 --> Output Class Initialized
+INFO - 2025-08-25 12:24:06 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:06 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:06 --> Input Class Initialized
+INFO - 2025-08-25 12:24:06 --> Language Class Initialized
+INFO - 2025-08-25 12:24:06 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:06 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:06 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:06 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:06 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:06 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:06 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:06 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:06 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:06 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:06 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:06 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:06 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:06 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:06 --> File loaded: F:\laragon\www\iloveemas\application\views\ListTransaction.php
+INFO - 2025-08-25 19:24:06 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:06 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:06 --> Total execution time: 0.1701
+INFO - 2025-08-25 12:24:06 --> Config Class Initialized
+INFO - 2025-08-25 12:24:06 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:06 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:06 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:06 --> URI Class Initialized
+INFO - 2025-08-25 12:24:06 --> Router Class Initialized
+INFO - 2025-08-25 12:24:06 --> Output Class Initialized
+INFO - 2025-08-25 12:24:06 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:06 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:06 --> Input Class Initialized
+INFO - 2025-08-25 12:24:06 --> Language Class Initialized
+INFO - 2025-08-25 12:24:06 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:06 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:06 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:06 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:06 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:06 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:06 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:06 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:06 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:06 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:06 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:06 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:06 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:06 --> Cart class already loaded. Second attempt ignored.
+DEBUG - 2025-08-25 19:24:07 --> [{"no":1,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-1\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-1","status":"SELESAI","date":"2025-05-13 18:19:28","customer":"INDRA-TEST","qty":2,"price_total":"0"},{"no":2,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-2\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-2","status":"SELESAI","date":"2025-05-13 18:51:04","customer":"DIVA DEVINA","qty":1,"price_total":"1725620"},{"no":3,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-3\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-3","status":"SELESAI","date":"2025-05-13 19:20:05","customer":"DIVA DEVINA","qty":1,"price_total":"17256200"},{"no":4,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-4\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-4","status":"SELESAI","date":"2025-05-23 00:01:28","customer":"DIVA DEVINA","qty":1,"price_total":"8128100"},{"no":5,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-5\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-5","status":"SELESAI","date":"2025-05-24 08:15:27","customer":"DIVA DEVINA","qty":0,"price_total":"0"},{"no":6,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-6\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-6","status":"SELESAI","date":"2025-05-24 10:54:54","customer":"GILANG PRIYATMOKO NUR","qty":1,"price_total":"882783"},{"no":7,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-7\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-7","status":"SELESAI","date":"2025-05-24 10:56:02","customer":"KHOLIPAH","qty":2,"price_total":"10401396"},{"no":8,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-8\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-8","status":"SELESAI","date":"2025-05-24 11:16:08","customer":"NOVIA AMALIA","qty":1,"price_total":"167557"},{"no":9,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-9\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-9","status":"SELESAI","date":"2025-05-24 11:21:37","customer":"HAERUL ANWAR","qty":3,"price_total":"3213858"},{"no":10,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-10\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-10","status":"SELESAI","date":"2025-05-24 11:32:57","customer":"HAERUL ANWAR","qty":0,"price_total":"0"}]
+INFO - 2025-08-25 19:24:07 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:07 --> Total execution time: 0.2287
+INFO - 2025-08-25 12:24:08 --> Config Class Initialized
+INFO - 2025-08-25 12:24:08 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:08 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:08 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:08 --> URI Class Initialized
+INFO - 2025-08-25 12:24:08 --> Router Class Initialized
+INFO - 2025-08-25 12:24:08 --> Output Class Initialized
+INFO - 2025-08-25 12:24:08 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:08 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:08 --> Input Class Initialized
+INFO - 2025-08-25 12:24:08 --> Language Class Initialized
+INFO - 2025-08-25 12:24:08 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:08 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:08 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:08 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:08 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:08 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:08 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:08 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:08 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:08 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:08 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:08 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:08 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:08 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:08 --> File loaded: F:\laragon\www\iloveemas\application\views\CustomerSelect.php
+INFO - 2025-08-25 19:24:08 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:08 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:08 --> Total execution time: 0.3216
+INFO - 2025-08-25 12:24:12 --> Config Class Initialized
+INFO - 2025-08-25 12:24:12 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:12 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:12 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:12 --> URI Class Initialized
+INFO - 2025-08-25 12:24:12 --> Router Class Initialized
+INFO - 2025-08-25 12:24:12 --> Output Class Initialized
+INFO - 2025-08-25 12:24:12 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:12 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:12 --> Input Class Initialized
+INFO - 2025-08-25 12:24:12 --> Language Class Initialized
+INFO - 2025-08-25 12:24:12 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:12 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:12 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:12 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:12 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:12 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:12 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:12 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:12 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:12 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:12 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:12 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:12 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:12 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:12 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:12 --> Total execution time: 0.1303
+INFO - 2025-08-25 12:24:13 --> Config Class Initialized
+INFO - 2025-08-25 12:24:13 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:13 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:13 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:13 --> URI Class Initialized
+INFO - 2025-08-25 12:24:13 --> Router Class Initialized
+INFO - 2025-08-25 12:24:13 --> Output Class Initialized
+INFO - 2025-08-25 12:24:13 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:13 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:13 --> Input Class Initialized
+INFO - 2025-08-25 12:24:13 --> Language Class Initialized
+INFO - 2025-08-25 12:24:13 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:13 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:13 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:13 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:13 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:13 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:13 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:13 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:13 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:13 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:13 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:13 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:13 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:13 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:13 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:13 --> Total execution time: 0.1724
+INFO - 2025-08-25 12:24:14 --> Config Class Initialized
+INFO - 2025-08-25 12:24:14 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:14 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:14 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:14 --> URI Class Initialized
+INFO - 2025-08-25 12:24:14 --> Router Class Initialized
+INFO - 2025-08-25 12:24:14 --> Output Class Initialized
+INFO - 2025-08-25 12:24:14 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:14 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:14 --> Input Class Initialized
+INFO - 2025-08-25 12:24:14 --> Language Class Initialized
+INFO - 2025-08-25 12:24:14 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:14 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:14 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:14 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:14 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:14 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:14 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:14 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:14 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:14 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:14 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:14 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:14 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:14 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:14 --> File loaded: F:\laragon\www\iloveemas\application\views\Buy.php
+INFO - 2025-08-25 19:24:14 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:14 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:14 --> Total execution time: 0.1699
+INFO - 2025-08-25 12:24:15 --> Config Class Initialized
+INFO - 2025-08-25 12:24:15 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:15 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:15 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:15 --> URI Class Initialized
+INFO - 2025-08-25 12:24:15 --> Router Class Initialized
+INFO - 2025-08-25 12:24:15 --> Output Class Initialized
+INFO - 2025-08-25 12:24:15 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:15 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:15 --> Input Class Initialized
+INFO - 2025-08-25 12:24:15 --> Language Class Initialized
+INFO - 2025-08-25 12:24:15 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:15 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:15 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:15 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:15 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:15 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:15 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:15 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:15 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:15 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:15 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:15 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:15 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:15 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:15 --> File loaded: F:\laragon\www\iloveemas\application\views\CustomerSelect.php
+INFO - 2025-08-25 19:24:15 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:15 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:15 --> Total execution time: 0.1483
+INFO - 2025-08-25 12:24:18 --> Config Class Initialized
+INFO - 2025-08-25 12:24:18 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:18 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:18 --> URI Class Initialized
+INFO - 2025-08-25 12:24:18 --> Router Class Initialized
+INFO - 2025-08-25 12:24:18 --> Output Class Initialized
+INFO - 2025-08-25 12:24:18 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:18 --> Input Class Initialized
+INFO - 2025-08-25 12:24:18 --> Language Class Initialized
+INFO - 2025-08-25 12:24:18 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:18 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:18 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:18 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:18 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:18 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:18 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:18 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:18 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:18 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:18 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:18 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:18 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:18 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:18 --> Total execution time: 0.1451
+INFO - 2025-08-25 12:24:18 --> Config Class Initialized
+INFO - 2025-08-25 12:24:18 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:18 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:18 --> URI Class Initialized
+INFO - 2025-08-25 12:24:18 --> Router Class Initialized
+INFO - 2025-08-25 12:24:18 --> Output Class Initialized
+INFO - 2025-08-25 12:24:18 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:18 --> Input Class Initialized
+INFO - 2025-08-25 12:24:18 --> Language Class Initialized
+INFO - 2025-08-25 12:24:18 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:18 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:18 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:18 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:18 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:18 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:18 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:18 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:18 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:18 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:18 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:18 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:18 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:18 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:18 --> Total execution time: 0.1954
+INFO - 2025-08-25 12:24:18 --> Config Class Initialized
+INFO - 2025-08-25 12:24:18 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:18 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:18 --> URI Class Initialized
+INFO - 2025-08-25 12:24:18 --> Router Class Initialized
+INFO - 2025-08-25 12:24:18 --> Output Class Initialized
+INFO - 2025-08-25 12:24:18 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:18 --> Input Class Initialized
+INFO - 2025-08-25 12:24:18 --> Language Class Initialized
+INFO - 2025-08-25 12:24:18 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:18 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:18 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:18 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:18 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:18 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:19 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:19 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:19 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:19 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:19 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:19 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:19 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:19 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:19 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:19 --> Total execution time: 0.1427
+INFO - 2025-08-25 12:24:19 --> Config Class Initialized
+INFO - 2025-08-25 12:24:19 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:19 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:19 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:20 --> URI Class Initialized
+INFO - 2025-08-25 12:24:20 --> Router Class Initialized
+INFO - 2025-08-25 12:24:20 --> Output Class Initialized
+INFO - 2025-08-25 12:24:20 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:20 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:20 --> Input Class Initialized
+INFO - 2025-08-25 12:24:20 --> Language Class Initialized
+INFO - 2025-08-25 12:24:20 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:20 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:20 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:20 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:20 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:20 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:20 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:20 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:20 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:20 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:20 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:20 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:20 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:20 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:20 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:20 --> Total execution time: 0.1311
+INFO - 2025-08-25 12:24:20 --> Config Class Initialized
+INFO - 2025-08-25 12:24:20 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:20 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:20 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:20 --> URI Class Initialized
+INFO - 2025-08-25 12:24:20 --> Router Class Initialized
+INFO - 2025-08-25 12:24:20 --> Output Class Initialized
+INFO - 2025-08-25 12:24:20 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:20 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:20 --> Input Class Initialized
+INFO - 2025-08-25 12:24:20 --> Language Class Initialized
+INFO - 2025-08-25 12:24:20 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:20 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:20 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:20 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:21 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:21 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:21 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:21 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:21 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:21 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:21 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:21 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:21 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:21 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:21 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:21 --> Total execution time: 0.1326
+INFO - 2025-08-25 12:24:23 --> Config Class Initialized
+INFO - 2025-08-25 12:24:23 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:23 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:23 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:23 --> URI Class Initialized
+INFO - 2025-08-25 12:24:23 --> Router Class Initialized
+INFO - 2025-08-25 12:24:23 --> Output Class Initialized
+INFO - 2025-08-25 12:24:23 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:23 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:23 --> Input Class Initialized
+INFO - 2025-08-25 12:24:23 --> Language Class Initialized
+INFO - 2025-08-25 12:24:23 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:23 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:23 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:23 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:23 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:23 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:23 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:23 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:23 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:23 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:23 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:23 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:23 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:23 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:23 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:23 --> Total execution time: 0.1380
+INFO - 2025-08-25 12:24:23 --> Config Class Initialized
+INFO - 2025-08-25 12:24:23 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:23 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:23 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:23 --> URI Class Initialized
+INFO - 2025-08-25 12:24:23 --> Router Class Initialized
+INFO - 2025-08-25 12:24:23 --> Output Class Initialized
+INFO - 2025-08-25 12:24:23 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:23 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:23 --> Input Class Initialized
+INFO - 2025-08-25 12:24:23 --> Language Class Initialized
+INFO - 2025-08-25 12:24:23 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:23 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:23 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:23 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:23 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:23 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:23 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:23 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:23 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:23 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:23 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:23 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:23 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:23 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:23 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:23 --> Total execution time: 0.1320
+INFO - 2025-08-25 12:24:24 --> Config Class Initialized
+INFO - 2025-08-25 12:24:24 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:24 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:24 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:24 --> URI Class Initialized
+INFO - 2025-08-25 12:24:24 --> Router Class Initialized
+INFO - 2025-08-25 12:24:24 --> Output Class Initialized
+INFO - 2025-08-25 12:24:24 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:24 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:24 --> Input Class Initialized
+INFO - 2025-08-25 12:24:24 --> Language Class Initialized
+INFO - 2025-08-25 12:24:24 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:24 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:24 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:24 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:24 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:24 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:25 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:25 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:25 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:25 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:25 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:25 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:25 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:25 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:25 --> File loaded: F:\laragon\www\iloveemas\application\views\Sell.php
+INFO - 2025-08-25 19:24:25 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:25 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:25 --> Total execution time: 0.1707
+INFO - 2025-08-25 12:24:26 --> Config Class Initialized
+INFO - 2025-08-25 12:24:26 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:26 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:26 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:26 --> URI Class Initialized
+INFO - 2025-08-25 12:24:26 --> Router Class Initialized
+INFO - 2025-08-25 12:24:26 --> Output Class Initialized
+INFO - 2025-08-25 12:24:26 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:26 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:26 --> Input Class Initialized
+INFO - 2025-08-25 12:24:26 --> Language Class Initialized
+INFO - 2025-08-25 12:24:26 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:26 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:26 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:26 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:26 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:26 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:26 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:26 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:26 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:26 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:26 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:26 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:26 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:26 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:26 --> File loaded: F:\laragon\www\iloveemas\application\views\SellCart.php
+INFO - 2025-08-25 19:24:26 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:26 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:26 --> Total execution time: 0.1553
+INFO - 2025-08-25 12:24:30 --> Config Class Initialized
+INFO - 2025-08-25 12:24:30 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:30 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:30 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:30 --> URI Class Initialized
+INFO - 2025-08-25 12:24:30 --> Router Class Initialized
+INFO - 2025-08-25 12:24:30 --> Output Class Initialized
+INFO - 2025-08-25 12:24:30 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:30 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:30 --> Input Class Initialized
+INFO - 2025-08-25 12:24:30 --> Language Class Initialized
+INFO - 2025-08-25 12:24:30 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:30 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:30 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:30 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:30 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:30 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:30 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:30 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:30 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:30 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:30 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:30 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:30 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:30 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:30 --> Config Class Initialized
+INFO - 2025-08-25 12:24:30 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:30 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:30 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:30 --> URI Class Initialized
+INFO - 2025-08-25 12:24:30 --> Router Class Initialized
+INFO - 2025-08-25 12:24:30 --> Output Class Initialized
+INFO - 2025-08-25 12:24:30 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:30 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:30 --> Input Class Initialized
+INFO - 2025-08-25 12:24:30 --> Language Class Initialized
+INFO - 2025-08-25 12:24:30 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:30 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:30 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:30 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:30 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:30 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:30 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:30 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:30 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:30 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:30 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:30 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:30 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:31 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:31 --> File loaded: F:\laragon\www\iloveemas\application\views\SellCart.php
+INFO - 2025-08-25 19:24:31 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:31 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:31 --> Total execution time: 0.1895
+INFO - 2025-08-25 12:24:34 --> Config Class Initialized
+INFO - 2025-08-25 12:24:34 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:34 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:34 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:34 --> URI Class Initialized
+INFO - 2025-08-25 12:24:34 --> Router Class Initialized
+INFO - 2025-08-25 12:24:34 --> Output Class Initialized
+INFO - 2025-08-25 12:24:34 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:34 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:34 --> Input Class Initialized
+INFO - 2025-08-25 12:24:34 --> Language Class Initialized
+INFO - 2025-08-25 12:24:34 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:34 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:35 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:35 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:35 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:35 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:35 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:35 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:35 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:35 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:35 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:35 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:35 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:35 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:35 --> Config Class Initialized
+INFO - 2025-08-25 12:24:35 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:35 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:35 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:35 --> URI Class Initialized
+INFO - 2025-08-25 12:24:35 --> Router Class Initialized
+INFO - 2025-08-25 12:24:35 --> Output Class Initialized
+INFO - 2025-08-25 12:24:35 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:35 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:35 --> Input Class Initialized
+INFO - 2025-08-25 12:24:35 --> Language Class Initialized
+INFO - 2025-08-25 12:24:35 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:35 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:35 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:35 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:35 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:35 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:35 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:35 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:35 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:35 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:35 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:35 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:35 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:35 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:35 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintSell.php
+INFO - 2025-08-25 19:24:35 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:35 --> Total execution time: 0.1458
+INFO - 2025-08-25 12:24:52 --> Config Class Initialized
+INFO - 2025-08-25 12:24:52 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:52 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:52 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:52 --> URI Class Initialized
+INFO - 2025-08-25 12:24:52 --> Router Class Initialized
+INFO - 2025-08-25 12:24:52 --> Output Class Initialized
+INFO - 2025-08-25 12:24:52 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:52 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:52 --> Input Class Initialized
+INFO - 2025-08-25 12:24:52 --> Language Class Initialized
+INFO - 2025-08-25 12:24:52 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:52 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:52 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:52 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:52 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:53 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:53 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:53 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:53 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:53 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:53 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:53 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:53 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:53 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:53 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:53 --> Total execution time: 1.4085
+INFO - 2025-08-25 12:24:53 --> Config Class Initialized
+INFO - 2025-08-25 12:24:53 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:53 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:53 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:53 --> URI Class Initialized
+INFO - 2025-08-25 12:24:53 --> Router Class Initialized
+INFO - 2025-08-25 12:24:53 --> Output Class Initialized
+INFO - 2025-08-25 12:24:53 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:53 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:53 --> Input Class Initialized
+INFO - 2025-08-25 12:24:53 --> Language Class Initialized
+INFO - 2025-08-25 12:24:53 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:54 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:54 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:54 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:54 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:54 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:54 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:54 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:54 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:54 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:54 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:54 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:54 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:54 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:54 --> File loaded: F:\laragon\www\iloveemas\application\views\ReportSell.php
+INFO - 2025-08-25 19:24:54 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:54 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:54 --> Total execution time: 0.4341
+INFO - 2025-08-25 12:24:56 --> Config Class Initialized
+INFO - 2025-08-25 12:24:56 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:56 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:56 --> URI Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> No URI present. Default controller set.
+INFO - 2025-08-25 12:24:56 --> Router Class Initialized
+INFO - 2025-08-25 12:24:56 --> Output Class Initialized
+INFO - 2025-08-25 12:24:56 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:56 --> Input Class Initialized
+INFO - 2025-08-25 12:24:56 --> Language Class Initialized
+INFO - 2025-08-25 12:24:56 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:56 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:56 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:56 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:56 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:56 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:56 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:56 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:56 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:56 --> Config Class Initialized
+INFO - 2025-08-25 12:24:56 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:56 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:56 --> URI Class Initialized
+INFO - 2025-08-25 12:24:56 --> Router Class Initialized
+INFO - 2025-08-25 12:24:56 --> Output Class Initialized
+INFO - 2025-08-25 12:24:56 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:56 --> Input Class Initialized
+INFO - 2025-08-25 12:24:56 --> Language Class Initialized
+INFO - 2025-08-25 12:24:56 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:56 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:56 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:56 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:56 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:56 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:56 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:56 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:56 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:56 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:56 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:24:56 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:24:56 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:24:56 --> Final output sent to browser
+DEBUG - 2025-08-25 12:24:56 --> Total execution time: 0.1112
+INFO - 2025-08-25 12:24:58 --> Config Class Initialized
+INFO - 2025-08-25 12:24:58 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:58 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:58 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:58 --> URI Class Initialized
+INFO - 2025-08-25 12:24:58 --> Router Class Initialized
+INFO - 2025-08-25 12:24:58 --> Output Class Initialized
+INFO - 2025-08-25 12:24:58 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:58 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:58 --> Input Class Initialized
+INFO - 2025-08-25 12:24:58 --> Language Class Initialized
+INFO - 2025-08-25 12:24:58 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:58 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:58 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:58 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:58 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:58 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:58 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:58 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:58 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:58 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:58 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:58 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:58 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:58 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:24:58 --> File loaded: F:\laragon\www\iloveemas\application\views\ListTransaction.php
+INFO - 2025-08-25 19:24:58 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:24:58 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:58 --> Total execution time: 0.1827
+INFO - 2025-08-25 12:24:58 --> Config Class Initialized
+INFO - 2025-08-25 12:24:58 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:24:58 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:24:58 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:24:58 --> URI Class Initialized
+INFO - 2025-08-25 12:24:58 --> Router Class Initialized
+INFO - 2025-08-25 12:24:58 --> Output Class Initialized
+INFO - 2025-08-25 12:24:58 --> Security Class Initialized
+DEBUG - 2025-08-25 12:24:58 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:24:58 --> Input Class Initialized
+INFO - 2025-08-25 12:24:58 --> Language Class Initialized
+INFO - 2025-08-25 12:24:58 --> Loader Class Initialized
+INFO - 2025-08-25 12:24:58 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:24:58 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:24:58 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:24:58 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:24:58 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:24:58 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:24:58 --> Cart Class Initialized
+INFO - 2025-08-25 12:24:58 --> Controller Class Initialized
+INFO - 2025-08-25 12:24:58 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:24:58 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:24:58 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:24:58 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:24:58 --> Cart class already loaded. Second attempt ignored.
+DEBUG - 2025-08-25 19:24:58 --> [{"no":1,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-1\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-1","status":"SELESAI","date":"2025-05-13 18:19:28","customer":"INDRA-TEST","qty":2,"price_total":"0"},{"no":2,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-2\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-2","status":"SELESAI","date":"2025-05-13 18:51:04","customer":"DIVA DEVINA","qty":1,"price_total":"1725620"},{"no":3,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-3\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-3","status":"SELESAI","date":"2025-05-13 19:20:05","customer":"DIVA DEVINA","qty":1,"price_total":"17256200"},{"no":4,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-4\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-4","status":"SELESAI","date":"2025-05-23 00:01:28","customer":"DIVA DEVINA","qty":1,"price_total":"8128100"},{"no":5,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-5\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-5","status":"SELESAI","date":"2025-05-24 08:15:27","customer":"DIVA DEVINA","qty":0,"price_total":"0"},{"no":6,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-6\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-6","status":"SELESAI","date":"2025-05-24 10:54:54","customer":"GILANG PRIYATMOKO NUR","qty":1,"price_total":"882783"},{"no":7,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-7\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-7","status":"SELESAI","date":"2025-05-24 10:56:02","customer":"KHOLIPAH","qty":2,"price_total":"10401396"},{"no":8,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-8\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-8","status":"SELESAI","date":"2025-05-24 11:16:08","customer":"NOVIA AMALIA","qty":1,"price_total":"167557"},{"no":9,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-9\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-9","status":"SELESAI","date":"2025-05-24 11:21:37","customer":"HAERUL ANWAR","qty":3,"price_total":"3213858"},{"no":10,"action":"<a href=\"http:\/\/localhost\/iloveemas\/transaction\/redirect\/PB-2505-10\" class=\"btn btn-primary btn-sm\">Action<\/a>","transaction":"BUY","no_order":"PB-2505-10","status":"SELESAI","date":"2025-05-24 11:32:57","customer":"HAERUL ANWAR","qty":0,"price_total":"0"}]
+INFO - 2025-08-25 19:24:58 --> Final output sent to browser
+DEBUG - 2025-08-25 19:24:58 --> Total execution time: 0.2130
+INFO - 2025-08-25 12:25:00 --> Config Class Initialized
+INFO - 2025-08-25 12:25:00 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:00 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:00 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:00 --> URI Class Initialized
+INFO - 2025-08-25 12:25:00 --> Router Class Initialized
+INFO - 2025-08-25 12:25:00 --> Output Class Initialized
+INFO - 2025-08-25 12:25:00 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:00 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:00 --> Input Class Initialized
+INFO - 2025-08-25 12:25:00 --> Language Class Initialized
+INFO - 2025-08-25 12:25:00 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:00 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:00 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:00 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:00 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:00 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:00 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:00 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:00 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:00 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:00 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:00 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:00 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:00 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:00 --> File loaded: F:\laragon\www\iloveemas\application\views\CustomerSelect.php
+INFO - 2025-08-25 19:25:00 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:25:00 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:00 --> Total execution time: 0.3088
+INFO - 2025-08-25 12:25:06 --> Config Class Initialized
+INFO - 2025-08-25 12:25:06 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:06 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:06 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:06 --> URI Class Initialized
+INFO - 2025-08-25 12:25:06 --> Router Class Initialized
+INFO - 2025-08-25 12:25:06 --> Output Class Initialized
+INFO - 2025-08-25 12:25:06 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:06 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:06 --> Input Class Initialized
+INFO - 2025-08-25 12:25:06 --> Language Class Initialized
+INFO - 2025-08-25 12:25:06 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:06 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:06 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:06 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:06 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:06 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:06 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:06 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:06 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:06 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:06 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:06 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:06 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:06 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:06 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:06 --> Total execution time: 0.4038
+INFO - 2025-08-25 12:25:09 --> Config Class Initialized
+INFO - 2025-08-25 12:25:09 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:09 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:09 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:09 --> URI Class Initialized
+INFO - 2025-08-25 12:25:09 --> Router Class Initialized
+INFO - 2025-08-25 12:25:09 --> Output Class Initialized
+INFO - 2025-08-25 12:25:09 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:09 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:09 --> Input Class Initialized
+INFO - 2025-08-25 12:25:09 --> Language Class Initialized
+INFO - 2025-08-25 12:25:09 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:09 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:09 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:09 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:09 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:09 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:09 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:09 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:09 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:09 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:09 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:09 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:09 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:09 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:09 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:09 --> Total execution time: 0.1302
+INFO - 2025-08-25 12:25:09 --> Config Class Initialized
+INFO - 2025-08-25 12:25:09 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:09 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:09 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:09 --> URI Class Initialized
+INFO - 2025-08-25 12:25:09 --> Router Class Initialized
+INFO - 2025-08-25 12:25:09 --> Output Class Initialized
+INFO - 2025-08-25 12:25:09 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:09 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:09 --> Input Class Initialized
+INFO - 2025-08-25 12:25:09 --> Language Class Initialized
+INFO - 2025-08-25 12:25:09 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:09 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:09 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:09 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:09 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:09 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:09 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:09 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:09 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:09 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:09 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:09 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:09 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:09 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:09 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:09 --> Total execution time: 0.1324
+INFO - 2025-08-25 12:25:11 --> Config Class Initialized
+INFO - 2025-08-25 12:25:11 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:11 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:11 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:11 --> URI Class Initialized
+INFO - 2025-08-25 12:25:11 --> Router Class Initialized
+INFO - 2025-08-25 12:25:11 --> Output Class Initialized
+INFO - 2025-08-25 12:25:11 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:11 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:11 --> Input Class Initialized
+INFO - 2025-08-25 12:25:11 --> Language Class Initialized
+INFO - 2025-08-25 12:25:11 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:11 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:11 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:11 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:11 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:11 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:11 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:11 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:11 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:11 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:11 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:11 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:11 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:11 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:11 --> File loaded: F:\laragon\www\iloveemas\application\views\Buy.php
+INFO - 2025-08-25 19:25:11 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:25:11 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:11 --> Total execution time: 0.1936
+INFO - 2025-08-25 12:25:12 --> Config Class Initialized
+INFO - 2025-08-25 12:25:12 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:12 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:12 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:12 --> URI Class Initialized
+INFO - 2025-08-25 12:25:12 --> Router Class Initialized
+INFO - 2025-08-25 12:25:12 --> Output Class Initialized
+INFO - 2025-08-25 12:25:12 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:12 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:12 --> Input Class Initialized
+INFO - 2025-08-25 12:25:12 --> Language Class Initialized
+INFO - 2025-08-25 12:25:12 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:12 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:12 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:12 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:12 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:12 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:12 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:12 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:12 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:12 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:12 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:12 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:12 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:12 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:12 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:25:12 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:25:12 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:12 --> Total execution time: 0.2065
+INFO - 2025-08-25 12:25:16 --> Config Class Initialized
+INFO - 2025-08-25 12:25:16 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:16 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:16 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:16 --> URI Class Initialized
+INFO - 2025-08-25 12:25:16 --> Router Class Initialized
+INFO - 2025-08-25 12:25:16 --> Output Class Initialized
+INFO - 2025-08-25 12:25:16 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:16 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:16 --> Input Class Initialized
+INFO - 2025-08-25 12:25:16 --> Language Class Initialized
+INFO - 2025-08-25 12:25:16 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:16 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:16 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:16 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:16 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:16 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:16 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:16 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:16 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:16 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:16 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:16 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:16 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:16 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:16 --> Config Class Initialized
+INFO - 2025-08-25 12:25:16 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:16 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:16 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:16 --> URI Class Initialized
+INFO - 2025-08-25 12:25:16 --> Router Class Initialized
+INFO - 2025-08-25 12:25:16 --> Output Class Initialized
+INFO - 2025-08-25 12:25:17 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:17 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:17 --> Input Class Initialized
+INFO - 2025-08-25 12:25:17 --> Language Class Initialized
+INFO - 2025-08-25 12:25:17 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:17 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:17 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:17 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:17 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:17 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:17 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:17 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:17 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:17 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:17 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:17 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:17 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:17 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:17 --> File loaded: F:\laragon\www\iloveemas\application\views\BuyCart.php
+INFO - 2025-08-25 19:25:17 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:25:17 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:17 --> Total execution time: 0.1606
+INFO - 2025-08-25 12:25:21 --> Config Class Initialized
+INFO - 2025-08-25 12:25:21 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:21 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:21 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:21 --> URI Class Initialized
+INFO - 2025-08-25 12:25:21 --> Router Class Initialized
+INFO - 2025-08-25 12:25:21 --> Output Class Initialized
+INFO - 2025-08-25 12:25:21 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:21 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:21 --> Input Class Initialized
+INFO - 2025-08-25 12:25:21 --> Language Class Initialized
+INFO - 2025-08-25 12:25:21 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:21 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:21 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:21 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:21 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:21 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:21 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:21 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:21 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:21 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:21 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:21 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:21 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:21 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:21 --> Config Class Initialized
+INFO - 2025-08-25 12:25:21 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:21 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:21 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:21 --> URI Class Initialized
+INFO - 2025-08-25 12:25:21 --> Router Class Initialized
+INFO - 2025-08-25 12:25:21 --> Output Class Initialized
+INFO - 2025-08-25 12:25:21 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:21 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:21 --> Input Class Initialized
+INFO - 2025-08-25 12:25:21 --> Language Class Initialized
+INFO - 2025-08-25 12:25:21 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:21 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:21 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:21 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:21 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:21 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:21 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:21 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:21 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:21 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:21 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:21 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:21 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:21 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:21 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintBuy.php
+INFO - 2025-08-25 19:25:21 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:21 --> Total execution time: 0.1965
+INFO - 2025-08-25 12:25:24 --> Config Class Initialized
+INFO - 2025-08-25 12:25:24 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:24 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:24 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:24 --> URI Class Initialized
+INFO - 2025-08-25 12:25:24 --> Router Class Initialized
+INFO - 2025-08-25 12:25:24 --> Output Class Initialized
+INFO - 2025-08-25 12:25:24 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:24 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:24 --> Input Class Initialized
+INFO - 2025-08-25 12:25:24 --> Language Class Initialized
+INFO - 2025-08-25 12:25:24 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:24 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:24 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:24 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:24 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:24 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:24 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:24 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:24 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:24 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:24 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:24 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:24 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:24 --> Cart class already loaded. Second attempt ignored.
+ERROR - 2025-08-25 19:25:24 --> PRINT ACTION HIT type=BUY id=1372
+ERROR - 2025-08-25 19:25:24 --> RAW_IN={"cabang":[],"payments":[]}
+ERROR - 2025-08-25 19:25:24 --> PARSED_PAYLOAD={"cabang":[],"payments":[]}
+INFO - 2025-08-25 19:25:25 --> File loaded: F:\laragon\www\iloveemas\application\views\PrintBuy.php
+INFO - 2025-08-25 19:25:26 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:26 --> Total execution time: 1.6442
+INFO - 2025-08-25 12:25:27 --> Config Class Initialized
+INFO - 2025-08-25 12:25:27 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:27 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:27 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:27 --> URI Class Initialized
+INFO - 2025-08-25 12:25:27 --> Router Class Initialized
+INFO - 2025-08-25 12:25:27 --> Output Class Initialized
+INFO - 2025-08-25 12:25:27 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:27 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:27 --> Input Class Initialized
+INFO - 2025-08-25 12:25:27 --> Language Class Initialized
+INFO - 2025-08-25 12:25:27 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:27 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:27 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:27 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:27 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:27 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:27 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:27 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:27 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:27 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:27 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:27 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:27 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:27 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:28 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:28 --> Total execution time: 0.2629
+INFO - 2025-08-25 12:25:28 --> Config Class Initialized
+INFO - 2025-08-25 12:25:28 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:28 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:28 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:28 --> URI Class Initialized
+INFO - 2025-08-25 12:25:28 --> Router Class Initialized
+INFO - 2025-08-25 12:25:28 --> Output Class Initialized
+INFO - 2025-08-25 12:25:28 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:28 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:28 --> Input Class Initialized
+INFO - 2025-08-25 12:25:28 --> Language Class Initialized
+INFO - 2025-08-25 12:25:28 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:28 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:28 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:28 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:28 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:28 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:28 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:28 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:28 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:28 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:28 --> File loaded: F:\laragon\www\iloveemas\application\views\Sidebar.php
+INFO - 2025-08-25 12:25:28 --> File loaded: F:\laragon\www\iloveemas\application\views\Dashboard.php
+INFO - 2025-08-25 12:25:28 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 12:25:28 --> Final output sent to browser
+DEBUG - 2025-08-25 12:25:28 --> Total execution time: 0.0845
+INFO - 2025-08-25 12:25:56 --> Config Class Initialized
+INFO - 2025-08-25 12:25:56 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:56 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:56 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:56 --> URI Class Initialized
+INFO - 2025-08-25 12:25:56 --> Router Class Initialized
+INFO - 2025-08-25 12:25:56 --> Output Class Initialized
+INFO - 2025-08-25 12:25:56 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:56 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:56 --> Input Class Initialized
+INFO - 2025-08-25 12:25:56 --> Language Class Initialized
+INFO - 2025-08-25 12:25:56 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:56 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:56 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:56 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:56 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:56 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:56 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:56 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:56 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:56 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:56 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:56 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:56 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:56 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:56 --> File loaded: F:\laragon\www\iloveemas\application\views\Report.php
+INFO - 2025-08-25 19:25:56 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:25:56 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:56 --> Total execution time: 0.3321
+INFO - 2025-08-25 12:25:57 --> Config Class Initialized
+INFO - 2025-08-25 12:25:57 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:25:57 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:25:57 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:25:57 --> URI Class Initialized
+INFO - 2025-08-25 12:25:57 --> Router Class Initialized
+INFO - 2025-08-25 12:25:57 --> Output Class Initialized
+INFO - 2025-08-25 12:25:57 --> Security Class Initialized
+DEBUG - 2025-08-25 12:25:57 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:25:57 --> Input Class Initialized
+INFO - 2025-08-25 12:25:57 --> Language Class Initialized
+INFO - 2025-08-25 12:25:57 --> Loader Class Initialized
+INFO - 2025-08-25 12:25:57 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:25:57 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:25:57 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:25:57 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:25:57 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:25:57 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:25:57 --> Cart Class Initialized
+INFO - 2025-08-25 12:25:57 --> Controller Class Initialized
+INFO - 2025-08-25 12:25:57 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:25:57 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:25:57 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:25:57 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:25:57 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:25:57 --> File loaded: F:\laragon\www\iloveemas\application\views\ReportSell.php
+INFO - 2025-08-25 19:25:57 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:25:57 --> Final output sent to browser
+DEBUG - 2025-08-25 19:25:57 --> Total execution time: 0.1660
+INFO - 2025-08-25 12:26:03 --> Config Class Initialized
+INFO - 2025-08-25 12:26:03 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:03 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:03 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:03 --> URI Class Initialized
+INFO - 2025-08-25 12:26:03 --> Router Class Initialized
+INFO - 2025-08-25 12:26:03 --> Output Class Initialized
+INFO - 2025-08-25 12:26:03 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:03 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:03 --> Input Class Initialized
+INFO - 2025-08-25 12:26:03 --> Language Class Initialized
+INFO - 2025-08-25 12:26:03 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:03 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:03 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:03 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:03 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:03 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:03 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:03 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:03 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:03 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:03 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:03 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:03 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:04 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:26:04 --> Final output sent to browser
+DEBUG - 2025-08-25 19:26:04 --> Total execution time: 0.2248
+INFO - 2025-08-25 12:26:04 --> Config Class Initialized
+INFO - 2025-08-25 12:26:04 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:04 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:04 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:04 --> URI Class Initialized
+INFO - 2025-08-25 12:26:04 --> Router Class Initialized
+INFO - 2025-08-25 12:26:04 --> Output Class Initialized
+INFO - 2025-08-25 12:26:04 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:04 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:04 --> Input Class Initialized
+INFO - 2025-08-25 12:26:04 --> Language Class Initialized
+INFO - 2025-08-25 12:26:04 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:04 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:04 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:04 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:04 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:04 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:04 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:04 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:04 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:04 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:04 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:04 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:04 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:04 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:04 --> Config Class Initialized
+INFO - 2025-08-25 12:26:04 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:04 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:04 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:04 --> URI Class Initialized
+INFO - 2025-08-25 12:26:04 --> Router Class Initialized
+INFO - 2025-08-25 12:26:04 --> Output Class Initialized
+INFO - 2025-08-25 12:26:04 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:04 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:04 --> Input Class Initialized
+INFO - 2025-08-25 12:26:04 --> Language Class Initialized
+INFO - 2025-08-25 12:26:04 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:04 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:04 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:04 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:04 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:04 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:04 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:04 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:04 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:04 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:04 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:04 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:04 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:04 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:26:04 --> File loaded: F:\laragon\www\iloveemas\application\views\Sell.php
+INFO - 2025-08-25 19:26:04 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:26:04 --> Final output sent to browser
+DEBUG - 2025-08-25 19:26:04 --> Total execution time: 0.2592
+INFO - 2025-08-25 12:26:05 --> Config Class Initialized
+INFO - 2025-08-25 12:26:05 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:05 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:05 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:05 --> URI Class Initialized
+INFO - 2025-08-25 12:26:05 --> Router Class Initialized
+INFO - 2025-08-25 12:26:05 --> Output Class Initialized
+INFO - 2025-08-25 12:26:05 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:05 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:05 --> Input Class Initialized
+INFO - 2025-08-25 12:26:05 --> Language Class Initialized
+INFO - 2025-08-25 12:26:05 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:05 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:05 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:05 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:05 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:05 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:05 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:05 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:05 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:05 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:05 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:05 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:05 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:05 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:26:05 --> File loaded: F:\laragon\www\iloveemas\application\views\SellCart.php
+INFO - 2025-08-25 19:26:05 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:26:05 --> Final output sent to browser
+DEBUG - 2025-08-25 19:26:05 --> Total execution time: 0.1475
+INFO - 2025-08-25 12:26:16 --> Config Class Initialized
+INFO - 2025-08-25 12:26:16 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:16 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:16 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:16 --> URI Class Initialized
+INFO - 2025-08-25 12:26:16 --> Router Class Initialized
+INFO - 2025-08-25 12:26:16 --> Output Class Initialized
+INFO - 2025-08-25 12:26:16 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:16 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:16 --> Input Class Initialized
+INFO - 2025-08-25 12:26:16 --> Language Class Initialized
+INFO - 2025-08-25 12:26:16 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:16 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:16 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:16 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:16 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:16 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:16 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:16 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:16 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:16 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:16 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:16 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:16 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:16 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:17 --> Config Class Initialized
+INFO - 2025-08-25 12:26:17 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:17 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:17 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:17 --> URI Class Initialized
+INFO - 2025-08-25 12:26:17 --> Router Class Initialized
+INFO - 2025-08-25 12:26:17 --> Output Class Initialized
+INFO - 2025-08-25 12:26:17 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:17 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:17 --> Input Class Initialized
+INFO - 2025-08-25 12:26:17 --> Language Class Initialized
+INFO - 2025-08-25 12:26:17 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:17 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:17 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:17 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:17 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:17 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:17 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:17 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:17 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:17 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:17 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:17 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:17 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:17 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:26:17 --> File loaded: F:\laragon\www\iloveemas\application\views\SellCart.php
+INFO - 2025-08-25 19:26:17 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:26:17 --> Final output sent to browser
+DEBUG - 2025-08-25 19:26:17 --> Total execution time: 0.2103
+INFO - 2025-08-25 12:26:27 --> Config Class Initialized
+INFO - 2025-08-25 12:26:27 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:27 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:27 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:27 --> URI Class Initialized
+INFO - 2025-08-25 12:26:27 --> Router Class Initialized
+INFO - 2025-08-25 12:26:27 --> Output Class Initialized
+INFO - 2025-08-25 12:26:27 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:27 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:27 --> Input Class Initialized
+INFO - 2025-08-25 12:26:27 --> Language Class Initialized
+INFO - 2025-08-25 12:26:27 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:27 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:27 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:27 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:27 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:27 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:27 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:27 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:27 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:27 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:27 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:27 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:27 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:27 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:27 --> Config Class Initialized
+INFO - 2025-08-25 12:26:27 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:26:27 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:26:27 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:26:27 --> URI Class Initialized
+INFO - 2025-08-25 12:26:27 --> Router Class Initialized
+INFO - 2025-08-25 12:26:27 --> Output Class Initialized
+INFO - 2025-08-25 12:26:27 --> Security Class Initialized
+DEBUG - 2025-08-25 12:26:27 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:26:27 --> Input Class Initialized
+INFO - 2025-08-25 12:26:27 --> Language Class Initialized
+INFO - 2025-08-25 12:26:27 --> Loader Class Initialized
+INFO - 2025-08-25 12:26:27 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:26:27 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:26:27 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:26:27 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:26:27 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:26:27 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:26:27 --> Cart Class Initialized
+INFO - 2025-08-25 12:26:27 --> Controller Class Initialized
+INFO - 2025-08-25 12:26:27 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:26:27 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:26:27 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:26:27 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:26:27 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:26:27 --> File loaded: F:\laragon\www\iloveemas\application\views\SellCart.php
+INFO - 2025-08-25 19:26:27 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:26:27 --> Final output sent to browser
+DEBUG - 2025-08-25 19:26:27 --> Total execution time: 0.1600
+INFO - 2025-08-25 12:29:14 --> Config Class Initialized
+INFO - 2025-08-25 12:29:14 --> Hooks Class Initialized
+DEBUG - 2025-08-25 12:29:14 --> UTF-8 Support Enabled
+INFO - 2025-08-25 12:29:14 --> Utf8 Class Initialized
+INFO - 2025-08-25 12:29:14 --> URI Class Initialized
+INFO - 2025-08-25 12:29:14 --> Router Class Initialized
+INFO - 2025-08-25 12:29:14 --> Output Class Initialized
+INFO - 2025-08-25 12:29:14 --> Security Class Initialized
+DEBUG - 2025-08-25 12:29:14 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-08-25 12:29:14 --> Input Class Initialized
+INFO - 2025-08-25 12:29:14 --> Language Class Initialized
+INFO - 2025-08-25 12:29:14 --> Loader Class Initialized
+INFO - 2025-08-25 12:29:14 --> Helper loaded: form_helper
+INFO - 2025-08-25 12:29:14 --> Helper loaded: url_helper
+INFO - 2025-08-25 12:29:14 --> Database Driver Class Initialized
+DEBUG - 2025-08-25 12:29:14 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-08-25 12:29:14 --> Session: Class initialized using 'files' driver.
+DEBUG - 2025-08-25 12:29:14 --> Session class already loaded. Second attempt ignored.
+INFO - 2025-08-25 12:29:14 --> Cart Class Initialized
+INFO - 2025-08-25 12:29:14 --> Controller Class Initialized
+INFO - 2025-08-25 12:29:14 --> Model "UserModel" initialized
+INFO - 2025-08-25 12:29:14 --> Model "MasterModel" initialized
+INFO - 2025-08-25 12:29:14 --> Model "TransactionModel" initialized
+INFO - 2025-08-25 12:29:15 --> Model "MaterialModel" initialized
+DEBUG - 2025-08-25 19:29:15 --> Cart class already loaded. Second attempt ignored.
+INFO - 2025-08-25 19:29:15 --> File loaded: F:\laragon\www\iloveemas\application\views\SellCart.php
+INFO - 2025-08-25 19:29:15 --> File loaded: F:\laragon\www\iloveemas\application\views\UserTemplate.php
+INFO - 2025-08-25 19:29:15 --> Final output sent to browser
+DEBUG - 2025-08-25 19:29:15 --> Total execution time: 0.4232

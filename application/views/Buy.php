@@ -14,22 +14,6 @@
             </li>
         </ol>
     </nav>
-<?php
-// Debug session untuk memastikan noOrder ada atau tidak
-echo "<pre>";
-print_r($this->session->userdata());
-echo "</pre>";
-
-// Atau kalau hanya ingin cek noOrder saja:
-echo "<p style='color:yellow;background:#000;padding:5px;'>noOrder: "
-     . $this->session->userdata('noOrder') . "</p>";
-
-// Debug isi cart / detail barang
-echo "<h4 style='color:white;'>Detail Barang (Cart Contents)</h4>";
-echo "<pre>";
-print_r($this->cart->contents());
-echo "</pre>";
-?>
     <h3 class="text-center text-white">BUY</h3>
     <h3 class="text-center text-white">Choose Material</h3>
     <br>

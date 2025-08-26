@@ -203,10 +203,22 @@
 
       <!-- Actions -->
       <div class="cfg-actions">
+        <!-- back to dashboard -->
+        <a href="<?= base_url('dashboard'); ?>" class="cfg-btn cfg-btn-soft" id="cfgBackBtn">
+          <!-- ikon back -->
+          <svg class="cfg-btn__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"/>
+            <path d="M3 12h18"/>
+          </svg>
+          <span class="cfg-btn__label">Kembali ke Dashboard</span>
+        </a>
+
+        <!-- save -->
         <button class="cfg-btn cfg-btn-primary" id="cfgSaveBtn" type="submit">
           <!-- ikon save -->
           <svg class="cfg-btn__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
             <path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/>
           </svg>
@@ -218,6 +230,7 @@
           </svg>
         </button>
       </div>
+
     </form>
   </div>
 </div>

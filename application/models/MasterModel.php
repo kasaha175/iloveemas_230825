@@ -111,5 +111,30 @@ class MasterModel extends CI_Model {
         return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
     }
 
+    public function dtCabang($start, $length, $search, $orderBy, $dir)
+    {
+        // total ENABLE
+        $total = $this->db->from('tb_cabang')->where('status','ENABLE')->count_all_results();
+
+        // filtered
+        $qb = $this->db->from('tb_cabang')->where('status','ENABLE');
+        if ($search !== '') {
+            $qb->group_start()
+                ->like('nama_cabang', $search)
+                ->or_like('alamat_cabang', $search)
+            ->group_end();
+        }
+        $filtered = $qb->count_all_results();
+
+        // rows
+        $rows = $this->db->from('tb_cabang')
+                ->where('status','ENABLE')
+                ->order_by($orderBy, $dir)
+                ->limit($length, $start)
+                ->get()->result();
+
+        return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
+    }
+
 }
 ?>

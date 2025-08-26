@@ -650,4 +650,46 @@ class MasterController extends CI_Controller
         ]);
         // tidak perlu exit; json_encode sudah terakhir
     }
+
+    public function cabang_dt()
+    {
+        if ($this->session->userdata('authUser') !== true) show_404();
+
+        $draw   = (int)$this->input->post('draw');
+        $start  = (int)$this->input->post('start');
+        $length = (int)$this->input->post('length');
+        $search = $this->input->post('search')['value'] ?? '';
+        $order  = $this->input->post('order')[0] ?? ['column'=>4,'dir'=>'asc'];
+
+        // mapping index kolom DT -> kolom DB
+        $cols    = ['id', null, 'nama_cabang', 'alamat_cabang', 'urutan_cabang'];
+        $orderBy = $cols[$order['column']] ?? 'urutan_cabang';
+        $dir     = strtolower($order['dir']) === 'desc' ? 'DESC' : 'ASC';
+
+        $res  = $this->MasterModel->dtCabang($start, $length, $search, $orderBy, $dir);
+
+        $data = [];
+        $no   = $start;
+        foreach ($res['rows'] as $r) {
+            $no++;
+            $aksi = '<a href="'.base_url('master/detailCabang/'.$r->id.'/').'" class="btn btn-primary btn-circle btn-sm mr-1" title="Detail/Edit"><i class="fas fa-edit"></i></a>'
+                . '<a href="'.base_url('master/deleteCabang/'.$r->id.'/').'" class="btn btn-danger btn-circle btn-sm js-del" data-name="'.htmlspecialchars($r->nama_cabang,ENT_QUOTES).'" title="Hapus"><i class="fas fa-trash"></i></a>';
+
+            $data[] = [
+                $no,
+                $aksi,
+                $r->nama_cabang,
+                $r->alamat_cabang,           // alamat ikut dikirim
+                (int)$r->urutan_cabang
+            ];
+        }
+
+        echo json_encode([
+            'draw'            => $draw,
+            'recordsTotal'    => $res['total'],
+            'recordsFiltered' => $res['filtered'],
+            'data'            => $data,
+            $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+        ]);
+    }
 }

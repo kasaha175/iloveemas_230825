@@ -82,6 +82,7 @@ $route['master/save-update-potongan']            = 'MasterController/saveUpdateP
 $route['master/deletePotongan/(:any)']           = 'MasterController/deletePotongan/$1';
 
 $route['master/cabang']                          = 'MasterController/cabang';
+$route['master/cabang-dt']                       = 'MasterController/cabang_dt';
 $route['master/addcabang']                       = 'MasterController/addCabang';
 $route['master/save-cabang']                     = 'MasterController/saveCabang';
 $route['master/detailCabang/(:any)']             = 'MasterController/detailCabang/$1';

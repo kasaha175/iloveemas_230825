@@ -193,6 +193,21 @@
           <span><h3 class="ilv-tit">Konfigurasi</h3><p class="ilv-sub">Kelola logo, warna, nama & versi aplikasi.</p></span>
         </a>
         <?php endif; ?>
+
+        <?php if (!empty($userData) && strtolower($userData[0]->u_rule ?? '') === 'administrator'): ?>
+          <a class="ilv-card" href="<?= base_url('maintenance/truncate') ?>">
+            <span class="ilv-ico" aria-hidden="true">
+              <!-- icon trash / tools -->
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </span>
+            <span>
+              <h3 class="ilv-tit">Data Maintenance</h3>
+              <p class="ilv-sub">Truncate data transaksi & customer.</p>
+            </span>
+          </a>
+        <?php endif; ?>
       </nav>
 
       <!-- decorative blobs -->

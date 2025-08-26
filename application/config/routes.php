@@ -103,6 +103,10 @@ $route['report/sell/(:num)']              = 'ReportController/sellDetail/$1';
 
 $route['report/test-dompdf']              = 'ReportController/testDompdf';
 
+// Maintenance (admin-only)
+$route['maintenance/truncate']['get']  = 'MaintenanceController/truncate';
+$route['maintenance/truncate']['post'] = 'MaintenanceController/truncateRun';
+
 /* =============================== DEFAULT =============================== */
 $route['default_controller'] = 'HomeController';
 $route['404_override']       = 'HomeController/error';

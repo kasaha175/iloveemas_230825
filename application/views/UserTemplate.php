@@ -178,7 +178,7 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
   <script>
     $(function () {
       // Select2
-      $('.select2').select2();
+      
 
       // Summernote (jika ada)
       $('.summernote').summernote({

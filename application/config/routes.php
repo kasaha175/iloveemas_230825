@@ -61,6 +61,7 @@ $route['archive/sell/save']      = 'MasterController/sellSave';
 /* ================================ MASTER =============================== */
 $route['master']                                 = 'MasterController/master';
 $route['master/customer']                        = 'MasterController/customer';
+$route['transaction/customers']                  = 'TransactionController/getCustomers';
 $route['master/customer-dt']                     = 'MasterController/customer_dt';
 $route['master/delete-customer-process/(:any)']  = 'MasterController/deleteCustomerProcess/$1';
 $route['master/edit-customer-process']           = 'MasterController/editCustomerProcess';

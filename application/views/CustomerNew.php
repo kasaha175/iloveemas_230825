@@ -139,14 +139,30 @@
 </div>
 
 <script>
-  // Select2 (kalau ada)
-  $("#materialType").select2();
-  $(".select2").select2();
+  // Tunggu sampai jQuery (dan plugin) siap dulu
+  (function waitLib(n){
+    if (window.jQuery && jQuery.fn) { init(); return; }
+    if (n > 80) { console.error('jQuery belum tersedia'); return; }
+    setTimeout(function(){ waitLib(n+1); }, 100);
+  })(0);
 
-  // jqKeyboard untuk input teks
-  jQuery(function($){
-    if ($.fn.keyboard){
-      $('#u_name, #u_address, #u_resident_address, #u_phone, #u_id_number').keyboard({ layout:'qwerty' });
-    }
-  });
+  function init(){
+    (function($){
+      // Select2 (aman bila plugin ada)
+      if ($.fn.select2) {
+        $('.select2').select2({
+          width: '100%',
+          placeholder: 'Please select customer...',
+          allowClear: true
+        });
+      }
+
+      // jqKeyboard (aman bila plugin ada)
+      if ($.fn.keyboard) {
+        $('#u_name, #u_address, #u_resident_address, #u_phone, #u_id_number')
+          .keyboard({ layout: 'qwerty' });
+      }
+    })(jQuery);
+  }
 </script>
+

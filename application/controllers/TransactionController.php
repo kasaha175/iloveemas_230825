@@ -1588,35 +1588,56 @@ class TransactionController extends CI_Controller
 
 public function getCustomers()
 {
-    $search = $this->input->get('search'); // Kata kunci pencarian
-    $page = $this->input->get('page'); // Halaman untuk pagination
-    $limit = 10; // Jumlah data per halaman
+    $search = trim((string)$this->input->get('search', true));
+    $page   = max(1, (int)$this->input->get('page'));
+    $limit  = 10;
     $offset = ($page - 1) * $limit;
 
-    // Query untuk mengambil data pelanggan
-    $this->db->select('c_id, c_name, c_id_number');
-    if (!empty($search)) {
-        $this->db->like('c_name', $search); // Filter berdasarkan nama pelanggan
-        $this->db->or_like('c_id_number', $search); // Filter berdasarkan nomor ID pelanggan
+    // ---- Build the filter once and reuse for COUNT + DATA
+    $this->db->start_cache();
+    $this->db->from('tb_customer c');
+
+    if ($search !== '') {
+        $like = $this->db->escape_like_str($search);
+        $this->db->group_start()
+                 ->like('c.c_name', $search, 'both')           // name
+                 ->or_like('c.c_id_number', $search, 'both')    // id_number
+                 // use raw where for CAST to avoid backticks on the expression
+                 ->or_where("CAST(c.c_id AS CHAR) LIKE '%{$like}%'", null, false)
+                 ->group_end();
     }
+    $this->db->stop_cache();
+
+    // ---- Count total (reusing the same filter)
+    $total = (int)$this->db->count_all_results();
+
+    // ---- Page data
+    $this->db->select('c.c_id, c.c_name, c.c_id_number');
+    $this->db->order_by('c.c_name', 'ASC');
     $this->db->limit($limit, $offset);
-    $query = $this->db->get('tb_customer'); // Ganti 'tb_customer' dengan nama tabel Anda
+    $query = $this->db->get();
+    $rows  = $query->result();
 
-    $results = $query->result();
+    // ---- Cleanup cache
+    $this->db->flush_cache();
 
-    // Hitung total data untuk pagination
-    $total = $this->db->from('tb_customer')->count_all_results();
-
-    // Struktur data yang sesuai dengan Select2
-    $data = [
-        'results' => $results,
-        'pagination' => [
-            'more' => ($offset + $limit) < $total // Cek apakah ada halaman berikutnya
-        ]
+    // ---- Response for Select2 (+ minimal debug to help you)
+    $out = [
+        'results'    => $rows,
+        'pagination' => ['more' => ($offset + $limit) < $total],
+        // comment this out later if you don’t want it
+        'debug'      => [
+            'search' => $search,
+            'page'   => $page,
+            'limit'  => $limit,
+            'count'  => $total,
+        ],
     ];
 
-    // Kirim data dalam format JSON
-    echo json_encode($data);
+    return $this->output
+        ->set_content_type('application/json', 'utf-8')
+        ->set_header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0')
+        ->set_output(json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 }
 
 public function updateAllStatus() {

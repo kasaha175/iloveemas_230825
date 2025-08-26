@@ -605,4 +605,49 @@ class MasterController extends CI_Controller
         $this->session->set_userdata(['status'=>'success','message'=>'Cabang Berhasil Disimpan']);
         redirect(base_url('master/cabang'));
     }
+
+    public function memo_dt()
+    {
+        if ($this->session->userdata('authUser') !== true) show_404();
+
+        $draw   = (int) $this->input->post('draw');
+        $start  = (int) $this->input->post('start');
+        $length = (int) $this->input->post('length');
+        $search = $this->input->post('search')['value'] ?? '';
+        $order  = $this->input->post('order')[0] ?? ['column'=>2,'dir'=>'asc'];
+        // index kolom di tabel: 0=No, 1=Aksi, 2=tm_value, 3=tm_priority
+        $cols   = ['tm_id', null, 'tm_value', 'tm_priority'];
+        $orderBy= $cols[$order['column']] ?? 'tm_priority';
+        $dir    = strtolower($order['dir']) === 'desc' ? 'DESC' : 'ASC';
+
+        $res = $this->MasterModel->dtMemos($start, $length, $search, $orderBy, $dir);
+
+        $data = [];
+        $no = $start;
+        foreach ($res['rows'] as $r) {
+            $no++;
+            $aksi =
+                '<a href="'.base_url('master/detailMemo/'.$r->tm_id.'/').'" '.
+                'class="btn btn-primary btn-circle btn-sm mr-2" title="Detail"><i class="fas fa-edit"></i></a>'.
+                '<a href="'.base_url('master/deleteMemo/'.$r->tm_id.'/').'" '.
+                'class="btn btn-danger btn-circle btn-sm js-del" title="Hapus"><i class="fas fa-trash"></i></a>';
+
+            $data[] = [
+                $no,
+                $aksi,
+                $r->tm_value,
+                $r->tm_priority
+            ];
+        }
+
+        echo json_encode([
+            'draw'            => $draw,
+            'recordsTotal'    => $res['total'],
+            'recordsFiltered' => $res['filtered'],
+            'data'            => $data,
+            // putar CSRF agar request berikutnya valid
+            $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+        ]);
+        // tidak perlu exit; json_encode sudah terakhir
+    }
 }

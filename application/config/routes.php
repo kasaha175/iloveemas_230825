@@ -67,6 +67,7 @@ $route['master/edit-customer-process']           = 'MasterController/editCustome
 $route['master/customer/(:any)']                 = 'MasterController/detailCustomer/$1';
 
 $route['master/memo']                            = 'MasterController/memo';
+$route['master/memo-dt']                         = 'MasterController/memo_dt';
 $route['master/addMemo']                         = 'MasterController/addmemo';
 $route['master/save-memo']                       = 'MasterController/saveMemo';
 $route['master/detailMemo/(:any)']               = 'MasterController/detailMemo/$1';

@@ -87,5 +87,29 @@ class MasterModel extends CI_Model {
         return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
     }
 
+    public function dtMemos($start, $length, $search, $orderBy, $dir)
+    {
+        // total baris
+        $total = $this->db->from('tb_memo')->count_all_results();
+
+        // filter count
+        $qb = $this->db->from('tb_memo');
+        if ($search !== '') {
+            $qb->group_start()
+            ->like('tm_value', $search)
+            ->or_like('tm_priority', $search)
+            ->group_end();
+        }
+        $filtered = $qb->count_all_results();
+
+        // ambil data page ini
+        $rows = $this->db->from('tb_memo')
+                        ->order_by($orderBy, $dir)
+                        ->limit($length, $start)
+                        ->get()->result();
+
+        return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
+    }
+
 }
 ?>

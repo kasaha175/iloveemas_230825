@@ -1,162 +1,199 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/** Guard + fallback config */
+$cfg            = isset($config) && is_array($config) ? $config : [];
+$appName        = $cfg['app_name']        ?? 'I Love Emas';
+$appVersion     = $cfg['app_version']     ?? '3.0.0';
+$colorPrimary   = $cfg['color_primary']   ?? '#074799';
+$colorSecondary = $cfg['color_secondary'] ?? '#001A6E';
+$colorPastel    = $cfg['color_pastel']    ?? '#B1F0F7';
+
+$logoPath       = !empty($cfg['logo'])
+                    ? base_url($cfg['logo'])
+                    : base_url('assets/offline/icon-ilovemas.png');
+
+$faviconPath    = !empty($cfg['favicon'])
+                    ? base_url($cfg['favicon'])
+                    : base_url('assets/img/favicon.png');
+
+$bgDashboardUrl = !empty($cfg['bg_dashboard'])
+                    ? base_url($cfg['bg_dashboard'])
+                    : base_url('assets/offline/bg-black.jpg');
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title><?=$title?></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="<?= html_escape($appName) ?>">
+  <title><?= isset($title) && $title ? html_escape($title).' — ' : '' ?><?= html_escape($appName) ?></title>
 
-    <!-- Core CSS -->
-    <link href="<?=base_url()?>assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-    <link href="<?=base_url()?>assets/css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="<?=base_url()?>assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <link href="<?=base_url()?>assets/css/keyboard.css" rel="stylesheet">
-    <link href="<?=base_url()?>/assets/select2/css/select2.min.css" rel="stylesheet">
-    <link href="<?= base_url() ?>assets/summernote/summernote.min.css" rel="stylesheet">
-	<!-- <link href="<?= base_url() ?>assets/offline/custom.css" rel="stylesheet"> -->
+  <!-- Favicon (konfigurasi) -->
+  <link rel="icon" href="<?= $faviconPath ?>" type="image/png">
 
-    <!-- Keyboard Plugin -->
-    <link href="<?=base_url()?>assets/keyboard/docs/css/jquery-ui.min.css" rel="stylesheet">
-    <link href="<?=base_url()?>assets/keyboard/css/keyboard.css" rel="stylesheet">
+  <!-- Core CSS -->
+  <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+  <link href="<?= base_url('assets/css/sb-admin-2.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/vendor/datatables/dataTables.bootstrap4.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/select2/css/select2.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/summernote/summernote.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/keyboard/docs/css/jquery-ui.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/keyboard/css/keyboard.css') ?>" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap" rel="stylesheet">
 
-    <!-- Optional Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
+  <!-- Theme variables + fix z-index -->
+  <style>
+    :root{
+      --blue-light:  <?= $colorPrimary ?>;
+      --blue-dark:   <?= $colorSecondary ?>;
+      --blue-pastel: <?= $colorPastel ?>;
+      --topbar-h:    72px;
+    }
 
-    <!-- Core JavaScript -->
-    <script src="<?=base_url()?>assets/vendor/jquery/jquery.min.js"></script>
-	<script src="<?=base_url()?>assets/select2/js/select2.min.js"></script>
-    <script src="<?=base_url()?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    body{
+      font-family: 'Poppins','Nunito','Segoe UI',Arial,Helvetica,sans-serif;
+      background-image: url('<?= $bgDashboardUrl ?>');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+      position: relative;
+    }
+    /* Overlay latar di belakang, non-interaktif */
+    body::before{
+      content:"";
+      position:absolute; inset:0;
+      /* Jika ingin gelap: background: rgba(0,0,0,.35); */
+      z-index:-1 !important;
+      pointer-events:none;
+    }
 
-    <!-- DataTables -->
-    <script src="<?=base_url()?>assets/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="<?=base_url()?>assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    /* Navbar/Dropdown di atas konten */
+    .navbar.topbar { position: relative; z-index: 1050 !important; }
+    .dropdown-menu { z-index: 1060 !important; }
+    .page-wrap     { position: relative; z-index: 1; padding-top: calc(var(--topbar-h) + 16px); }
 
-    <!-- jqKeyboard Dependencies -->
-    <script src="<?=base_url()?>assets/keyboard/docs/js/jquery-ui.min.js"></script>
-    <script src="<?=base_url()?>assets/keyboard/js/jquery.keyboard.js"></script>
-    <script src="<?=base_url()?>assets/keyboard/js/jquery.keyboard.extension-typing.js"></script>
-    <script src="<?=base_url()?>assets/keyboard/js/jquery.keyboard.extension-autocomplete.js"></script>
-    <script src="<?=base_url()?>assets/keyboard/js/jquery.keyboard.extension-caret.js"></script>
+    /* Topbar pakai warna konfigurasi */
+    .topbar{
+      background: linear-gradient(135deg, var(--blue-pastel), #dff5ff);
+    }
+    .brand-logo{
+      max-width:200px; height:auto;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.15));
+    }
+    .img-profile{ object-fit:cover; }
 
-    <!-- Plugins -->
-    <script src="<?= base_url()?>assets/offline/sweetalert2.all.js"></script>
-    <script src="<?=base_url()?>assets/js/sb-admin-2.min.js"></script>
-    <script src="<?=base_url()?>assets/summernote/summernote.min.js"></script>
-    <script src="<?=base_url()?>assets/offline/dataTables.buttons.min.js"></script>
-    <script src="<?=base_url()?>assets/offline/jszip.min.js"></script>
-    <script src="<?=base_url()?>assets/offline/buttons.html5.min.js"></script>
-    <script src="<?=base_url()?>assets/offline/buttons.print.min.js"></script>
-
-    <!-- Custom Styles -->
-    <style>
-        body {
-            font-family: 'Poppins', 'sans-serif';
-            background-image: url(<?=base_url()?>assets/offline/bg-black.jpg);
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            width: 100%;
-            min-height: 750px;
-        }
-        body:before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            background: rgba(0,0,0,.45);
-        }
-        .btn-custom {
-            color: #000;
-            padding: 16px 0;
-            width: 100%;
-            background: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16pt;
-            box-shadow: 0 5px 15px -5px rgba(0,0,0,0.1);
-            transition: all 250ms ease-in-out;
-        }
-        .select2 {
-            width: 100%!important;
-        }
-    </style>
+    /* Komponen kecil */
+    .select2{ width:100% !important; }
+  </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand navbar-light topbar mb-4 fixed-top shadow" style="background-color:#9de4ff;">
-        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-        </button>
-        <a href="<?=base_url()?>" style="text-decoration: none;color:#000;">
-            <img src="<?=base_url()?>assets/offline/icon-ilovemas.png" alt="" style="max-width: 200px;">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand navbar-light topbar fixed-top shadow">
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <a href="<?= base_url('dashboard') ?>" class="d-flex align-items-center text-decoration-none">
+      <img src="<?= $logoPath ?>" alt="<?= html_escape($appName) ?>" class="brand-logo">
+    </a>
+
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item d-none d-sm-flex align-items-center pr-2" style="color:#000;">
+        <small class="font-weight-600"><?= html_escape($appName) ?> — v<?= html_escape($appVersion) ?></small>
+      </li>
+
+      <li class="nav-item dropdown no-arrow">
+        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="mr-2 d-none d-lg-inline small" style="color:#000;">
+            <?= isset($userData[0]->u_name) ? html_escape($userData[0]->u_name) : 'User' ?>
+          </span>
+          <img class="img-profile rounded-circle" src="<?= base_url('assets/img/user/logo.png') ?>" width="36" height="36" alt="avatar">
         </a>
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown no-arrow">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <span class="mr-2 d-none d-lg-inline small" style="color:#000;">Administrator</span>
-                    <img class="img-profile rounded-circle" src="<?=base_url()?>assets/img/user/logo.png">
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                        Logout
-                    </a>
-                </div>
-            </li>
-        </ul>
-    </nav>
 
-    <!-- Content -->
-    <div class="container-fluid">
-        <?=$content?>
-    </div>
-
-    <!-- Logout Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document" style="top: 84px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-danger" href="<?=base_url()?>logout-process/">Logout</a>
-                </div>
-            </div>
+        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+          <!-- Logout: confirm() + POST -->
+          <a href="#" class="dropdown-item js-logout">
+            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+          </a>
         </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Hidden logout form (POST + CSRF) -->
+  <form id="logoutForm" action="<?= base_url('logout-process') ?>" method="post" style="display:none;">
+    <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>"
+           value="<?= $this->security->get_csrf_hash(); ?>">
+  </form>
+
+  <!-- Konten halaman -->
+  <main class="page-wrap">
+    <div class="container-fluid">
+      <?= isset($content) ? $content : '' ?>
     </div>
+  </main>
 
-    <!-- Script Initialization -->
-    <script>
-        $(function () {
-            // Initialize Keyboard
-            if (typeof jqKeyboard !== 'undefined') {
-                jqKeyboard.init();
-            }
+  <!-- Core JS -->
+  <script src="<?= base_url('assets/vendor/jquery/jquery.min.js') ?>"></script>
+  <script src="<?= base_url('assets/select2/js/select2.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/datatables/jquery.dataTables.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/datatables/dataTables.bootstrap4.min.js') ?>"></script>
 
-            // Initialize Summernote
-            $('.summernote').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['font', ['strikethrough', 'superscript', 'subscript']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link', 'picture', 'video']],
-                    ['misc', ['fullscreen', 'codeview', 'help']]
-                ]
-            });
-        });
-    </script>
+  <!-- jqKeyboard -->
+  <script src="<?= base_url('assets/keyboard/docs/js/jquery-ui.min.js') ?>"></script>
+  <script src="<?= base_url('assets/keyboard/js/jquery.keyboard.js') ?>"></script>
+  <script src="<?= base_url('assets/keyboard/js/jquery.keyboard.extension-typing.js') ?>"></script>
+  <script src="<?= base_url('assets/keyboard/js/jquery.keyboard.extension-autocomplete.js') ?>"></script>
+  <script src="<?= base_url('assets/keyboard/js/jquery.keyboard.extension-caret.js') ?>"></script>
+
+  <!-- Plugins -->
+  <script src="<?= base_url('assets/offline/sweetalert2.all.js') ?>"></script>
+  <script src="<?= base_url('assets/js/sb-admin-2.min.js') ?>"></script>
+  <script src="<?= base_url('assets/summernote/summernote.min.js') ?>"></script>
+  <script src="<?= base_url('assets/offline/dataTables.buttons.min.js') ?>"></script>
+  <script src="<?= base_url('assets/offline/jszip.min.js') ?>"></script>
+  <script src="<?= base_url('assets/offline/buttons.html5.min.js') ?>"></script>
+  <script src="<?= base_url('assets/offline/buttons.print.min.js') ?>"></script>
+
+  <script>
+    $(function () {
+      // Select2
+      $('.select2').select2();
+
+      // Summernote (jika ada)
+      $('.summernote').summernote({
+        height: 200,
+        toolbar: [
+          ['style', ['bold','italic','underline','clear']],
+          ['font', ['strikethrough','superscript','subscript']],
+          ['para', ['ul','ol','paragraph']],
+          ['insert', ['link','picture','video']],
+          ['misc', ['fullscreen','codeview','help']]
+        ]
+      });
+
+      // jqKeyboard (opsional)
+      if ($.keyboard) {
+        try { $('.use-keyboard').keyboard(); } catch(e){}
+      }
+    });
+
+    // Logout via confirm() + POST
+    $(document).on('click', '.js-logout', function (e) {
+      e.preventDefault();
+      // Tutup dropdown (kosmetik)
+      $(this).closest('.dropdown-menu').removeClass('show');
+      if (window.confirm('Anda yakin ingin keluar dari sesi saat ini?')) {
+        document.getElementById('logoutForm').submit();
+      }
+    });
+  </script>
 </body>
 </html>

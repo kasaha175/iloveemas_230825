@@ -12,6 +12,12 @@ if (!defined('BASEPATH'))
      * @param string $search Kata kunci pencarian
      * @return array Daftar transaksi
      */
+
+	// Ganti nama tabel & kolom sesuai skema kamu
+    private $table        = 'all_transaction';
+    private $dateColumn   = 't_date_created';  // DATETIME/DATE ok
+    private $statusColumn = 't_status';      // contoh: status / tr_status
+
     public function getTransactions($start, $length, $search)
     {
         // Pencarian (jika ada kata kunci)
@@ -334,6 +340,29 @@ if (!defined('BASEPATH'))
         $this->db->trans_commit();
         return true;
     }
+
+	public function countTodayFinalized(array $finalStatuses = ['SELESAI'])
+	{
+		// rentang hari ini [00:00, 24:00)
+		$start = date('Y-m-d 00:00:00');
+		$end   = date('Y-m-d 00:00:00', strtotime('+1 day'));
+
+		// siapkan dua variasi: UPPER & lower untuk jaga-jaga jika kolom status case-sensitive
+		$statusesUpper = array_map('strtoupper', $finalStatuses);
+		$statusesLower = array_map('strtolower', $finalStatuses);
+
+		$this->db->from($this->table);
+		$this->db->where("{$this->dateColumn} >=", $start);
+		$this->db->where("{$this->dateColumn} <",  $end);
+
+		// (status IN UPPER) OR (status IN lower) — semuanya di-escape oleh CI
+		$this->db->group_start()
+				->where_in($this->statusColumn, $statusesUpper)
+				->or_where_in($this->statusColumn, $statusesLower)
+				->group_end();
+
+		return (int) $this->db->count_all_results();
+	}
 
 	
 }

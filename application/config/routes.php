@@ -1,11 +1,20 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$route['login']['get']           = 'AuthController/login';
-$route['login-process']['post']  = 'AuthController/loginProcess';
-$route['login-process']['get']   = 'AuthController/login';   // cegah 405
-$route['logout-process']['get'] = 'AuthController/logoutProcess';
-$route['dashboard']['get']       = 'HomeController/dashboard';
+$route['login']['GET']             = 'AuthController/login';
+$route['login-process']['POST']    = 'AuthController/loginProcess';
+$route['login-process']['GET']     = 'AuthController/login';    // fallback anti 405
+
+$route['logout-process']['POST']   = 'AuthController/logoutProcess'; // ✅ tambahkan ini
+// (Opsional) jika ingin tetap izinkan GET juga:
+$route['logout-process']['GET']    = 'AuthController/logoutProcess';
+
+$route['dashboard']['GET']         = 'HomeController/dashboard';
+
+$route['config']['GET']            = 'ConfigController/index';
+$route['config']['POST']           = 'ConfigController/save';
+
+$route['api/kpi-dashboard']['GET'] = 'HomeController/kpiDashboard';
 
 /* ============================= TRANSACTION ============================= */
 $route['transaction']                                = 'TransactionController';

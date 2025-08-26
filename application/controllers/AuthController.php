@@ -1,24 +1,47 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class AuthController extends CI_Controller {
-	function __construct() {
-		parent::__construct();
-		$this->load->model('UserModel');
-		$this->load->model('TransactionModel');
-		$this->load->model('ProductModel');
-        $this->data["title"] = "And Team Andromeda Tours";
-        date_default_timezone_set("Asia/Jakarta"); 
-        $this->dateToday = date("Y-m-d H:i:s");
-	}
+class AuthController extends CI_Controller
+{
+    protected $data = [];
+
+    public function __construct()
+    {
+        parent::__construct();
+        date_default_timezone_set('Asia/Jakarta');
+
+        $this->load->model('UserModel');
+        $this->load->model('TransactionModel');
+        $this->load->model('ProductModel');
+        $this->load->model('ConfigModel'); // <-- penting
+
+        $this->data['title'] = 'Login';
+        $this->dateToday     = date('Y-m-d H:i:s');
+    }
+
+    /** Helper ambil config */
+    private function _cfg()
+    {
+        try {
+            return (array) $this->ConfigModel->getAllAssoc();
+        } catch (\Throwable $e) {
+            log_message('error', 'Config load error: '.$e->getMessage());
+            return [];
+        }
+    }
 
     public function login()
     {
         if ($this->session->userdata('authUser') === true) {
             return redirect(base_url('dashboard'));
         }
-        $data['title'] = 'Login';
-        $this->load->view('/login', $data); // sesuaikan path view
+        $data            = $this->data;
+        $data['config']  = $this->_cfg();      // <-- kirim ke view login
+        $data['title']   = 'Login';
+
+        // Jangan pakai leading slash pada view path
+        $view = file_exists(APPPATH.'views/Login.php') ? 'Login' : 'login';
+        $this->load->view($view, $data);
     }
 
     public function loginProcess()
@@ -30,8 +53,8 @@ class AuthController extends CI_Controller {
             return redirect(base_url('login'));
         }
 
-        $username = trim((string)$this->input->post('username', true));
-        $password = (string)$this->input->post('password');
+        $username = trim((string) $this->input->post('username', true));
+        $password = (string) $this->input->post('password');
 
         if ($username === '' || $password === '') {
             $this->session->set_userdata(['failedLogin' => true, 'authUser' => false]);
@@ -43,7 +66,6 @@ class AuthController extends CI_Controller {
 
         if ($user) {
             $stored = (string)($user->u_password ?? '');
-
             if ($stored !== '') {
                 $info = password_get_info($stored);
 
@@ -55,20 +77,17 @@ class AuthController extends CI_Controller {
                 } elseif (preg_match('/^[a-f0-9]{32}$/i', $stored)) {
                     if (hash_equals(strtolower($stored), md5($password))) {
                         $ok = true;
-                        // coba upgrade; jika gagal tetap login, tapi log error
                         $newHash = password_hash($password, PASSWORD_DEFAULT);
                         if (!$this->UserModel->upgradePassword($user->u_id, $newHash)) {
                             log_message('error', 'Upgrade password gagal untuk user_id='.$user->u_id);
                         }
                     }
                 } else {
-                    // hash tak dikenal
                     log_message('error', 'Format hash tak dikenal untuk user_id='.$user->u_id);
                 }
             }
         } else {
-            // user null karena schema salah atau tidak ditemukan
-            log_message('info', 'Login gagal: user tidak ditemukan/DB error untuk username='.$username);
+            log_message('info', 'Login gagal: user tidak ditemukan untuk username='.$username);
         }
 
         if ($ok) {
@@ -77,21 +96,17 @@ class AuthController extends CI_Controller {
             return redirect(base_url('dashboard'));
         }
 
-        usleep(300000);
+        usleep(300000); // throttle
         $this->session->set_userdata(['failedLogin' => true, 'authUser' => false]);
         return redirect(base_url('login'));
     }
 
     public function logoutProcess()
     {
-        // jika mau izinkan GET/POST:
         if (!in_array($this->input->method(TRUE), ['POST','GET'], true)) {
             return redirect(base_url('login'));
         }
         $this->session->sess_destroy();
         return redirect(base_url('login'));
     }
-
 }
-
-?>

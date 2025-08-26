@@ -74,7 +74,9 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
     /* Navbar/Dropdown di atas konten */
     .navbar.topbar { position: relative; z-index: 1050 !important; }
     .dropdown-menu { z-index: 1060 !important; }
-    .page-wrap     { position: relative; z-index: 1; padding-top: calc(var(--topbar-h) + 16px); }
+    .page-wrap     { position: relative; z-index: 1; 
+      /* padding-top: calc(var(--topbar-h) + 16px);  */
+    }
 
     /* Topbar pakai warna konfigurasi */
     .topbar{

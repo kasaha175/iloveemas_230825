@@ -1,22 +1,128 @@
 <style>
-    .bordering{
-        width:50%;
-        border: 1px solid #fff;
-        text-align:left;
-        padding-left:5px;
-        color:#fff;
+  /* ====== Scoped ke form ini saja ====== */
+  #myForm{
+    --card-border:#e6eefc;
+    --thead-bg:#f5fbff;
+    --text-dark:#0e204a;
+    --shadow:0 10px 24px rgba(0,0,0,.08);
+  }
+
+  /* Container atas (menggantikan margin-top inline yang kaku) */
+  .col-md-12[style*="margin-top:110px;"]{
+    margin-top: calc(var(--topbar-h,72px) + 20px) !important;
+    padding-inline: clamp(12px, 4vw, 24px) !important;
+  }
+
+  /* ====== Tabel rapi & “card-like” ====== */
+  #myForm table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    background:#fff;
+    box-shadow: var(--shadow);
+    /* penting: jangan pangkas keyboard */
+    overflow: visible !important;
+  }
+
+  /* Sudut membulat tetap rapi walau overflow visible */
+  #myForm thead th:first-child{ border-top-left-radius:16px; }
+  #myForm thead th:last-child { border-top-right-radius:16px; }
+  #myForm tbody tr:last-child td:first-child{ border-bottom-left-radius:16px; }
+  #myForm tbody tr:last-child td:last-child { border-bottom-right-radius:16px; }
+
+  #myForm thead th{
+    background: linear-gradient(135deg, var(--thead-bg), #e9faff);
+    color: var(--text-dark);
+    font-weight:800;
+    text-align:center;
+    letter-spacing:.2px;
+  }
+  #myForm th, #myForm td{
+    border:1px solid #e2e8f3;
+    padding:12px 14px;
+    vertical-align:middle;
+  }
+
+  /* Pastikan seluruh bagian tabel tidak memangkas popup keyboard */
+  #myForm thead, #myForm tbody, #myForm tr, #myForm th, #myForm td{
+    overflow: visible !important;
+    position: relative;
+  }
+
+  /* ====== Header kolom (pengganti .bordering lama) ====== */
+  .bordering{
+    width:auto;
+    border:1px solid #e2e8f3 !important;
+    text-align:left;
+    padding-left:10px;
+    color:var(--text-dark) !important;
+    background:#fff !important;
+  }
+
+  /* ====== Input angka di sel tabel ====== */
+  .input-box{
+    width:100%;
+    height: clamp(38px, 5.2vw, 44px);
+    margin:0;
+    padding:8px 10px;
+    background:#fff;
+    border:1px solid #e3e6ef;
+    border-radius:10px;
+    font-weight:700;
+    text-align:center;
+    outline:0;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .input-box:focus{
+    border-color:#b9d6ff;
+    box-shadow:0 0 0 3px rgba(51,136,255,.15);
+  }
+
+  /* Hilangkan spinner number untuk tampilan bersih */
+  #myForm input[type=number]::-webkit-outer-spin-button,
+  #myForm input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  #myForm input[type=number]{ -moz-appearance:textfield; }
+
+  /* ====== Tombol bawah lebih rapi di mobile ====== */
+  .btn.btn-icon-split.btn-lg{
+    border-radius:12px;
+    box-shadow: var(--shadow);
+  }
+  @media (max-width: 576px){
+    .btn.btn-icon-split.btn-lg{
+      width:100%;
+      margin-bottom:10px;
     }
-    .input-box{
-        height:35px;
-        padding:10px;
-        background: #EEE;
-        margin: 0px;
-        padding: 0px;
-        border: none;
-        margin-bottom: 0px;
-        width:100%;
-    }
+  }
+
+  /* ====== Perbaiki padding kolom inline yang “350px” agar responsif ====== */
+  @media (max-width: 1199.98px){
+    .col-md-12[style*="padding:0px 350px;"]{ padding: 0 12px !important; }
+  }
+  @media (min-width: 1200px){
+    .col-md-12[style*="padding:0px 350px;"]{ padding: 0 160px !important; }
+  }
+  @media (min-width: 1400px){
+    .col-md-12[style*="padding:0px 350px;"]{ padding: 0 220px !important; }
+  }
+
+  /* ====== Judul halaman lebih modern ====== */
+  h3.text-center{
+    font-weight:800;
+    font-size: clamp(20px, 3.4vw, 28px);
+    margin-bottom: 8px;
+    text-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+
+  /* ====== Keyboard jQuery: selalu tampak & bisa diklik (tanpa ubah visual) ====== */
+  .ui-keyboard{
+    z-index: 3000 !important;    /* di atas card/dropdown/modal */
+    pointer-events: auto;        /* memastikan bisa diklik */
+  }
 </style>
+
 <?php 
     foreach($data as $d){};
     foreach($data2 as $dd){};  
@@ -219,27 +325,30 @@
                     <span class="icon text-white-50">
                     <i class="fas fa-arrow-left"></i>
                     </span>
-                    <span class="text">Back</span>
+                    <span class="text">Kembali</span>
                 </a>
                 <a href="#" onclick="document.getElementById('myForm').submit();" class="btn btn-success btn-icon-split btn-lg mr-3">
                     <span class="icon text-white-50">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-save mr-1"></i>
                     </span>
-                    <span class="text">Save</span>
+                    <span class="text"> Simpan</span>
                 </a>
             </div>
 </div>
 </form>
-    <script>
-    jQuery(function ($) {
-        // Num Pad Input
-    // ********************
-    $('.input-box').keyboard({
-        layout: 'num',
-        restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
-        preventPaste : true,  // prevent ctrl-v and right click
-        autoAccept : true
+<script>
+  (function(){
+    function onReady(fn){ document.readyState!=='loading' ? fn() : document.addEventListener('DOMContentLoaded', fn); }
+    onReady(function(){
+      // NumPad dari jQuery Keyboard (kalau plugin tersedia)
+      if (window.jQuery && jQuery.fn && jQuery.fn.keyboard) {
+        jQuery('.input-box').keyboard({
+          layout: 'num',
+          restrictInput: true,
+          preventPaste: true,
+          autoAccept: true
+        });
+      }
     });
-    prettyPrint();
-    });
+  })();
 </script>

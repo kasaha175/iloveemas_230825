@@ -82,6 +82,37 @@
 
   /* Pastikan keyboard virtual tampil di atas (tanpa ubah tampilannya) */
   .ui-keyboard{ z-index:1300 !important; }
+
+  /* ===== Overlay Loading saat submit ===== */
+  .saving-overlay{
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,.35);
+    backdrop-filter: saturate(110%) blur(1px);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 5000;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition: opacity .2s ease;
+  }
+  .saving-overlay.show{ opacity:1; visibility:visible; pointer-events:auto; }
+  .saving-box{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    background: rgba(255,255,255,.95);
+    border:1px solid #e6eefc; border-radius:16px;
+    padding:18px 22px; box-shadow:0 12px 30px rgba(0,0,0,.18);
+    min-width:220px;
+  }
+  .saving-text{ font-weight:800; color:#0e204a; letter-spacing:.3px; }
+  .saving-box .fa-spin{ font-size:30px; color:#2563eb; }
+  .saving-fallback{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid #dbeafe; border-top-color:#2563eb;
+    animation: spin 1s linear infinite; display:none;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){
+    .saving-box .fa-spin{ animation: none !important; }
+    .saving-fallback{ animation: none !important; }
+  }
 </style>
 
 <div class="archive-sell-edit-scope">
@@ -165,6 +196,7 @@
             <div class="actions mt-3 mb-1">
               <a href="<?= base_url('archive/sell') ?>" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
+              </a>
               <a href="#" onclick="document.getElementById('myForm').submit();" class="btn btn-success">
                 <i class="fas fa-save mr-1"></i> Simpan
               </a>
@@ -181,6 +213,17 @@
   </div>
 </div>
 
+<!-- Overlay Loading -->
+<div class="saving-overlay" id="savingOverlay" aria-hidden="true" aria-label="Sedang menyimpan" role="status">
+  <div class="saving-box" aria-live="polite">
+    <!-- Pakai Font Awesome jika tersedia -->
+    <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
+    <!-- Fallback spinner CSS bila FA tidak tersedia -->
+    <div class="saving-fallback" aria-hidden="true"></div>
+    <div class="saving-text">Menyimpan…</div>
+  </div>
+</div>
+
 <script>
   (function(){
     function onReady(fn){ document.readyState!=='loading' ? fn() : document.addEventListener('DOMContentLoaded', fn); }
@@ -192,6 +235,27 @@
           restrictInput: true,
           preventPaste: true,
           autoAccept: true
+        });
+      }
+
+      // Overlay loading saat submit
+      var form    = document.getElementById('myForm');
+      var overlay = document.getElementById('savingOverlay');
+      var faIcon  = overlay ? overlay.querySelector('.fa-circle-notch') : null;
+      var cssSpin = overlay ? overlay.querySelector('.saving-fallback') : null;
+
+      // Jika Font Awesome tidak tersedia, munculkan spinner CSS
+      try {
+        var faLoaded = window.getComputedStyle(faIcon, '::before').getPropertyValue('content');
+        if (!faLoaded || faLoaded === 'none' || faLoaded === 'normal' || faLoaded === '""') {
+          cssSpin && (cssSpin.style.display = 'block');
+        }
+      } catch(e){ cssSpin && (cssSpin.style.display = 'block'); }
+
+      if (form && overlay) {
+        form.addEventListener('submit', function(){
+          if (typeof form.checkValidity === 'function' && !form.checkValidity()) return;
+          overlay.classList.add('show');
         });
       }
     });

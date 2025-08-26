@@ -121,6 +121,44 @@
     z-index: 3000 !important;    /* di atas card/dropdown/modal */
     pointer-events: auto;        /* memastikan bisa diklik */
   }
+
+  /* ====== Overlay Loading saat Simpan ====== */
+  .saving-overlay{
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, .35);
+    backdrop-filter: saturate(110%) blur(1px);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 5000;           /* di atas keyboard */
+    opacity:0; visibility:hidden;
+    transition: opacity .2s ease;
+    pointer-events:none;
+  }
+  .saving-overlay.show{ opacity:1; visibility:visible; pointer-events:auto; }
+
+  .saving-box{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    background: rgba(255,255,255,.92);
+    border: 1px solid #e6eefc; border-radius:16px;
+    padding:18px 22px; box-shadow:0 12px 30px rgba(0,0,0,.18);
+    min-width:220px;
+  }
+  .saving-text{ font-weight:800; color:#0e204a; letter-spacing:.3px; }
+
+  /* Ikon FA berputar */
+  .saving-box .fa-spin{ font-size:30px; color:#2563eb; }
+
+  /* Fallback spinner jika Font Awesome tidak ada */
+  .saving-fallback{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid #dbeafe; border-top-color:#2563eb;
+    animation: spin 1s linear infinite;
+    display:none;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){
+    .saving-box .fa-spin{ animation: none !important; }
+    .saving-fallback{ animation: none !important; }
+  }
 </style>
 
 <?php 
@@ -307,7 +345,6 @@
                         $potongan_lm = json_decode($d->potongan_lm, true);
                         
                         $tahun_mulai = 2018;
-                        // $d=mktime(11, 14, 54, 8, 12, 2023);
                         while ($tahun_mulai <= date('Y')+1) { ?>
                             <tr>
                                 <td class="bordering">LM Certi <?= $tahun_mulai; ?></td>
@@ -336,17 +373,50 @@
             </div>
 </div>
 </form>
+
+<!-- Overlay Loading -->
+<div class="saving-overlay" id="savingOverlay" aria-hidden="true" aria-label="Sedang menyimpan" role="status">
+  <div class="saving-box" aria-live="polite">
+    <!-- Pakai FA jika tersedia; ada fallback CSS -->
+    <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
+    <div class="saving-fallback" aria-hidden="true"></div>
+    <div class="saving-text">Menyimpan…</div>
+  </div>
+</div>
+
 <script>
   (function(){
     function onReady(fn){ document.readyState!=='loading' ? fn() : document.addEventListener('DOMContentLoaded', fn); }
     onReady(function(){
-      // NumPad dari jQuery Keyboard (kalau plugin tersedia)
+      // NumPad dari jQuery Keyboard (kalau plugin tersedia) — TIDAK diubah
       if (window.jQuery && jQuery.fn && jQuery.fn.keyboard) {
         jQuery('.input-box').keyboard({
           layout: 'num',
           restrictInput: true,
           preventPaste: true,
           autoAccept: true
+        });
+      }
+
+      // Overlay loading saat submit
+      var form    = document.getElementById('myForm');
+      var overlay = document.getElementById('savingOverlay');
+      var faIcon  = overlay ? overlay.querySelector('.fa-circle-notch') : null;
+      var cssSpin = overlay ? overlay.querySelector('.saving-fallback') : null;
+
+      // Jika Font Awesome tidak tersedia, tampilkan spinner fallback
+      try {
+        var faLoaded = window.getComputedStyle(faIcon, '::before').getPropertyValue('content');
+        if (!faLoaded || faLoaded === 'none' || faLoaded === 'normal' || faLoaded === '""') {
+          cssSpin && (cssSpin.style.display = 'block');
+        }
+      } catch(e){ cssSpin && (cssSpin.style.display = 'block'); }
+
+      if (form && overlay) {
+        form.addEventListener('submit', function(e){
+          // Biarkan validasi HTML5 jalan; hanya tampilkan overlay jika valid
+          if (typeof form.checkValidity === 'function' && !form.checkValidity()) return;
+          overlay.classList.add('show');
         });
       }
     });

@@ -58,8 +58,43 @@
     .archive-buy-edit-scope .actions .btn{ width:100%; }
   }
 
-  /* Pastikan virtual keyboard tampil di atas & bisa diklik (tanpa ubah tampilannya) */
+  /* Pastikan virtual keyboard tampil di atas (tanpa mengubah tampilannya) */
   .ui-keyboard{ z-index: 3000 !important; pointer-events:auto; }
+
+  /* ===== Overlay Loading ===== */
+  .saving-overlay{
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, .35); /* transparan gelap */
+    backdrop-filter: saturate(110%) blur(1px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5000; /* di atas keyboard */
+    opacity: 0; visibility: hidden; transition: opacity .2s ease;
+    pointer-events: none; /* aktifkan saat .show */
+  }
+  .saving-overlay.show{ opacity:1; visibility:visible; pointer-events:auto; }
+
+  .saving-box{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    background: rgba(255,255,255,.92);
+    border: 1px solid #e6eefc; border-radius:16px;
+    padding:18px 22px; box-shadow:0 12px 30px rgba(0,0,0,.18);
+    min-width:220px;
+  }
+  /* Spinner FA */
+  .saving-box .fa-spin{ font-size:30px; color:#2563eb; }
+  .saving-text{ font-weight:800; color:#0e204a; letter-spacing:.3px; }
+
+  /* Fallback spinner (jika Font Awesome tidak tersedia) */
+  .saving-fallback{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid #dbeafe; border-top-color:#2563eb;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){
+    .saving-box .fa-spin{ animation: none; }
+    .saving-fallback{ animation: none; }
+  }
 </style>
 
 <div class="archive-buy-edit-scope">
@@ -89,6 +124,7 @@
           <h6 class="m-0">Input Nilai: <?= html_escape($label) ?></h6>
         </div>
         <div class="card-body">
+          <!-- NB: method tetap GET sesuai kode Anda -->
           <form id="formRti" action="<?= base_url('archive/buy/save/') ?>" method="get">
             <input type="hidden" name="key" value="<?= html_escape($key) ?>">
             <?php if (isset($this->security)) : ?>
@@ -115,7 +151,7 @@
               <a href="<?= base_url('archive/buy') ?>" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
               </a>
-              <button type="submit" class="btn btn-success">
+              <button type="submit" class="btn btn-success" id="btnSubmit">
                 <i class="fas fa-save mr-1"></i> Simpan
               </button>
               <?php if ($key !== 'rti-ta'): ?>
@@ -132,17 +168,54 @@
   </div>
 </div>
 
+<!-- Overlay Loading -->
+<div class="saving-overlay" id="savingOverlay" aria-hidden="true" aria-label="Sedang menyimpan" role="status">
+  <div class="saving-box" aria-live="polite">
+    <!-- Pakai FA jika tersedia, fallback CSS spinner jika tidak -->
+    <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
+    <div class="saving-fallback" aria-hidden="true" style="display:none"></div>
+    <div class="saving-text">Menyimpan…</div>
+  </div>
+</div>
+
 <script>
   (function(){
     function onReady(fn){ document.readyState!=='loading' ? fn() : document.addEventListener('DOMContentLoaded', fn); }
+
     onReady(function(){
-      // Inisialisasi NumPad (jQuery Keyboard) bila tersedia
+      // Inisialisasi NumPad (jQuery Keyboard) bila tersedia – TIDAK diubah
       if (window.jQuery && jQuery.fn && jQuery.fn.keyboard) {
         jQuery('.input-box').keyboard({
           layout: 'num',
           restrictInput: true,
           preventPaste: true,
           autoAccept: true
+        });
+      }
+
+      // Loading overlay saat submit
+      var form    = document.getElementById('formRti');
+      var overlay = document.getElementById('savingOverlay');
+      var faIcon  = overlay.querySelector('.fa-circle-notch');
+      var cssSpin = overlay.querySelector('.saving-fallback');
+
+      // Jika Font Awesome tidak ada, tampilkan spinner fallback CSS
+      if (!faIcon || !('classList' in faIcon)) {
+        cssSpin.style.display = 'block';
+      }
+
+      if (form && overlay) {
+        form.addEventListener('submit', function(e){
+          // Hanya tampilkan overlay bila form valid
+          if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+            // biarkan browser menampilkan pesan validasi
+            return;
+          }
+          overlay.classList.add('show');
+
+          // Nonaktifkan tombol submit untuk mencegah double submit
+          var btn = document.getElementById('btnSubmit');
+          if (btn) { btn.setAttribute('disabled', 'disabled'); btn.classList.add('disabled'); }
         });
       }
     });

@@ -1,19 +1,19 @@
 <!-- Dashboard — modern, responsive, aesthetic (I Love Emas) -->
 <style>
   :root{
-    --blue-light:#074799;   /* biru muda */
-    --blue-dark:#001A6E;    /* biru tua  */
-    --blue-pastel:#B1F0F7;  /* biru pastel */
+    --blue-light:#074799;
+    --blue-dark:#001A6E;
+    --blue-pastel:#B1F0F7;
     --text:#0B0F1A;
     --muted:#6b7a99;
     --card-bg:#ffffff;
     --card-br:#e6eefc;
     --shadow:0 18px 30px rgba(0,0,0,.10);
     --radius:18px;
-    --topbar-h:72px;        /* kira-kira tinggi navbar fixed-top di template */
+    --topbar-h:72px;
   }
 
-  /* scope ke dashboard agar tidak bentrok dengan sb-admin */
+  /* scope ke dashboard */
   .ilv-dash{ padding:clamp(16px,2.2vw,28px); margin-top:var(--topbar-h); }
   .ilv-container{ max-width:1200px; margin-inline:auto; }
 
@@ -31,10 +31,7 @@
   .ilv-hero .b2{ width:240px;height:240px;background:#8fd2ff;left:-80px;bottom:-100px;opacity:.2;}
 
   /* KPI row */
-  .kpi-row{
-    margin-top:14px;
-    display:grid; grid-template-columns:1fr; gap:12px;
-  }
+  .kpi-row{ margin-top:14px; display:grid; grid-template-columns:1fr; gap:12px; }
   @media (min-width:760px){ .kpi-row{ grid-template-columns:repeat(2,1fr); } }
 
   .kpi-card{
@@ -52,8 +49,8 @@
   .kpi-empty{ font-size:13px; color:#6b7a99; }
 
   /* Skeleton / shimmer loader */
-  .kpi-card .skeleton{ display:none; }                  /* default: tersembunyi */
-  .kpi-card.loading .skeleton{ display:block; }         /* tampil hanya saat loading */
+  .kpi-card .skeleton{ display:none; }
+  .kpi-card.loading .skeleton{ display:block; }
   .kpi-card.loading .kpi-value,
   .kpi-card.loading .kpi-empty{ display:none !important; }
   .skeleton{
@@ -76,11 +73,8 @@
     transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
   }
   .ilv-card:hover{ transform: translateY(-2px); box-shadow:0 14px 32px rgba(0,0,0,.12); border-color:#d7e5ff; background:#fff; }
-  .ilv-ico{
-    flex:0 0 48px; height:48px; display:grid; place-items:center; border-radius:14px;
-    background:linear-gradient(135deg, var(--blue-pastel), #e9faff);
-    border:1px solid #d7f4ff;
-  }
+  .ilv-ico{ flex:0 0 48px; height:48px; display:grid; place-items:center; border-radius:14px;
+    background:linear-gradient(135deg, var(--blue-pastel), #e9faff); border:1px solid #d7f4ff; }
   .ilv-ico svg{width:22px;height:22px;}
   .ilv-tit{font-weight:600; margin:0; font-size:15px;}
   .ilv-sub{margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.35;}
@@ -89,15 +83,36 @@
     margin-top:16px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
     font-size:12px; color:#26406e;
   }
-  .ilv-badge{
-    background:#ffffff; color:#0e2b68; border:1px solid #dfeaff; padding:6px 10px; border-radius:999px;
-  }
+  .ilv-badge{ background:#ffffff; color:#0e2b68; border:1px solid #dfeaff; padding:6px 10px; border-radius:999px; }
 
-  /* kecilkan spasi di layar sangat kecil */
   @media (max-width:480px){
     .ilv-hero{ padding:16px; }
     .ilv-card{ padding:14px; }
   }
+
+  /* ===== Global overlay while fetching KPI ===== */
+  .app-overlay{
+    position:fixed; inset:0; z-index:3000;
+    background: rgba(255,255,255,.35);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity .25s ease, visibility .25s ease;
+  }
+  .app-overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+
+  .loader{
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:18px 22px; border-radius:16px; background:rgba(255,255,255,.8); border:1px solid #e6eefc;
+    box-shadow:0 8px 24px rgba(0,0,0,.10);
+  }
+  .ring{
+    width:44px; height:44px; border-radius:50%;
+    border:3px solid rgba(0,26,110,.25); border-top-color: var(--blue-dark);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin{ to { transform: rotate(360deg); } }
+  .loader-label{ font-size:13px; color:#0b1f4f; font-weight:600; }
 </style>
 
 <div class="ilv-dash">
@@ -197,7 +212,6 @@
         <?php if (!empty($userData) && strtolower($userData[0]->u_rule ?? '') === 'administrator'): ?>
           <a class="ilv-card" href="<?= base_url('maintenance/truncate') ?>">
             <span class="ilv-ico" aria-hidden="true">
-              <!-- icon trash / tools -->
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
               </svg>
@@ -222,23 +236,30 @@
   </div>
 </div>
 
+<!-- Overlay while loading KPI -->
+<div id="dashLoading" class="app-overlay" aria-live="polite" aria-busy="true">
+  <div class="loader">
+    <div class="ring" aria-hidden="true"></div>
+    <div class="loader-label">Memuat dashboard…</div>
+  </div>
+</div>
+
 <script>
 (function(){
   const endpoint = "<?= base_url('api/kpi-dashboard') ?>";
   const elTx   = document.getElementById('kpiTx');
   const elCust = document.getElementById('kpiCust');
+  const overlay = document.getElementById('dashLoading');
 
   function finishLoading(node){
-    node.classList.remove('loading');                 // lepas state loading
-    const sk = node.querySelector('.skeleton');       // sembunyikan skeleton (jaga-jaga)
+    node.classList.remove('loading');
+    const sk = node.querySelector('.skeleton');
     if (sk) sk.style.display = 'none';
   }
-
   function setKPI(node, value){
     finishLoading(node);
     const v = node.querySelector('.kpi-value');
     const e = node.querySelector('.kpi-empty');
-
     if (typeof value === 'number' && value > 0){
       v.textContent = value;
       v.style.display = 'block';
@@ -249,7 +270,6 @@
       e.style.display = 'block';
     }
   }
-
   function setError(node){
     finishLoading(node);
     const v = node.querySelector('.kpi-value');
@@ -258,7 +278,16 @@
     e.textContent = 'Gagal memuat';
     e.style.display = 'block';
   }
+  function hideOverlay(){
+    if (!overlay) return;
+    // beri sedikit delay agar transisi halus
+    setTimeout(()=> {
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-busy','false');
+    }, 100);
+  }
 
+  // TAMPILKAN overlay sejak halaman dimuat (default), sembunyikan setelah fetch selesai
   fetch(endpoint, { headers:{ 'X-Requested-With':'XMLHttpRequest' } })
     .then(r => r.ok ? r.json() : Promise.reject(r))
     .then(d => {
@@ -268,6 +297,7 @@
     .catch(() => {
       setError(elTx);
       setError(elCust);
-    });
+    })
+    .finally(hideOverlay);
 })();
 </script>

@@ -89,22 +89,26 @@ $route['master/detailCabang/(:any)']             = 'MasterController/detailCaban
 $route['master/save-update-cabang']              = 'MasterController/saveUpdateCabang';
 $route['master/deleteCabang/(:any)']             = 'MasterController/deleteCabang/$1';
 
-/* ================================ REPORT =============================== */
-$route['report']                          = 'ReportController/report';
+// REPORT
+$route['report']                   = 'ReportController/report';
 
-$route['report/buy']                      = 'ReportController/buy';
-$route['report/buy-graph']                = 'ReportController/buyGraph';
-$route['report/buy-print/(:num)']         = 'ReportController/buyPrint/$1';
-$route['report/buy-print-action/(:num)']  = 'ReportController/buyPrintAction/$1';
-$route['report/buy/(:num)']               = 'ReportController/buyDetail/$1';
-
-$route['report/sell']                     = 'ReportController/sell';
-$route['report/sell-graph']               = 'ReportController/sellGraph';
-$route['report/sell-print/(:num)']        = 'ReportController/sellPrint/$1';
+// SELL (urutkan yang spesifik dulu)
+$route['report/sell-dt']          = 'ReportController/sell_dt';
+$route['report/sell-graph']       = 'ReportController/sellGraph';
+$route['report/sell-print/(:num)']= 'ReportController/sellPrint/$1';
 $route['report/sell-print-action/(:num)'] = 'ReportController/sellPrintAction/$1';
-$route['report/sell/(:num)']              = 'ReportController/sellDetail/$1';
+$route['report/sell/(:num)']      = 'ReportController/sellDetail/$1';
+$route['report/sell']             = 'ReportController/sell';
 
-$route['report/test-dompdf']              = 'ReportController/testDompdf';
+// BUY (biarkan seperti sebelumnya)
+$route['report/buy-dt']           = 'ReportController/buy_dt';
+$route['report/buy-graph']        = 'ReportController/buyGraph';
+$route['report/buy-print/(:num)'] = 'ReportController/buyPrint/$1';
+$route['report/buy-print-action/(:num)'] = 'ReportController/buyPrintAction/$1';
+$route['report/buy/(:num)']       = 'ReportController/buyDetail/$1';
+$route['report/buy']              = 'ReportController/buy';
+
+$route['report/test-dompdf']      = 'ReportController/testDompdf';
 
 // Maintenance (admin-only)
 $route['maintenance/truncate']['get']  = 'MaintenanceController/truncate';

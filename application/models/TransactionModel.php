@@ -364,5 +364,161 @@ if (!defined('BASEPATH'))
 		return (int) $this->db->count_all_results();
 	}
 
-	
+	// TransactionModel.php
+
+	public function dtBuy(int $start, int $length, string $dateStart, string $dateEnd,
+						string $search = '', string $orderBy = 't_date_created', string $dir = 'DESC'): array
+	{
+		$startDT = $dateStart . ' 00:00:00';
+		$endDT   = $dateEnd   . ' 23:59:59';
+
+		// --- total (tanpa search) ---
+		$this->db->from('tb_transaction a')
+				->where('a.t_visible', 1)
+				->where('a.t_date_created >=', $startDT)
+				->where('a.t_date_created <=', $endDT);
+		$total = (int)$this->db->count_all_results();
+
+		// --- base + join + search ---
+		$this->db->select('a.*, b.u_name AS nameCreator, c.u_name AS nameReceive, d.c_name AS nameCustomer')
+				->from('tb_transaction a')
+				->join('tb_user b','a.t_created_by=b.u_id','left')
+				->join('tb_user c','a.t_receive_by=c.u_id','left')
+				->join('tb_customer d','a.t_customer=d.c_id','left')
+				->where('a.t_visible', 1)
+				->where('a.t_date_created >=', $startDT)
+				->where('a.t_date_created <=', $endDT);
+
+		if ($search !== '') {
+			$this->db->group_start()
+					->like('a.t_no_order', $search)
+					->or_like('a.t_status', $search)
+					->or_like('b.u_name', $search)
+					->or_like('c.u_name', $search)
+					->or_like('d.c_name', $search)
+					->group_end();
+		}
+
+		// hitung filtered (jangan reset builder)
+		$filtered = (int)$this->db->count_all_results('', false);
+
+		// order map
+		$orderMap = [
+			't_id'          => 'a.t_id',
+			't_no_order'    => 'a.t_no_order',
+			't_status'      => 'a.t_status',
+			't_date_created'=> 'a.t_date_created',
+			'nameCreator'   => 'b.u_name',
+			'nameReceive'   => 'c.u_name',
+			'nameCustomer'  => 'd.c_name',
+			't_qtt'         => 'a.t_qtt',
+			't_price_total' => 'a.t_price_total',
+		];
+		$orderCol = $orderMap[$orderBy] ?? 'a.t_date_created';
+		$this->db->order_by($orderCol, $dir);
+
+		if ($length !== -1) $this->db->limit($length, $start);
+
+		$rows = $this->db->get()->result();
+
+		// Format baris sesuai kolom DataTables (biar controller simple)
+		$outRows = [];
+		$no = $start;
+		foreach ($rows as $r) {
+			$no++; $id = (int)$r->t_id;
+			$act =
+				'<a href="#" class="btn btn-danger btn-circle btn-sm mr-2 js-open-delete" data-id="'.$id.
+				'" data-no="'.htmlspecialchars($r->t_no_order,ENT_QUOTES).'"><i class="fas fa-trash"></i></a>'.
+				'<a href="'.base_url('report/buy-print/'.$id.'/').'" class="btn btn-success btn-circle btn-sm mr-2"><i class="fas fa-print"></i></a>'.
+				'<a href="'.base_url('report/buy/'.$id.'/').'" class="btn btn-primary btn-circle btn-sm"><i class="fas fa-info"></i></a>'.
+				'<button type="button" class="btn btn-warning btn-circle btn-sm ml-2" onclick="openModalEdit('.$id.')"><i class="fas fa-edit"></i></button>';
+
+			$outRows[] = [
+				$no, $act,
+				$r->t_no_order, $r->t_status, $r->t_date_created,
+				$r->nameCreator, $r->nameReceive, $r->nameCustomer,
+				(int)$r->t_qtt,
+				'IDR '.number_format((float)$r->t_price_total,0,',','.')
+			];
+		}
+
+		return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$outRows];
+	}
+
+	public function dtSell(int $start, int $length, string $dateStart, string $dateEnd,
+						string $search = '', string $orderBy = 't_date_created', string $dir = 'DESC'): array
+	{
+		$startDT = $dateStart . ' 00:00:00';
+		$endDT   = $dateEnd   . ' 23:59:59';
+
+		// total
+		$this->db->from('tb_transaction_sell a')
+				->where('a.t_visible', 1)
+				->where('a.t_date_created >=', $startDT)
+				->where('a.t_date_created <=', $endDT);
+		$total = (int)$this->db->count_all_results();
+
+		// base + search
+		$this->db->select('a.*, b.u_name AS nameCreator, c.u_name AS nameReceive, d.c_name AS nameCustomer')
+				->from('tb_transaction_sell a')
+				->join('tb_user b','a.t_created_by=b.u_id','left')
+				->join('tb_user c','a.t_receive_by=c.u_id','left')
+				->join('tb_customer d','a.t_customer=d.c_id','left')
+				->where('a.t_visible', 1)
+				->where('a.t_date_created >=', $startDT)
+				->where('a.t_date_created <=', $endDT);
+
+		if ($search !== '') {
+			$this->db->group_start()
+					->like('a.t_no_order', $search)
+					->or_like('a.t_status', $search)
+					->or_like('b.u_name', $search)
+					->or_like('c.u_name', $search)
+					->or_like('d.c_name', $search)
+					->group_end();
+		}
+
+		$filtered = (int)$this->db->count_all_results('', false);
+
+		$orderMap = [
+			't_id'          => 'a.t_id',
+			't_no_order'    => 'a.t_no_order',
+			't_status'      => 'a.t_status',
+			't_date_created'=> 'a.t_date_created',
+			'nameCreator'   => 'b.u_name',
+			'nameReceive'   => 'c.u_name',
+			'nameCustomer'  => 'd.c_name',
+			't_qtt'         => 'a.t_qtt',
+			't_price_total' => 'a.t_price_total',
+		];
+		$orderCol = $orderMap[$orderBy] ?? 'a.t_date_created';
+		$this->db->order_by($orderCol, $dir);
+
+		if ($length !== -1) $this->db->limit($length, $start);
+
+		$rows = $this->db->get()->result();
+
+		$outRows = [];
+		$no = $start;
+		foreach ($rows as $r) {
+			$no++; $id = (int)$r->t_id;
+			$act =
+				'<a href="#" class="btn btn-danger btn-circle btn-sm mr-2 js-open-delete" data-id="'.$id.
+				'" data-no="'.htmlspecialchars($r->t_no_order,ENT_QUOTES).'"><i class="fas fa-trash"></i></a>'.
+				'<a href="'.base_url('report/sell-print/'.$id.'/').'" class="btn btn-success btn-circle btn-sm mr-2"><i class="fas fa-print"></i></a>'.
+				'<a href="'.base_url('report/sell/'.$id.'/').'" class="btn btn-primary btn-circle btn-sm"><i class="fas fa-info"></i></a>'.
+				'<button type="button" class="btn btn-warning btn-circle btn-sm ml-2" onclick="openModalEdit('.$id.')"><i class="fas fa-edit"></i></button>';
+
+			$outRows[] = [
+				$no, $act,
+				$r->t_no_order, $r->t_status, $r->t_date_created,
+				$r->nameCreator, $r->nameReceive, $r->nameCustomer,
+				(int)$r->t_qtt,
+				'IDR '.number_format((float)$r->t_price_total,0,',','.')
+			];
+		}
+
+		return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$outRows];
+	}
+
 }

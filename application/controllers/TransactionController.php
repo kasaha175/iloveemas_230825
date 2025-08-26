@@ -374,37 +374,104 @@ class TransactionController extends CI_Controller
 		redirect(base_url('transaction/buy/'));
 	}
 
-	function confirmEdit(){
-		$datapost = $this->input->post();
-		$idUser = $this->session->userdata("idUser");
+	public function confirmEdit()
+	{
+		// Wajib login
+		if ($this->session->userdata('authUser') !== true) {
+			return $this->output->set_status_header(401)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['status'=>'gagal','msg'=>'Unauthorized']));
+		}
+
+		// Ambil & sanitasi input
+		$post     = $this->input->post(NULL, true);
+		$type     = strtolower($post['type'] ?? '');
+		$id       = (int)($post['id'] ?? 0);
+		$alasan   = trim($post['alasan'] ?? '');
+		$password = (string)($post['password'] ?? '');
+
+		if (!$id || !in_array($type, ['buy','sell'], true) || $alasan === '' || $password === '') {
+			return $this->output->set_content_type('application/json','utf-8')
+				->set_output(json_encode([
+					'status' => 'gagal',
+					$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+				]));
+		}
+
+		// User & hash di DB
+		$idUser   = (int)$this->session->userdata('idUser');
 		$userData = $this->UserModel->userDataById($idUser)->row();
-		if($userData->u_password == md5($datapost['password'])){
-			$data = array(
-				't_alasan' => $datapost['alasan']
-			);
-			if($datapost['type'] == 'sell'){
-				$this->db->update('tb_transaction_sell', $data, ['t_id' => $datapost['id']]);
-				$this->db->where('t_id', $datapost['id']);
-				$cek_data = $this->db->get('tb_transaction_sell')->row();
-			}
-			else{
-				$this->db->update('tb_transaction', $data, ['t_id' => $datapost['id']]);
-				$this->db->where('t_id', $datapost['id']);
-				$cek_data = $this->db->get('tb_transaction')->row();
-			}
-			echo json_encode([
-				'status' => 'berhasil',
-				'no_transaksi' => $cek_data->t_no_order,
-				'id' =>	$cek_data->t_id,
-			]);
-			// $this->redirectTransaction($cek_data->t_no_order);
+
+		if (!$userData) {
+			return $this->output->set_content_type('application/json','utf-8')
+				->set_output(json_encode([
+					'status'=>'gagal',
+					$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+				]));
 		}
-		else{
-			echo json_encode([
-				'status' => 'gagal'
-			]);
+
+		$stored = (string)($userData->u_password ?? '');
+		$ok = false;
+
+		// 1) Hash modern (bcrypt/argon) — password_verify
+		$info = password_get_info($stored);
+		if (!empty($info['algo'])) {
+			$ok = password_verify($password, $stored);
+
+			// (opsional) upgrade hash bila diperlukan
+			if ($ok && password_needs_rehash($stored, PASSWORD_DEFAULT)) {
+				$this->db->update('tb_user',
+					['u_password' => password_hash($password, PASSWORD_DEFAULT)],
+					['u_id' => $userData->u_id]
+				);
+			}
+		} else {
+			// 2) Fallback legacy: MD5 / SHA1
+			//    (hindari timing attacks dengan hash_equals)
+			if (strlen($stored) === 32 && ctype_xdigit($stored)) {
+				$ok = hash_equals(strtolower($stored), md5($password));
+			} elseif (strlen($stored) === 40 && ctype_xdigit($stored)) {
+				$ok = hash_equals(strtolower($stored), sha1($password));
+			}
 		}
+
+		if (!$ok) {
+			return $this->output->set_content_type('application/json','utf-8')
+				->set_output(json_encode([
+					'status' => 'gagal',
+					$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+				]));
+		}
+
+		// Update alasan pada header transaksi
+		$table = ($type === 'sell') ? 'tb_transaction_sell' : 'tb_transaction';
+
+		$this->db->where('t_id', $id)->update($table, [
+			't_alasan'     => $alasan,
+			't_updated_at' => date('Y-m-d H:i:s'),
+			't_updated_by' => $idUser
+		]);
+
+		// Ambil ulang header untuk response
+		$row = $this->db->where('t_id', $id)->get($table)->row();
+		if (!$row) {
+			return $this->output->set_content_type('application/json','utf-8')
+				->set_output(json_encode([
+					'status'=>'gagal',
+					$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+				]));
+		}
+
+		// Kirim sukses + refresh CSRF
+		return $this->output->set_content_type('application/json','utf-8')
+			->set_output(json_encode([
+				'status'        => 'berhasil',
+				'no_transaksi'  => $row->t_no_order,
+				'id'            => (int)$row->t_id,
+				$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+			], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 	}
+
 	function deleteTransaction($no_order)
     {
         $authUser = $this->session->userdata("authUser");

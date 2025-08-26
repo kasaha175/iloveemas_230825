@@ -88,6 +88,17 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
 
     /* Komponen kecil */
     .select2{ width:100% !important; }
+
+    /* Pastikan modal selalu di atas topbar & dropdown */
+    /* modal harus di atas apapun */
+    .modal-backdrop { z-index: 1190 !important; }
+    .modal          { z-index: 1200 !important; }
+
+    /* saat modal terbuka, jangan buat .page-wrap jadi konteks z-index yang menghalangi */
+    body.modal-open .page-wrap { z-index: auto !important; }
+
+    /* opsional: turunkan topbar sedikit saat modal terbuka (biar pasti di bawah backdrop) */
+    body.modal-open .navbar.topbar { z-index: 1000 !important; }
   </style>
 </head>
 <body>

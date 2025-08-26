@@ -1,152 +1,152 @@
-<div class="col-md-12" style="margin-top:110px;">
-    <div style="color:#fff;margin-top:-30px;">
-        <a style="color:#fff;text-decoration:none;" href="<?=base_url()?>dashboard/" class="fa fa-home"></a>
-        <a style="color:#fff;text-decoration:none;" href="<?=base_url()?>dashboard/">Dashboard</a> 
-        > 
-        <a style="color:#fff;text-decoration:none;" href="<?=base_url()?>transaction/">Transaction</a> 
-        > 
-        <a style="color:#fff;text-decoration:none;" href="">New Customer</a> 
-    </div>
-    <h3 class="text-center" style="color:#fff">TRANSACTION</h3>
-    <h3 class="text-center" style="color:#fff">New Customer</h3>
-    <br>
-    <div class="col-md-12" style="padding:0px 150px;">
-        <div class="row">
-            <div class="col-md-6 offset-md-3" style="padding:10px 10px">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card shadow mb-4">
-                            <!-- Card Header - Accordion -->
-                            <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button"
-                                aria-expanded="true" aria-controls="collapseCardExample">
-                                <h6 class="m-0 font-weight-bold text-primary">NEW CUSTOMER</h6>
-                            </a>
-                            <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardExample" style="">
-                                <div class="card-body">
-                                    <form action="<?=base_url()?>transaction/new-customer-process/" method="post" id="myForm">
-                                        <div class="form-group">
-                                            <label>NAME</label>
-                                            <input type="hidden" class="form-control" name="key" value="<?=$this->input->get('key')?>">
-                                            <input id="u_name" type="text" required class="form-control" name="name">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>ID NUMBER (KTP)</label>
-                                            <input type="text" id="u_id_number" required class="form-control" name="idNumber">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>ADDRESS</label>
-                                            <textarea id="u_address" required class="form-control" name="address" value=""></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>RESIDENT ADDRESS</label>
-                                            <textarea id="u_resident_address" required class="form-control" name="resident_address" value=""></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>PHONE</label>
-                                            <input id="u_phone" type="text" required class="form-control" name="phone">
-                                        </div>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="row">
-                                                        <div class="col-md-12 mb-3">
-                                                        <a href="#" onclick="document.getElementById('myForm').submit();" 
-                                                            class="btn btn-primary btn-icon-split btn-lg btn-block">
-                                                            <span class="text">Save</span>
-                                                        </a>
-                                                        </div>
-                                                        
-                                                        <div class="col-md-4">
-                                                        <a href="<?=base_url()?>master/customer/"
-                                                            class="btn btn-primary btn-icon-split btn-lg btn-block">
-                                                           <span class="text">Back</span>
-                                                        </a>
-                                                        </div>
-                                                        
-                                                   </div>
-                                            </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<style>
+  /* ===== Scoped only for this page ===== */
+  .nc-wrap{ margin-top: calc(var(--topbar-h,72px) + 12px); padding: clamp(12px,2vw,20px); }
+  .nc-container{ max-width: 920px; margin-inline:auto; }
 
-        </div>
+  /* Breadcrumb chip */
+  .nc-crumbs{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:10px 14px; border-radius:12px;
+    background: linear-gradient(135deg, var(--blue-pastel,#B1F0F7), #dff5ff);
+    border:1px solid #dfeaff; color:#0e204a; box-shadow:0 8px 20px rgba(0,0,0,.06);
+    margin-bottom:14px;
+  }
+  .nc-crumbs a{ color:#0e204a; text-decoration:none; font-weight:700; font-size:13px; }
+  .nc-crumbs a:hover{ color:var(--blue-dark,#001A6E); text-decoration:underline; }
+  .nc-crumbs .sep{ color:#7a8eb8; }
 
-    </div>
+  /* Header */
+  .nc-head h1{ margin:6px 0; color:#fff; font-weight:800; letter-spacing:.2px; font-size: clamp(20px,3.2vw,28px); }
+  .nc-head p{ margin:0; color:#dbe8ff; font-size:13px; }
 
+  /* Card */
+  .nc-card{ margin-top:12px; background:#fff; border:1px solid #e6eefc; border-radius:18px; overflow:hidden;
+           box-shadow:0 16px 28px rgba(0,0,0,.10); }
+  .nc-card-hd{
+    display:flex; align-items:center; gap:10px; justify-content:space-between;
+    padding:16px; border-bottom:1px solid #eaf0ff;
+    background:linear-gradient(135deg,#f7fbff,#ffffff);
+  }
+  .nc-card-hd h2{ margin:0; font-size:16px; font-weight:800; color:#0e204a; }
+  .nc-card-bd{ padding:18px; }
+
+  /* Form fields */
+  .nc-form .form-group{ margin-bottom:14px; }
+  .nc-form label{ font-weight:700; color:#0e204a; font-size:13px; margin-bottom:6px; }
+  .nc-form .form-control{
+    border:1px solid #dfeaff; border-radius:12px; padding:10px 12px;
+    box-shadow:0 8px 16px rgba(0,0,0,.04);
+  }
+  .nc-form .form-control:focus{
+    border-color:#bad3ff; box-shadow:0 0 0 4px rgba(7,71,153,.10);
+  }
+  textarea.form-control{ min-height:90px; resize:vertical; }
+
+  /* Buttons */
+  .btn-grad{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px 16px; border-radius:12px; border:0; font-weight:800; color:#fff;
+    background:linear-gradient(135deg,var(--blue-light,#074799),var(--blue-dark,#001A6E));
+    box-shadow:0 12px 22px rgba(0,26,110,.25); transition:transform .08s ease, filter .2s ease;
+  }
+  .btn-grad:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+  .btn-soft{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px 16px; border-radius:12px; font-weight:700;
+    color:#0e204a; background:#fff; border:1px solid #dfeaff; box-shadow:0 10px 18px rgba(0,0,0,.06);
+  }
+  .btn-row{ display:grid; grid-template-columns: 1fr; gap:10px; }
+  @media (min-width:560px){ .btn-row{ grid-template-columns: 2fr 1fr; } }
+
+  /* Success pill (optional) */
+  .nc-badge{
+    display:inline-block; padding:8px 12px; border-radius:999px;
+    border:1px solid #c9f6d1; background:#ecffef; color:#155724; font-weight:700; font-size:12px;
+  }
+</style>
+
+<div class="nc-wrap">
+  <div class="nc-container">
+
+    <!-- Breadcrumb -->
+    <nav class="nc-crumbs" aria-label="Breadcrumb">
+      <a href="<?= base_url('dashboard') ?>">Dashboard</a>
+      <span class="sep">/</span>
+      <a href="<?= base_url('transaction') ?>">Transaction</a>
+      <span class="sep">/</span>
+      <span>New Customer</span>
+    </nav>
+
+    <!-- Head -->
+    <header class="nc-head">
+      <h1>New Customer</h1>
+      <p>Input data pelanggan baru untuk transaksi di <strong>I Love Emas</strong>.</p>
+    </header>
+
+    <?php if($this->session->userdata('status')==='success'): ?>
+      <div style="margin:10px 0 0;">
+        <span class="nc-badge"><?= html_escape($this->session->userdata('message')) ?></span>
+      </div>
+      <?php $this->session->set_userdata(['status'=>'','message'=>'']); ?>
+    <?php endif; ?>
+
+    <!-- Card -->
+    <section class="nc-card">
+      <div class="nc-card-hd">
+        <h2><i class="fas fa-user-plus"></i> &nbsp;New Customer</h2>
+      </div>
+      <div class="nc-card-bd">
+        <form action="<?= base_url('transaction/new-customer-process/') ?>" method="post" id="myForm" class="nc-form" novalidate>
+          <!-- CSRF (jaga-jaga jika tidak auto) -->
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+          <input type="hidden" name="key" value="<?= $this->input->get('key'); ?>">
+
+          <div class="form-group">
+            <label for="u_name">Name</label>
+            <input id="u_name" type="text" name="name" class="form-control" required autocomplete="name" placeholder="Nama lengkap">
+          </div>
+
+          <div class="form-group">
+            <label for="u_id_number">ID Number (KTP)</label>
+            <input id="u_id_number" type="text" name="idNumber" class="form-control" required inputmode="numeric" maxlength="20" placeholder="Nomor KTP">
+          </div>
+
+          <div class="form-group">
+            <label for="u_address">Address</label>
+            <textarea id="u_address" name="address" class="form-control" required placeholder="Alamat sesuai KTP"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="u_resident_address">Resident Address</label>
+            <textarea id="u_resident_address" name="resident_address" class="form-control" required placeholder="Alamat domisili saat ini"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="u_phone">Phone</label>
+            <input id="u_phone" type="text" name="phone" class="form-control" required inputmode="tel" maxlength="20" placeholder="08xxxxxxxxxx">
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-grad"><i class="fas fa-save"></i> Simpan</button>
+            <a href="<?= base_url('master/customer') ?>" class="btn-soft"><i class="fas fa-arrow-left"></i> Kembali</a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </div>
 </div>
-<script type="text/javascript">
-    $("#materialType").select2();
-    $(".select2").select2();
-</script>
 
 <script>
-    jQuery(function ($) {
+  // Select2 (kalau ada)
+  $("#materialType").select2();
+  $(".select2").select2();
 
-        // QWERTY Text Input
-        // The bottom of this file is where the autocomplete extension is added
-        // ********************
-        $('#u_name').keyboard({
-            layout: 'qwerty'
-        });
-        $('#u_address').keyboard({
-            layout: 'qwerty'
-        });
-         $('#u_resident_address').keyboard({
-            layout: 'qwerty'
-        });
-        $('#u_phone').keyboard({
-            layout: 'qwerty'
-        });
-        $('#u_id_number').keyboard({
-            layout: 'qwerty'
-        });
-
-        $('.version').html('(v' + $('#u_name').getkeyboard().version + ')');
-
-        // Contenteditable
-        // ********************
-        $.keyboard.keyaction.undo = function (base) {
-            base.execCommand('undo');
-            return false;
-        };
-        $.keyboard.keyaction.redo = function (base) {
-            base.execCommand('redo');
-            return false;
-        };
-
-        $('#contenteditable').keyboard({
-            usePreview: false,
-            useCombos: false,
-            autoAccept: true,
-            layout: 'custom',
-            customLayout: {
-                'normal': [
-                    '` 1 2 3 4 5 6 7 8 9 0 - = {del} {b}',
-                    '{tab} q w e r t y u i o p [ ] \\',
-                    'a s d f g h j k l ; \' {enter}',
-                    '{shift} z x c v b n m , . / {shift}',
-                    '{accept} {space} {left} {right} {undo:Undo} {redo:Redo}'
-                ],
-                'shift': [
-                    '~ ! @ # $ % ^ & * ( ) _ + {del} {b}',
-                    '{tab} Q W E R T Y U I O P { } |',
-                    'A S D F G H J K L : " {enter}',
-                    '{shift} Z X C V B N M < > ? {shift}',
-                    '{accept} {space} {left} {right} {undo:Undo} {redo:Redo}'
-                ]
-            },
-            display: {
-                del: '\u2326:Delete',
-                redo: '↻',
-                undo: '↺'
-            }
-        });
-        prettyPrint();
-
-    });
+  // jqKeyboard untuk input teks
+  jQuery(function($){
+    if ($.fn.keyboard){
+      $('#u_name, #u_address, #u_resident_address, #u_phone, #u_id_number').keyboard({ layout:'qwerty' });
+    }
+  });
 </script>

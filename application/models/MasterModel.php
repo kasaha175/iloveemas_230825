@@ -54,5 +54,38 @@ class MasterModel extends CI_Model {
         WHERE a.c_id = '$idCustomer'");
         return $query;
     }
+
+    public function dtCustomers($start, $length, $search, $orderBy, $dir)
+    {
+        // total
+        $total = $this->db->from('tb_customer c')
+                        ->where('c.c_id_number !=', '999999999999999')
+                        ->count_all_results();
+
+        // filtered count
+        $qb = $this->db->from('tb_customer c')
+                    ->join('tb_user u','u.u_id=c.c_u_id','left')
+                    ->where('c.c_id_number !=', '999999999999999');
+
+        if ($search !== '') {
+            $qb->group_start()
+            ->like('c.c_name', $search)
+            ->or_like('c.c_no_order', $search)
+            ->or_like('c.c_phone', $search)
+            ->group_end();
+        }
+        $filtered = $qb->count_all_results();
+
+        // data
+        $rows = $this->db->from('tb_customer c')
+                        ->join('tb_user u','u.u_id=c.c_u_id','left')
+                        ->where('c.c_id_number !=', '999999999999999')
+                        ->order_by($orderBy, $dir)
+                        ->limit($length, $start)
+                        ->get()->result();
+
+        return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
+    }
+
 }
 ?>

@@ -1,145 +1,205 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php
-function nominal($angka){ return number_format((float)$angka, 0, ',', '.'); }
+// ===== Defaults
 $dateStart = $this->input->get('dateStart') ?: date('Y-m-01');
 $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
+
+// ===== Brand colors from app config (safe fallback)
+$cfg    = isset($config) && is_array($config) ? $config : [];
+$brand  = $cfg['color_primary']    ?? $cfg['primary_color'] ?? '#2563eb';
+$brand2 = $cfg['color_primary_2']  ?? '#1d4ed8';
+$pastel = $cfg['color_pastel']     ?? '#e7f1ff';
+$ink    = $cfg['color_text']       ?? '#0e204a';
+$accent = $cfg['color_accent']     ?? '#4a7dff';
+$line   = '#e6eefc';
 ?>
 <style>
-  /* ===== SCOPED supaya tidak bentrok UserTemplate ===== */
-  .report-sell-scope .master-wrap{ margin-top: calc(var(--topbar-h) + 12px); padding: clamp(12px, 2vw, 20px); }
-  .report-sell-scope .master-container{ max-width: 1480px; margin-inline:auto; }
+/* ===== Scoped styles ===== */
+.report-sell-scope{
+  --brand: <?= html_escape($brand) ?>;
+  --brand2: <?= html_escape($brand2) ?>;
+  --blue-pastel: <?= html_escape($pastel) ?>;
+  --ink: <?= html_escape($ink) ?>;
+  --accent: <?= html_escape($accent) ?>;
+  --line: <?= html_escape($line) ?>;
+}
+.report-sell-scope .wrap{ margin-top: calc(var(--topbar-h, 98px) + 12px); padding: clamp(12px,2vw,20px); }
+.report-sell-scope .container-max{ max-width:1380px; margin-inline:auto; }
 
-  .report-sell-scope .master-crumbs{
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    padding:10px 16px; border-radius:9999px;
-    background: linear-gradient(135deg, var(--blue-pastel), #dff5ff);
-    border:1px solid #dfeaff; color:#0e204a;
-    box-shadow:0 8px 20px rgba(0,0,0,.06); margin-bottom:14px;
-  }
-  .report-sell-scope .master-crumbs a{ color:#0e204a; text-decoration:none; font-weight:700; font-size:13px; }
-  .report-sell-scope .master-crumbs a:hover{ color:var(--blue-light); text-decoration:underline; }
-  .report-sell-scope .master-crumbs .sep{ color:#7a8eb8; }
+/* Breadcrumb */
+.report-sell-scope .crumbs{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:10px 16px; border-radius:9999px;
+  background:linear-gradient(135deg,var(--blue-pastel),#dff5ff);
+  border:1px solid #dfeaff; color:var(--ink);
+  box-shadow:0 8px 20px rgba(0,0,0,.06); margin-bottom:14px;
+}
+.report-sell-scope .crumbs a{ color:var(--ink); text-decoration:none; font-weight:700; font-size:12px; }
+.report-sell-scope .crumbs a:hover{ color:var(--accent); text-decoration:underline; }
+.report-sell-scope .crumbs .sep{ color:#7a8eb8; }
 
-  .report-sell-scope .master-head h3{ margin:8px 0 6px; color:#fff; font-weight:800; font-size:clamp(20px,3.2vw,28px); }
-  .report-sell-scope .master-head p{ margin:0; color:#dbe8ff; font-size:13px; }
+/* Heading */
+.report-sell-scope .heading h3{ margin:8px 0 6px; color:#fff; font-weight:800; font-size:clamp(20px,3.2vw,28px); }
+.report-sell-scope .heading p{ margin:0; color:#dbe8ff; font-size:12px; }
 
-  .report-sell-scope .card{ border-radius:16px; border:1px solid #e6eefc; }
-  .report-sell-scope .card-header{
-    background: linear-gradient(135deg, var(--blue-pastel), #e9faff);
-    border-bottom-color:#dfeaff; border-top-left-radius:16px; border-top-right-radius:16px;
-  }
-  .report-sell-scope .card-header h6{ color:#0e204a; font-weight:800; }
+/* Card */
+.report-sell-scope .card{
+  border-radius:16px; border:1px solid var(--line); overflow:hidden;
+  box-shadow:0 10px 24px rgba(0,0,0,.08); background:#fff;
+}
+.report-sell-scope .card-header{
+  background:linear-gradient(135deg,var(--blue-pastel),#e9faff);
+  border-bottom:1px solid #dfeaff;
+}
+.report-sell-scope .card-header h6{ margin:0; color:var(--ink); font-weight:800; }
 
-  /* header tabel satu baris; body boleh wrap */
-  .report-sell-scope .table thead th{ white-space:nowrap; text-align:center; }
-  .report-sell-scope table th, .report-sell-scope table td{ min-width:unset !important; }
-  .report-sell-scope .text-wrap{ white-space:normal !important; }
-  @media (min-width: 1200px){ .report-sell-scope .table-responsive{ overflow-x:visible; } }
+/* DataTables look (11px) */
+.report-sell-scope .dataTables_wrapper{ font-size:11px; }
+.report-sell-scope .dataTables_length{ display:flex; align-items:center; }
+.report-sell-scope .dataTables_length label{
+  margin-bottom:0; font-weight:600; display:flex; align-items:center; gap:8px;
+}
+.report-sell-scope .dataTables_length select{
+  font-size:11px; padding:.35rem .7rem; height:30px; border-radius:8px;
+  border:1px solid #e2e8f0; min-width:160px;
+}
+.report-sell-scope .dataTables_filter label{ margin-bottom:0; font-weight:600; }
+.report-sell-scope .dataTables_filter input{
+  font-size:11px; padding:.35rem .6rem; height:30px; border-radius:8px; border:1px solid #e2e8f0;
+}
+.report-sell-scope .dataTables_paginate .paginate_button{
+  padding:.28rem .55rem !important; margin:0 .12rem !important; border-radius:6px !important;
+  border:1px solid #e2e8f0 !important; background:#fff !important; color:#334155 !important;
+}
+.report-sell-scope .dataTables_paginate .paginate_button.current{
+  background:var(--brand) !important; color:#fff !important; border-color:var(--brand) !important;
+}
+.report-sell-scope .dt-buttons .btn{ font-size:11px; padding:.35rem .6rem; border-radius:8px; }
 
-  .report-sell-scope .master-actions{ margin-top:12px; }
-  .report-sell-scope .btn-back{
-    display:inline-flex; align-items:center; gap:8px; background:#fff; color:#0e204a; font-weight:700;
-    border:1px solid #dfeaff; padding:10px 14px; border-radius:12px; text-decoration:none;
-    box-shadow:0 10px 18px rgba(0,0,0,.06);
-  }
-  .report-sell-scope .btn-back:hover{ border-color:#cfe0ff; }
+/* Table */
+.report-sell-scope .table{ width:100%; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.report-sell-scope thead th{
+  background:#f5fbff; color:var(--ink); font-weight:800; text-align:center; white-space:nowrap; font-size:11px;
+}
+.report-sell-scope .table th, .report-sell-scope .table td{ vertical-align:middle !important; font-size:11px; }
+.report-sell-scope .text-wrap{ white-space:normal !important; }
+.report-sell-scope .text-nowrap{ white-space:nowrap !important; }
 
-  /* ==== FIX LAYERING: Swal di atas modal bootstrap (global, jangan dibatasi scope) ==== */
-  .modal-backdrop { z-index: 1190 !important; }
-  .modal          { z-index: 1200 !important; }
-  .swal2-container.swal2-on-top { z-index: 1600 !important; }
+/* Buttons */
+.report-sell-scope .btn-action{ font-size:11px; padding:.3rem .5rem; border-radius:8px; }
+.btn-brand{ background:var(--brand); border-color:var(--brand); color:#fff; }
+.btn-brand:hover{ background:var(--brand2); border-color:var(--brand2); color:#fff; }
+
+/* Preloader overlay (min 1.5s) */
+#rsOverlay{
+  position:fixed; inset:0; background:rgba(15,23,42,.35); backdrop-filter:saturate(110%) blur(2px);
+  display:flex; align-items:center; justify-content:center; z-index:5000;
+  opacity:0; visibility:hidden; pointer-events:none; transition:opacity .2s ease;
+}
+#rsOverlay.show{ opacity:1; visibility:visible; pointer-events:auto; }
+#rsOverlay .box{
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  background:rgba(255,255,255,.95); border:1px solid var(--line); border-radius:16px;
+  padding:16px 18px; box-shadow:0 12px 30px rgba(0,0,0,.18); min-width:220px;
+}
+#rsOverlay .spinner{ width:26px; height:26px; border-radius:50%; border:3px solid #dbeafe; border-top-color:var(--brand); animation:spin 1s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* Modal detail (brand) */
+#sellDetailModal .modal-content{ border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+#sellDetailModal .modal-header{ background:linear-gradient(135deg,var(--blue-pastel),#eef8ff); border-bottom:1px solid var(--line); }
+#sellDetailModal .modal-title{ color:var(--ink); font-weight:800; }
+#sellDetailModal .table th{ background:#f7fbff; }
+#sellDetailModal .badge-status{
+  display:inline-flex; align-items:center; gap:6px; font-weight:700;
+  padding:.18rem .5rem; border-radius:999px; background:#eef2ff; color:#3730a3; border:1px solid #e5e7eb;
+}
+#sellDetailModal .modal-footer{ background:#f7fbff; border-top:1px solid var(--line); }
+#sellDetailModal .modal-footer .btn{ font-size:11px; font-weight:700; border-radius:10px; padding:.38rem .7rem; }
+
+/* Layering fix */
+.modal-backdrop{ z-index:1190 !important; }
+.modal{ z-index:1200 !important; }
 </style>
 
 <div class="report-sell-scope">
-  <div class="master-wrap">
-    <div class="master-container">
+  <div class="wrap">
+    <div class="container-max">
 
       <!-- Breadcrumb -->
-      <nav class="master-crumbs" aria-label="Breadcrumb">
-        <a href="<?= base_url('dashboard') ?>">Dashboard</a>
-        <span class="sep">/</span>
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="<?= base_url('dashboard') ?>" class="fa fa-home" aria-label="Home"></a>
         <a href="<?= base_url('report') ?>">Report</a>
         <span class="sep">/</span>
         <span>Sell</span>
       </nav>
 
-      <!-- Header -->
-      <header class="master-head">
+      <!-- Heading -->
+      <header class="heading">
         <h3>Report</h3>
         <p>Transaction Sell</p>
       </header>
 
       <!-- Filter -->
-      <section class="mb-3">
-        <div class="card shadow-sm">
-          <a href="#filterCollapse" class="d-block card-header py-3" data-toggle="collapse" role="button"
-             aria-expanded="true" aria-controls="filterCollapse">
-            <h6 class="m-0 font-weight-bold">Filter Data</h6>
-          </a>
-          <div class="collapse show" id="filterCollapse">
-            <div class="card-body">
-              <form id="filterForm" action="<?= base_url('report/sell/') ?>" method="get">
-                <div class="form-row">
-                  <div class="form-group col-md-4">
-                    <label for="dateStart">Start Date</label>
-                    <input id="dateStart" name="dateStart" required type="date" value="<?= html_escape($dateStart) ?>" class="form-control">
-                  </div>
-                  <div class="form-group col-md-4">
-                    <label for="dateEnd">End Date</label>
-                    <input id="dateEnd" name="dateEnd" required type="date" value="<?= html_escape($dateEnd) ?>" class="form-control">
-                  </div>
-                  <div class="form-group col-md-4">
-                    <label>&nbsp;</label>
-                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
-                  </div>
-                </div>
-              </form>
+      <section class="card mt-3">
+        <div class="card-header py-3">
+          <h6 class="m-0">Filter Data</h6>
+        </div>
+        <div class="card-body">
+          <form id="filterForm" action="<?= base_url('report/sell/') ?>" method="get">
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="dateStart">Start Date</label>
+                <input id="dateStart" name="dateStart" type="date" required value="<?= html_escape($dateStart) ?>" class="form-control form-control-sm">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="dateEnd">End Date</label>
+                <input id="dateEnd" name="dateEnd" type="date" required value="<?= html_escape($dateEnd) ?>" class="form-control form-control-sm">
+              </div>
+              <div class="form-group col-md-4">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-brand btn-block btn-sm">Filter</button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </section>
 
-      <!-- Tabel data -->
-      <section>
-        <div class="card shadow-sm">
-          <a href="#dataCollapse" class="d-block card-header py-3" data-toggle="collapse" role="button"
-             aria-expanded="true" aria-controls="dataCollapse">
-            <h6 class="m-0 font-weight-bold">Transaction Data</h6>
-          </a>
-          <div class="collapse show" id="dataCollapse">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th class="text-nowrap">Action</th>
-                      <th class="text-nowrap">No Order</th>
-                      <th class="text-nowrap">Status</th>
-                      <th class="text-nowrap">Date</th>
-                      <th class="text-wrap">Created By</th>
-                      <th class="text-wrap">Receive By</th>
-                      <th class="text-wrap">Customer</th>
-                      <th class="text-nowrap">Qtt</th>
-                      <th class="text-nowrap">Price Total</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody><!-- server-side -->
-                </table>
-              </div>
-            </div>
+      <!-- Table -->
+      <section class="card mt-3">
+        <div class="card-header py-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <h6 class="m-0">Transaction Data</h6>
+            <div class="dt-topbar d-flex align-items-center"></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th class="text-nowrap">Action</th>
+                  <th class="text-nowrap">No Order</th>
+                  <th class="text-nowrap">Status</th>
+                  <th class="text-nowrap">Date</th>
+                  <th class="text-wrap">Created By</th>
+                  <th class="text-wrap">Receive By</th>
+                  <th class="text-wrap">Customer</th>
+                  <th class="text-nowrap">Qty</th>
+                  <th class="text-nowrap">Grand Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <!-- Back -->
-      <div class="master-actions">
-        <a href="<?= base_url('report') ?>" class="btn-back">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          Kembali ke Report
+      <div class="mt-3">
+        <a href="<?= base_url('report') ?>" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-left mr-1"></i> Kembali
         </a>
       </div>
 
@@ -147,7 +207,16 @@ $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
   </div>
 </div>
 
-<!-- Modal DELETE (global) -->
+<!-- Preloader -->
+<div id="rsOverlay" role="status" aria-hidden="true">
+  <div class="box" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <div style="font-weight:800;color:#0e204a;letter-spacing:.2px;">Loading…</div>
+    <div style="font-size:11px;color:#475569;">Please wait</div>
+  </div>
+</div>
+
+<!-- Modal Delete -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteTitle" aria-hidden="true">
   <div class="modal-dialog" role="document" style="top:84px;">
     <div class="modal-content">
@@ -164,7 +233,7 @@ $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
   </div>
 </div>
 
-<!-- Modal KONFIRMASI EDIT -->
+<!-- Modal Edit -->
 <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="editTitle" aria-hidden="true">
   <div class="modal-dialog" role="document" style="top:84px;">
     <div class="modal-content">
@@ -188,130 +257,279 @@ $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-        <button class="btn btn-primary" type="button" onclick="submitKonfirmasi()"><i class="fa fa-save"></i> Submit</button>
+        <button class="btn btn-brand" type="button" onclick="submitKonfirmasi()"><i class="fa fa-save mr-1"></i> Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detail (ringkasan + items) -->
+<div class="modal fade" id="sellDetailModal" tabindex="-1" role="dialog" aria-labelledby="sellDetailTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document" style="top:84px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sellDetailTitle">Transaction Detail</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Ringkasan -->
+        <div class="table-responsive mb-3">
+          <table class="table table-bordered mb-0">
+            <tbody>
+              <tr><th style="width:180px;">No Order</th><td id="sd_no"></td></tr>
+              <tr><th>Status</th><td><span id="sd_status" class="badge-status"></span></td></tr>
+              <tr><th>Tanggal</th><td id="sd_date"></td></tr>
+              <tr><th>Customer</th><td id="sd_customer"></td></tr>
+              <tr><th>Receive By</th><td id="sd_receive"></td></tr>
+              <tr><th>Qty</th><td id="sd_qty"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Items -->
+        <div class="table-responsive">
+          <table class="table table-bordered mb-0">
+            <thead>
+              <tr>
+                <th class="text-center" style="width:48px;">No</th>
+                <th>Item</th>
+                <th class="text-center" style="width:80px;">Qty</th>
+                <th class="text-right" style="width:140px;">Unit Price</th>
+                <th class="text-right" style="width:160px;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="sd_itemsBody">
+              <tr><td colspan="5" class="text-center text-muted">Loading item…</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><th colspan="4" class="text-right">Subtotal</th>   <th class="text-right" id="sd_subtotal">IDR 0</th></tr>
+              <tr><th colspan="4" class="text-right">Admin Fee</th>  <th class="text-right" id="sd_admin">IDR 0</th></tr>
+              <tr><th colspan="4" class="text-right">Grand Total</th><th class="text-right" id="sd_grand">IDR 0</th></tr>
+            </tfoot>
+          </table>
+        </div>
+        <small class="text-muted d-block mt-2">* Jika detail item tidak muncul, pastikan endpoint JSON tersedia.</small>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">
+          <i class="fa fa-times mr-1"></i> Tutup
+        </button>
+        <a id="sdBtnPrint" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+          <i class="fa fa-print mr-1"></i> Print
+        </a>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-(function ReportSellPage(){
+(function(){
   const BASE_URL  = "<?= base_url() ?>";
   const CSRF_NAME = "<?= $this->security->get_csrf_token_name(); ?>";
   let   CSRF_HASH = "<?= $this->security->get_csrf_hash(); ?>";
 
-  // util
-  function onReady(fn){ document.readyState!=='loading' ? fn() : document.addEventListener('DOMContentLoaded', fn); }
-  function ensureDT(fn){
+  // Preloader (min 1.5s)
+  const Overlay = (function(){
+    const el = document.getElementById('rsOverlay');
+    let minTimer=null, minDone=false, waiting=true;
+    function show(){ el.classList.add('show'); waiting=true; minDone=false; minTimer=setTimeout(()=>{ minDone=true; maybe(); },1500); }
+    function hide(){ el.classList.remove('show'); }
+    function xhrDone(){ waiting=false; maybe(); }
+    function maybe(){ if(minDone && !waiting){ clearTimeout(minTimer); hide(); } }
+    return { show, xhrDone };
+  })();
+
+  // Wait libs
+  function ensureDT(cb){
     let n=0, t=setInterval(function(){
-      if (window.jQuery && jQuery.fn && jQuery.fn.DataTable){ clearInterval(t); fn(jQuery); }
-      else if(++n>200){ clearInterval(t); console.error('jQuery/DataTables not found'); }
+      const ok = !!(window.jQuery && jQuery.fn && jQuery.fn.DataTable);
+      if (ok){ clearInterval(t); cb(jQuery); }
+      else if(++n>240){ clearInterval(t); console.error('jQuery/DataTables not ready.'); }
     },50);
   }
-  // SweetAlert helper: selalu di atas modal
-  function swalert(cfg){
-    if (!cfg) cfg = {};
-    const merged = Object.assign({ customClass:{ container:'swal2-on-top' }, backdrop:true }, cfg);
-    (window.Swal && Swal.fire) ? Swal.fire(merged) : alert(cfg.title || cfg.text || '');
-  }
 
-  // global helpers
-  window.openModalEdit = function(id){ jQuery('#edit_id').val(id); jQuery('#modalEdit').modal('show'); };
-  window.submitKonfirmasi = function(){
-    const $ = jQuery;
-    const alasan = ($('#alasan').val() || '').trim();
-    if (!alasan){ swalert({icon:'error',title:'Gagal',text:'Alasan tidak boleh kosong.'}); return; }
+  function fmtIDR(n){ return 'IDR ' + new Intl.NumberFormat('id-ID').format(Number(n||0)); }
 
-    swalert({title:'Mohon Tunggu Sebentar', html:'<i class="fa fa-sync fa-spin"></i>', showConfirmButton:false, allowOutsideClick:false});
-    $.ajax({
-      url: BASE_URL + "transaction/confirm-edit",
-      type: "POST",
-      data: {
-        type: $('#type').val(),
-        id: $('#edit_id').val(),
-        alasan: alasan,
-        password: $('#password').val(),
-        [CSRF_NAME]: CSRF_HASH
-      }
-    }).done(function(resp){
-      let res={}; try{ res = typeof resp==='object' ? resp : JSON.parse(resp); }catch(_){}
-      if(!res || res.status==='gagal'){
-        swalert({icon:'error',title:'Gagal',text:'Kata sandi salah atau permintaan tidak valid.'});
-        return;
-      }
-      // tutup modal dulu supaya layering rapi
-      $('#modalEdit').modal('hide');
-      swalert({icon:'success',title:'Berhasil',text:'Mohon tunggu sebentar...'});
-      window.location.href = BASE_URL + "transaction/redirect/" + (res.no_transaksi || "");
-    }).fail(function(){
-      swalert({icon:'error',title:'Gagal',text:'Terjadi kesalahan jaringan.'});
-    });
-  };
-
-  onReady(function(){
+  document.addEventListener('DOMContentLoaded', function(){
     ensureDT(function($){
-      // pastikan modal ada di <body> untuk hindari stacking context aneh
-      $('#modalEdit, #deleteModal').appendTo('body');
+      Overlay.show();
 
-      // 1 modal delete untuk semua row
-      $(document).on('click', '.js-open-delete', function(e){
+      // Move modals into body
+      $('#modalEdit, #deleteModal, #sellDetailModal').appendTo('body');
+
+      // Edit helpers
+      window.openModalEdit = function(id){ $('#edit_id').val(id); $('#modalEdit').modal('show'); };
+      window.submitKonfirmasi = function(){
+        $.post({
+          url: BASE_URL + "transaction/confirm-edit",
+          data:{
+            type: $('#type').val(), id: $('#edit_id').val(),
+            alasan: ($('#alasan').val()||'').trim(),
+            password: $('#password').val(), [CSRF_NAME]: CSRF_HASH
+          }
+        }).done(function(resp){
+          let r={}; try{ r = typeof resp==='object'? resp : JSON.parse(resp); }catch(_){}
+          if(!r || r.status==='gagal'){ alert('Kata sandi salah / permintaan tidak valid.'); return; }
+          location.href = BASE_URL + "transaction/redirect/" + (r.no_transaksi || "");
+        }).fail(function(){ alert('Terjadi kesalahan jaringan.'); });
+      };
+
+      // DataTables
+      const dt = $('#dataTable').DataTable({
+        serverSide:true,
+        processing:true,
+        autoWidth:false,
+        order:[[4,'desc']],
+        ajax:{ url:"<?= base_url('report/sell-dt') ?>", type:"POST" },
+        lengthMenu:[[10,50,100],[10,50,100]],
+        pageLength:10,
+        dom:
+          '<"d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2"l<"dt-btns"B>f>' +
+          't' +
+          '<"d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2"i p>',
+        buttons:[
+          { extend:'copyHtml5',  text:'<i class="fas fa-clipboard"></i> Copy', className:'btn btn-light btn-sm' },
+          { extend:'excelHtml5', text:'<i class="fas fa-file-excel"></i> Excel', className:'btn btn-light btn-sm' },
+          { extend:'csvHtml5',   text:'<i class="fas fa-file-csv"></i> CSV',   className:'btn btn-light btn-sm' },
+          { extend:'pdfHtml5',   text:'<i class="fas fa-file-pdf"></i>',       className:'btn btn-light btn-sm', orientation:'landscape', pageSize:'A4' }
+        ],
+        columnDefs:[
+          { targets:[0,1,3,8], className:'text-center text-nowrap' }, // No, Action, Status, Qty center
+          { targets:[5,6,7],   className:'text-wrap' },
+          { targets:[9],       className:'text-right text-nowrap' }   // Grand Total right
+        ],
+        createdRow:function(row){
+          const $cells=$('td',row), $act=$cells.eq(1);
+          const $tmp=$('<div/>').html($act.html());
+          const $del=$tmp.find('.js-open-delete').first();
+          const $print=$tmp.find('a[href*="report/sell-print"]').first();
+          const $edit=$tmp.find('button[onclick^="openModalEdit"]').first();
+
+          const noOrder = $cells.eq(2).text().trim();
+          const status  = $cells.eq(3).text().trim();
+          const date    = $cells.eq(4).text().trim();
+          const created = $cells.eq(5).text().trim();
+          const receive = $cells.eq(6).text().trim();
+          const cust    = $cells.eq(7).text().trim();
+          const qty     = $cells.eq(8).text().trim();
+          const total   = $cells.eq(9).text().trim();
+
+          const idFromPrint = ($print.attr('href')||'').match(/\/(\d+)\/?$/);
+          const id = $del.data('id') || (idFromPrint? idFromPrint[1] : '');
+
+          const dropdown =
+            '<div class="dropdown">'+
+              '<button class="btn btn-outline-primary btn-action dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+                '<i class="fas fa-cog mr-1"></i> Actions'+
+              '</button>'+
+              '<div class="dropdown-menu dropdown-menu-right">'+
+                ($print.length? ('<a class="dropdown-item" target="_blank" href="'+$print.attr('href')+'"><i class="fas fa-print mr-2"></i> Print</a>') : '')+
+                '<a class="dropdown-item text-info js-sell-detail" href="#" '+
+                   'data-id="'+(id||'')+'" '+
+                   'data-no="'+$('<div/>').text(noOrder).html()+'" '+
+                   'data-status="'+$('<div/>').text(status).html()+'" '+
+                   'data-date="'+$('<div/>').text(date).html()+'" '+
+                   'data-created="'+$('<div/>').text(created).html()+'" '+
+                   'data-receive="'+$('<div/>').text(receive).html()+'" '+
+                   'data-customer="'+$('<div/>').text(cust).html()+'" '+
+                   'data-qty="'+$('<div/>').text(qty).html()+'" '+
+                   'data-total="'+$('<div/>').text(total).html()+'">'+
+                   '<i class="fas fa-info-circle mr-2"></i> Detail</a>'+
+                ($edit.length? ('<a class="dropdown-item text-warning" href="#" onclick="'+$edit.attr('onclick')+'"><i class="fas fa-edit mr-2"></i> Edit</a>') : '')+
+                (($del.length||id)? '<div class="dropdown-divider"></div>' : '')+
+                '<a class="dropdown-item text-danger js-open-delete" href="#" data-id="'+(id||'')+'" data-no="'+$('<div/>').text(noOrder).html()+'"><i class="fas fa-trash mr-2"></i> Delete</a>'+
+              '</div>'+
+            '</div>';
+          $act.html(dropdown);
+        }
+      });
+
+      // Ensure filter params + CSRF are always sent (fix date filter)
+      $('#dataTable').on('preXhr.dt', function(e, settings, data){
+        data.dateStart  = $('#dateStart').val() || '<?= html_escape($dateStart) ?>';
+        data.dateEnd    = $('#dateEnd').val()   || '<?= html_escape($dateEnd) ?>';
+        data[CSRF_NAME] = CSRF_HASH;
+      }).on('xhr.dt', function(e, settings, json){
+        if (json && typeof json[CSRF_NAME] !== 'undefined') CSRF_HASH = json[CSRF_NAME];
+        Overlay.xhrDone();
+      }).on('error.dt', function(){ Overlay.xhrDone(); });
+
+      // Move export buttons
+      $('.dt-btns').appendTo($('.dt-topbar'));
+
+      // Filter submit → draw ulang dari page 1
+      $('#filterForm').on('submit', function(e){
         e.preventDefault();
-        const id = $(this).data('id');
-        const no = $(this).data('no');
-        $('#deleteModal .js-no-order').text(no);
-        $('#deleteModal .js-delete-link').attr('href', BASE_URL + "transaction/sell-delete-transaction/" + id);
+        var s=$('#dateStart').val(), f=$('#dateEnd').val();
+        if (s && f && s>f){ alert('Start Date tidak boleh lebih besar dari End Date.'); return; }
+        dt.page('first').draw(false);
+      });
+
+      // Delete modal
+      $(document).on('click','.js-open-delete',function(e){
+        e.preventDefault();
+        const id=$(this).data('id'), no=$(this).data('no');
+        $('#deleteModal .js-no-order').text(no||'');
+        $('#deleteModal .js-delete-link').attr('href', BASE_URL+'transaction/sell-delete-transaction/'+id);
         $('#deleteModal').modal('show');
       });
 
-      const hasButtons = $.fn.dataTable && $.fn.dataTable.Buttons;
-      const table = $('#dataTable').DataTable({
-        serverSide: true,
-        processing: true,
-        autoWidth: false,
-        scrollX: false,               // tidak pakai horizontal scroll; kolom di-wrap sesuai CSS
-        order: [[4,'desc']],          // Date
-        ajax: {
-          url: "<?= base_url('report/sell-dt') ?>",
-          type: "POST",
-          data: function(d){
-            d.dateStart = $('#dateStart').val();
-            d.dateEnd   = $('#dateEnd').val();
-            d[CSRF_NAME]= CSRF_HASH;
-          },
-          dataSrc: function(json){
-            if (json && typeof json[CSRF_NAME] !== 'undefined') CSRF_HASH = json[CSRF_NAME];
-            return json && json.data ? json.data : [];
-          }
-        },
-        dom: 'Bfrtip',
-        lengthMenu: [[10,25,50,100,-1], ['10 rows','25 rows','50 rows','100 rows','Show all']],
-        buttons: hasButtons ? [
-          { extend:'copyHtml5',  text:'<i class="fas fa-clipboard"></i> Copy', className:'btn btn-default btn-flat',
-            exportOptions:{ columns:[0,2,3,4,5,6,7,8,9] } },
-          { extend:'pdfHtml5',   orientation:'landscape', pageSize:'A4',
-            text:'<i class="fas fa-file-pdf"></i> PDF', className:'btn btn-default btn-flat',
-            exportOptions:{ columns:[0,2,3,4,5,6,7,8,9] } },
-          { extend:'excelHtml5', text:'<i class="fas fa-file-excel"></i> Excel', className:'btn btn-default btn-flat',
-            exportOptions:{ columns:[0,2,3,4,5,6,7,8,9] } },
-          { extend:'csvHtml5',   text:'<i class="fas fa-file-csv"></i> CSV', className:'btn btn-default btn-flat',
-            exportOptions:{ columns:[0,2,3,4,5,6,7,8,9] } },
-          { extend:'pageLength', className:'selectTable btn btn-default btn-flat' }
-        ] : [],
-        columnDefs: [
-          { targets: [1,2,3,4,8,9], className: 'text-nowrap' }, // aksi, kode, tanggal, qty, harga
-          { targets: [5,6,7],       className: 'text-wrap'    }  // nama panjang -> wrap
-        ]
-      });
-
-      // filter tanpa reload halaman
-      $('#filterForm').on('submit', function(e){
+      // Detail modal (AJAX load items)
+      $(document).on('click','.js-sell-detail',function(e){
         e.preventDefault();
-        table.ajax.reload();
+        const d=$(this).data(); const id=d.id||'';
+
+        $('#sd_no').text(d.no||'');
+        $('#sd_status').text(d.status||'');
+        $('#sd_date').text(d.date||'');
+        $('#sd_customer').text(d.customer||'');
+        $('#sd_receive').text(d.receive||'');
+        $('#sd_qty').text(d.qty||'');
+        $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Loading item…</td></tr>');
+        $('#sd_subtotal').text('IDR 0'); $('#sd_admin').text('IDR 0'); $('#sd_grand').text(d.total||'IDR 0');
+        $('#sdBtnPrint').attr('href', BASE_URL+'report/sell-print/'+(id||'')+'/');
+
+        $('#sellDetailModal').modal('show');
+
+        if(!id){ $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Detail item tidak tersedia.</td></tr>'); return; }
+
+        $.ajax({
+          url: BASE_URL + 'report/sell-items-json/' + id,
+          type:'POST',
+          dataType:'json',
+          data:(function(){ var p={}; p[CSRF_NAME]=CSRF_HASH; return p; })()
+        }).done(function(r){
+          if (r && r[CSRF_NAME]) CSRF_HASH = r[CSRF_NAME];
+          if (!r || r.ok!==true){ $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Detail item tidak tersedia.</td></tr>'); return; }
+          const items = Array.isArray(r.items)? r.items : [];
+          if (!items.length){ $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Tidak ada item.</td></tr>'); return; }
+
+          let rows='', subtotal=0;
+          items.forEach(function(it,i){
+            const line = Number(it.total || (Number(it.qty||0)*Number(it.price||0)));
+            subtotal += line;
+            rows += '<tr>'+
+                      '<td class="text-center">'+(i+1)+'</td>'+
+                      '<td>'+(it.name||'-')+'</td>'+
+                      '<td class="text-center">'+(it.qty||0)+' '+(it.unit||'')+'</td>'+
+                      '<td class="text-right">'+fmtIDR(it.price||0)+'</td>'+
+                      '<td class="text-right">'+fmtIDR(line)+'</td>'+
+                    '</tr>';
+          });
+          $('#sd_itemsBody').html(rows);
+          $('#sd_subtotal').text(fmtIDR(subtotal));
+          const admin = Number(r.admin_fee||0);
+          $('#sd_admin').text(fmtIDR(admin));
+          const grand = Number(r.grand_total||0) ||
+                        (function(){ try{ return Number((''+(d.total||'')).replace(/[^\d]/g,'')); }catch(e){ return 0; }})();
+          $('#sd_grand').text(fmtIDR(grand || (subtotal+admin)));
+        }).fail(function(){
+          $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Gagal memuat detail item.</td></tr>');
+        });
       });
 
-      // kosmetik & fix kolom saat modal muncul/hilang
-      $('#dataTable_filter').addClass('col-md-12');
-      $(document).on('shown.bs.modal hidden.bs.modal', function(){ table.columns.adjust(); });
     });
   });
 })();

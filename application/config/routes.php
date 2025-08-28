@@ -52,6 +52,14 @@ $route['transaction/select-customer/(:any)']         = 'TransactionController/se
 $route['transaction/new-customer']                   = 'TransactionController/newCustomer';
 $route['transaction/new-customer-process']           = 'TransactionController/newCustomerProcess';
 
+// === Simpan metadata print + generate & simpan PDF ===
+$route['transaction/savePrint/(:any)/(:num)']['POST'] = 'TransactionController/savePrint/$1/$2';
+// (opsional) izinkan GET juga agar kalau diketik manual tetap masuk lalu dikembalikan 405 oleh controllernya
+$route['transaction/savePrint/(:any)/(:num)']['GET']  = 'TransactionController/savePrint/$1/$2';
+
+// === Unduh file PDF yang sudah tersimpan ===
+$route['transaction/print-file/(:any)/(:num)']['GET'] = 'TransactionController/printFile/$1/$2';
+
 /* =============================== ARCHIVE =============================== */
 $route['archive']                = 'MasterController/archive';
 $route['archive/buy']            = 'MasterController/buy';

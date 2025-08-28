@@ -394,6 +394,18 @@ $mutedLine = '#e6eefc';
   const CSRF_NAME = "<?= $this->security->get_csrf_token_name(); ?>";
   let   CSRF_HASH = "<?= $this->security->get_csrf_hash(); ?>";
 
+  /* helper: buat URL PDF dari NoOrder & Date */
+  function buildPdfUrl(noOrder, dateStr){
+    // Ambil YYYY dan MM dari kolom Date (format Y-m-d / Y-m-d H:i:s)
+    const m = (dateStr||'').match(/(\d{4})[-/](\d{2})/);
+    const yyyy = m ? m[1] : '';
+    const mm   = m ? m[2] : '';
+    // Nama file = NoOrder + ".pdf"
+    const file = (String(noOrder||'').replace(/[^\w\-]/g, '')) + '.pdf';
+    // Path sesuai pola penyimpanan
+    return BASE_URL + 'uploads/prints/buy/' + yyyy + '/' + mm + '/' + encodeURIComponent(file);
+  }
+
   /* ===== Overlay ===== */
   const Overlay = (function(){
     const el = document.getElementById('rbOverlay');
@@ -405,7 +417,6 @@ $mutedLine = '#e6eefc';
     return { show, markXHRDone };
   })();
 
-  /* ===== Tunggu jQuery + DataTables ===== */
   function ensureLibs(cb){
     let tries=0;
     const t=setInterval(function(){
@@ -414,18 +425,13 @@ $mutedLine = '#e6eefc';
       else if (++tries > 240){ clearInterval(t); console.error('jQuery/DataTables not ready.'); }
     }, 50);
   }
-
-  // Format IDR
   function fmtIDR(n){ return 'IDR ' + new Intl.NumberFormat('id-ID').format(Number(n||0)); }
 
   document.addEventListener('DOMContentLoaded', function(){
     ensureLibs(function($){
       Overlay.show();
-
-      // Pastikan modal dipindah ke body
       $('#modalEdit, #deleteModal, #detailModal').appendTo('body');
 
-      // Helpers modal edit
       window.openModalEdit = function(id){ $('#edit_id').val(id); $('#modalEdit').modal('show'); };
       window.submitKonfirmasi = function(){
         $.post({
@@ -444,17 +450,12 @@ $mutedLine = '#e6eefc';
         }).fail(function(){ alert('Terjadi kesalahan jaringan.'); });
       };
 
-      /* ===== DataTables ===== */
       const dt = $('#dataTable').DataTable({
         serverSide:true,
         processing:true,
         autoWidth:false,
         order:[[4,'desc']],
-        ajax:{
-          url : "<?= base_url('report/buy-dt') ?>",
-          type: "POST"
-          // ⬆️ Tidak perlu 'data:' lagi. Kita sisipkan filter via preXhr di bawah agar pasti terkirim setiap request.
-        },
+        ajax:{ url : "<?= base_url('report/buy-dt') ?>", type: "POST" },
         lengthMenu : [[10,50,100],[10,50,100]],
         pageLength : 10,
         dom:
@@ -472,25 +473,28 @@ $mutedLine = '#e6eefc';
           { targets:[5,6,7],   className:'text-wrap' },
           { targets:[9],       className:'text-right text-nowrap' }
         ],
+
+        /* ==== ACTION: ubah ke Preview PDF yang ambil dari path ==== */
         createdRow: function(row){
           const $cells  = $('td', row);
           const $actTd  = $cells.eq(1);
           const $tmp    = $('<div/>').html($actTd.html());
           const $del    = $tmp.find('.js-open-delete').first();
-          const $print  = $tmp.find('a[href*="report/buy-print"]').first();
           const $edit   = $tmp.find('button[onclick^="openModalEdit"]').first();
 
-          const noOrder = $cells.eq(2).text().trim();
+          const noOrder = $cells.eq(2).text().trim();   // ex: PB-2508-1385
+          const dateTxt = $cells.eq(4).text().trim();   // ex: 2025-08-28 20:50:11
+          const id      = $del.data('id') || '';
+
+          // Bangun URL PDF dari path yang disimpan (uploads/prints/buy/YYYY/MM/NoOrder.pdf)
+          const previewUrl = buildPdfUrl(noOrder, dateTxt);
+
           const status  = $cells.eq(3).text().trim();
-          const date    = $cells.eq(4).text().trim();
           const created = $cells.eq(5).text().trim();
           const receive = $cells.eq(6).text().trim();
           const cust    = $cells.eq(7).text().trim();
           const qty     = $cells.eq(8).text().trim();
           const total   = $cells.eq(9).text().trim();
-
-          const idFromPrint = ($print.attr('href')||'').match(/\/(\d+)\/?$/);
-          const id          = $del.data('id') || (idFromPrint ? idFromPrint[1] : '');
 
           const dropdown =
             '<div class="dropdown">' +
@@ -498,12 +502,13 @@ $mutedLine = '#e6eefc';
                 '<i class="fas fa-cog mr-1"></i> Actions' +
               '</button>' +
               '<div class="dropdown-menu dropdown-menu-right">' +
-                ($print.length ? ('<a class="dropdown-item" href="'+$print.attr('href')+'" target="_blank"><i class="fas fa-print mr-2"></i> Print</a>') : '') +
+                '<a class="dropdown-item text-primary" href="'+ previewUrl +'" target="_blank" rel="noopener">' +
+                  '<i class="fas fa-file-pdf mr-2"></i> Preview PDF</a>' +
                 '<a class="dropdown-item text-info js-show-detail" href="#" '+
                    'data-id="'+(id||'')+'" '+
                    'data-no="'+$('<div/>').text(noOrder).html()+'" '+
                    'data-status="'+$('<div/>').text(status).html()+'" '+
-                   'data-date="'+$('<div/>').text(date).html()+'" '+
+                   'data-date="'+$('<div/>').text(dateTxt).html()+'" '+
                    'data-created="'+$('<div/>').text(created).html()+'" '+
                    'data-receive="'+$('<div/>').text(receive).html()+'" '+
                    'data-customer="'+$('<div/>').text(cust).html()+'" '+
@@ -520,26 +525,21 @@ $mutedLine = '#e6eefc';
         }
       });
 
-      /* ==== KUNCI PERBAIKAN FILTER TANGGAL ==== */
-      // 1) Pastikan setiap XHR DataTables menyertakan dateStart/dateEnd + CSRF
+      // kirim filter + CSRF di setiap request
       $('#dataTable').on('preXhr.dt', function (e, settings, data) {
         data.dateStart  = $('#dateStart').val() || '<?= html_escape($dateStart) ?>';
         data.dateEnd    = $('#dateEnd').val()   || '<?= html_escape($dateEnd) ?>';
         data[CSRF_NAME] = CSRF_HASH;
       });
-
-      // 2) Update CSRF & hilangkan overlay saat response/ error
       $('#dataTable')
-        .on('xhr.dt', function(e, settings, json){
+        .on('xhr.dt', function(e, s, json){
           if (json && typeof json[CSRF_NAME] !== 'undefined') CSRF_HASH = json[CSRF_NAME];
           Overlay.markXHRDone();
         })
         .on('error.dt', function(){ Overlay.markXHRDone(); });
 
-      // Pindahkan tombol export
       $('.dt-btns').appendTo($('.dt-topbar'));
 
-      // 3) Submit filter → kembali ke page pertama dan draw (preXhr akan menambahkan filter)
       $('#filterForm').on('submit', function(e){
         e.preventDefault();
         var s = $('#dateStart').val(), f = $('#dateEnd').val();
@@ -547,7 +547,6 @@ $mutedLine = '#e6eefc';
         dt.page('first').draw(false);
       });
 
-      // Delete handler
       $(document).on('click', '.js-open-delete', function(e){
         e.preventDefault();
         const id = $(this).data('id'); const no = $(this).data('no');
@@ -560,7 +559,6 @@ $mutedLine = '#e6eefc';
       $(document).on('click', '.js-show-detail', function(e){
         e.preventDefault();
         const d   = $(this).data();
-        const id  = d.id || '';
 
         // Ringkasan
         $('#d_no').text(d.no || '');
@@ -575,18 +573,18 @@ $mutedLine = '#e6eefc';
         $('#ft_admin').text('IDR 0');
         $('#ft_grand').text(d.total || 'IDR 0');
 
-        // perbaikan id tombol print
-        $('#rbBtnPrint').attr('href', BASE_URL + 'report/buy-print/' + (id || '') + '/');
+        // tombol preview PDF di modal → pakai path (NoOrder + Date)
+        $('#rbBtnPrint').attr('href', buildPdfUrl(d.no, d.date));
 
         $('#detailModal').modal('show');
 
-        if(!id){
+        if(!d.id){
           $('#itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Detail item tidak tersedia.</td></tr>');
           return;
         }
 
         $.ajax({
-          url: BASE_URL + 'report/buy-items-json/' + id,
+          url: BASE_URL + 'report/buy-items-json/' + d.id,
           type: 'POST',
           dataType: 'json',
           data: (function(){ var p={}; p[CSRF_NAME]=CSRF_HASH; return p; })()
@@ -629,4 +627,7 @@ $mutedLine = '#e6eefc';
   });
 })();
 </script>
+
+
+
 

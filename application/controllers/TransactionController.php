@@ -592,25 +592,24 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
 	}
-	function buy()
+
+	public function buy()
 	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
+		$idUser   = $this->session->userdata("idUser");
 		$this->data["title"] = "TRANSACTION BUY";
-			// echo "<pre>";
-            // print_r ($authUser);
-            // echo "</pre>";
-			// die();
+
 		if ($authUser == true) {
 			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			//$this->data['data'] = $this->MaterialModel->materialData('Buy')->result();
-			$this->data['content'] = $this->load->view('Buy', $this->data, true);
+
+			// muat view utama ke dalam template
+			$this->data['content'] = $this->load->view('Buy', $this->data, true); // <-- pakai 'Buy', bukan 'transaction/buy'
 			$this->load->view("UserTemplate", $this->data);
-		}
-		else {
+		} else {
 			redirect(base_url());
 		}
 	}
+
 	function newCustomer(){
 		$authUser = $this->session->userdata("authUser");
 		$idUser = $this->session->userdata("idUser");
@@ -678,17 +677,41 @@ class TransactionController extends CI_Controller
 			redirect(base_url());
 		}
 	}
-	function updateLive(){
-		$id=$this->input->post('id'); 
-		$id = explode(" ", $id);
-		$id = $id[0];
+
+	public function updateLive()
+	{
+		// Wajib POST + CSRF valid
+		if (strtoupper($this->input->method()) !== 'POST') {
+			return $this->output->set_status_header(405)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'Method Not Allowed']));
+		}
+
+		$id = trim((string)$this->input->post('id', true));
+		if ($id === '') {
+			return $this->output->set_status_header(400)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode([
+					'ok'=>false,
+					'msg'=>'Missing id',
+					$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+				]));
+		}
+
+		// jangan di-explode; id kita sudah numeric murni dari Select2
 		$this->session->unset_userdata('idTransaction');
-		$data_session = array(
-			'idCustomer' => $id
-		);
-		$this->session->set_userdata($data_session);
+		$this->session->set_userdata(['idCustomer' => $id]);
 		$this->cart->destroy();
+
+		// kirim balik status + token baru
+		return $this->output->set_content_type('application/json','utf-8')
+			->set_output(json_encode([
+				'ok' => true,
+				'idCustomer' => $id,
+				$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+			]));
 	}
+
 	function buyCart()
 	{
 		$authUser = $this->session->userdata("authUser");
@@ -1143,23 +1166,24 @@ class TransactionController extends CI_Controller
 		redirect(base_url("report/buy-print/$idTransaction/"));
 	}
 
-    function sell()
+	public function sell()
 	{
 		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
+		$idUser   = $this->session->userdata("idUser");
 		$this->data["title"] = "TRANSACTION SELL";
+
 		if ($authUser == true) {
 			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			$type = $this->UserModel->userDataById($idUser)->row("u_rule");
-			$id = $this->input->get('id');
-			$this->data['data'] = $this->MaterialModel->materialData('Sell')->result();
-			$this->data['content'] = $this->load->view('Sell', $this->data, true);
+			$this->data['data']     = $this->MaterialModel->materialData('Sell')->result();
+
+			// muat view utama ke dalam template
+			$this->data['content'] = $this->load->view('Sell', $this->data, true); // <-- pakai 'Sell'
 			$this->load->view("UserTemplate", $this->data);
-		}
-		else {
+		} else {
 			redirect(base_url());
 		}
 	}
+
 	function sellCart()
 	{
 		$authUser = $this->session->userdata("authUser");

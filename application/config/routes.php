@@ -23,6 +23,7 @@ $route['transaction/getTransactions']                = 'TransactionController/ge
 $route['transaction/redirect/(:any)']               = 'TransactionController/redirectTransaction/$1'; // no_order (string)
 $route['transaction/delete-transaction/(:any)']     = 'TransactionController/deleteTransaction/$1';   // no_order (string)
 $route['transaction/confirm-edit']                   = 'TransactionController/confirmEdit';
+$route['transaction/updateLive']                     = 'TransactionController/updateLive';
 
 $route['transaction/buy']                            = 'TransactionController/buy';
 $route['transaction/buy/lm/select']                  = 'TransactionController/lm';

@@ -140,18 +140,60 @@
 function init(){ (function ($) {
   'use strict';
 
+  // ====== CONFIG ======
   var ENDPOINT = "<?= site_url('transaction/customers') ?>";
   var baseUrl  = "<?= base_url() ?>";
+  var CSRF     = {
+    name: "<?= $this->security->get_csrf_token_name() ?>",
+    value:"<?= $this->security->get_csrf_hash() ?>",
+  };
+
   var $sel     = $('#u_name');
+  var $sell    = $('#sell');
+  var $buy     = $('#buy');
+  var $overlay = $('#txOverlay');
+  var $txt     = $('#txOverlayTxt');
+
+  // set CSRF untuk semua POST
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings){
+      if (settings.type && settings.type.toUpperCase() === 'POST') {
+        if (typeof settings.data === 'string') {
+          var pair = encodeURIComponent(CSRF.name) + '=' + encodeURIComponent(CSRF.value);
+          settings.data = settings.data ? settings.data + '&' + pair : pair;
+        } else if ($.isPlainObject(settings.data)) {
+          settings.data[CSRF.name] = CSRF.value;
+        }
+      }
+    }
+  });
+
+  function showOverlay(msg){
+    if ($overlay && $overlay.length){
+      if ($txt && $txt.length && msg) { $txt.text(msg); }
+      $overlay.addClass('show');
+    }
+  }
+  function hideOverlay(){
+    if ($overlay && $overlay.length){
+      $overlay.removeClass('show');
+    }
+  }
+
+  function toggleActions(){
+    var has = !!$sel.val();
+    $sell.prop('disabled', !has);
+    $buy.prop('disabled', !has);
+  }
 
   console.log('%c[BOOT] jQuery & Select2 siap', 'color:#16a34a');
 
-  // ============== DEBUG MANUAL PING SEKALI (sanity check) =================
+  // ============== DEBUG PING (sanity check) =================
   $.get(ENDPOINT, {search:'ab', page:1})
     .done(function(d){ console.log('[PING] GET', ENDPOINT, '-> OK:', d); })
     .fail(function(xhr){ console.warn('[PING] GET', ENDPOINT, '-> FAIL', xhr.status, xhr.responseText); });
 
-  // ====================== SELECT2 + DEBUG LENGKAP ==========================
+  // ====================== SELECT2 ==========================
   $sel.select2({
     width: '100%',
     placeholder: 'Please select customer...',
@@ -163,31 +205,21 @@ function init(){ (function ($) {
       delay: 250,
       data: function (params) {
         console.log('[S2->data] term="%s" page=%s', params.term, params.page || 1);
-        return {
-          search: params.term || '',
-          page: params.page || 1
-        };
+        return { search: params.term || '', page: params.page || 1 };
       },
       processResults: function (data, params) {
         console.log('[S2<-resp] raw:', data);
         params.page = params.page || 1;
-
-        // normalisasi array
         var list = Array.isArray(data && data.results)
           ? data.results
           : (data && data.results ? Object.values(data.results) : []);
-
         var items = list.map(function (r) {
           return {
             id: String(r.c_id),
             text: (r.c_id ?? '') + ' - ' + (r.c_name ?? '') + ' - ' + (r.c_id_number ?? '')
           };
         });
-
-        return {
-          results: items,
-          pagination: { more: !!(data && data.pagination && data.pagination.more) }
-        };
+        return { results: items, pagination: { more: !!(data && data.pagination && data.pagination.more) } };
       },
       cache: true
     }
@@ -204,22 +236,57 @@ function init(){ (function ($) {
     }, 0);
   });
 
-  // log saat user memilih satu baris
+  // saat user memilih satu baris → simpan ke session via updateLive (POST + CSRF)
   $sel.on('select2:select', function(e){
+    var id = e.params.data.id;
     console.log('[S2] selected:', e.params.data);
-    // kirim ke server untuk simpan ke session
-    $.post(baseUrl + "transaction/updateLive", { id: e.params.data.id })
-      .done(function(){ console.log('[updateLive] OK'); })
-      .fail(function(xhr){ console.warn('[updateLive] FAIL', xhr.status, xhr.responseText); });
+
+    showOverlay('Menyimpan pilihan…');
+
+    $.post(baseUrl + "transaction/updateLive", { id: id })
+      .done(function(resp){
+        console.log('[updateLive] OK:', resp);
+        // update CSRF kalau server regenerate
+        try {
+          if (resp && typeof resp === 'object') {
+            if (resp[CSRF.name]) { CSRF.value = resp[CSRF.name]; }
+            if (resp.ok === false) {
+              alert(resp.msg || 'Gagal menyimpan customer.');
+            } else if (resp.idCustomer) {
+              // sukses
+              toggleActions();
+            }
+          }
+        } catch(err){ console.warn('CSRF/update parse warn:', err); }
+      })
+      .fail(function(xhr){
+        console.warn('[updateLive] FAIL', xhr.status, xhr.responseText);
+        alert('Gagal menyimpan pilihan customer (' + xhr.status + ').');
+      })
+      .always(function(){
+        hideOverlay();
+      });
   });
+
+  // enable/disable awal
+  toggleActions();
 
   // tombol
   function mustPick(){
     if (!$sel.val()) { alert('Please select customer!'); return true; }
     return false;
   }
-  $('#sell').on('click', function(e){ e.preventDefault(); if (mustPick()) return; window.location.href = baseUrl + "transaction/sell"; });
-  $('#buy').on('click',  function(e){ e.preventDefault(); if (mustPick()) return; window.location.href = baseUrl + "transaction/buy";  });
+  $('#sell').on('click', function(e){
+    e.preventDefault();
+    if (mustPick()) return;
+    window.location.href = baseUrl + "transaction/sell";
+  });
+  $('#buy').on('click', function(e){
+    e.preventDefault();
+    if (mustPick()) return;
+    window.location.href = baseUrl + "transaction/buy";
+  });
 
 })(jQuery); }
 </script>
+

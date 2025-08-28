@@ -2,6 +2,8 @@
 // ambil style tombol dari config (fallback aman)
 $ui       = $this->config->item('ui') ?? [];
 $btnLight = $ui['btn']['lightLg'] ?? 'btn btn-light btn-lg';
+// Ikon back dari config (fallback)
+$iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
 ?>
 <style>
   :root{

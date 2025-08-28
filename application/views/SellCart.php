@@ -1,215 +1,366 @@
 <?php
+// ===== Akumulasi total & helper format =====
 $total = 0;
-foreach($this->cart->contents() as $row){
-    $opt   = isset($row['options']) ? $row['options'] : [];
-    $total += isset($opt['priceTotal']) && is_numeric($opt['priceTotal']) ? (float)$opt['priceTotal'] : (float)$row['subtotal'];
+foreach ($this->cart->contents() as $row) {
+  $opt = $row['options'] ?? [];
+  if (isset($opt['price_total']) && is_numeric($opt['price_total'])) {
+    $total += (float)$opt['price_total'];
+  } elseif (isset($opt['priceTotal']) && is_numeric($opt['priceTotal'])) {
+    $total += (float)$opt['priceTotal'];
+  } else {
+    $total += (float)$row['subtotal'];
+  }
 }
+function nominal($angka){ return number_format(floor((float)$angka), 0, ',', '.'); }
 
-function nominal($angka){
-    $jd = number_format($angka, 0, ',', '.');
-    return $jd;
-}
+$iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
+$mSeg     = (string)$this->uri->segment(3);
 ?>
-<div class="col-md-12" style="margin-top:110px;">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb fixed-top bg-transparent w-50" style="margin-top:5rem">
-            <li class="breadcrumb-item"><a class="text-decoration-none text-white" href="<?=base_url()?>dashboard/"><i class="fas fa-home fa-fw"></i> Dashboard</a></li>
-            <li class="breadcrumb-item"><a class="text-decoration-none text-secondary" href="<?=base_url()?>transaction/">Transaction</a></li>
-            <li class="breadcrumb-item"><a class="text-decoration-none text-secondary" href="<?=base_url()?>transaction/sell">Sell</a></li>
-            <li class="breadcrumb-item"><a class="text-decoration-none text-secondary" href="<?=base_url()?>">Cart</a></li>
-        </ol>
-    </nav>
-    <h3 class="text-center" style="color:#fff">SELL</h3>
-    <h3 class="text-center" style="color:#fff">Checkout Session</h3>
-    <br>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 mt-3 mb-5">
-                <a href="<?=base_url()?>transaction/sell/" class="btn btn-light btn-icon-split btn-lg">
-                    <span class="icon text-white-50">
-                        <i class="fas fa-arrow-left text-dark"></i>
-                    </span>
-                    <span class="text">Back</span>
+<style>
+  :root{
+    --blue-light:#074799; --blue-dark:#001A6E; --blue-pastel:#B1F0F7;
+    --text:#0B0F1A; --muted:#6b7a99;
+    --card-bg:#fff; --card-br:#e6eefc;
+    --shadow:0 18px 30px rgba(0,0,0,.10);
+    --radius:18px; --topbar-h:72px;
+  }
+
+  /* ===== Boot & Overlay ===== */
+  .boot-hide{opacity:0;visibility:hidden;}
+  .app-overlay{
+    position:fixed; inset:0; z-index:4000;
+    background: rgba(255,255,255,.45);
+    backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity .25s ease, visibility .25s ease;
+  }
+  .app-overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+  .loader{
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:18px 22px; border-radius:16px; background:rgba(255,255,255,.9); border:1px solid #e6eefc;
+    box-shadow:0 8px 24px rgba(0,0,0,.10);
+  }
+  .ring{
+    width:46px; height:46px; border-radius:50%;
+    border:3px solid rgba(0,26,110,.25); border-top-color: var(--blue-dark);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin{ to { transform: rotate(360deg); } }
+  .loader-label{ font-size:13px; color:#0b1f4f; font-weight:700; }
+
+  .ilv-check{ padding:clamp(14px,2vw,24px); margin-top:var(--topbar-h); }
+  .ilv-container{ max-width:1200px; margin-inline:auto; }
+
+  /* HERO */
+  .ilv-hero{
+    position:relative; overflow:hidden; border-radius:var(--radius);
+    background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));
+    color:#fff; padding:clamp(16px,3vw,28px);
+    box-shadow:var(--shadow);
+  }
+  .ilv-crumbs{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.20);
+    border-radius:999px; padding:8px 12px; width:max-content;
+    backdrop-filter:blur(6px);
+  }
+  .ilv-crumbs a{ color:#e8f2ff; text-decoration:none; font-weight:600; }
+  .ilv-crumbs .sep{ color:#c9defe; opacity:.7; }
+  .ilv-hero h1{ margin:8px 0 4px; font-weight:800; font-size:clamp(18px,3vw,28px); }
+  .ilv-hero p{ margin:0; opacity:.95; font-size:clamp(12px,1.2vw,14px); }
+  .ilv-head{ margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+  /* Tombol Back */
+  .ilv-back{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#fff; color:#0b1f4f; border:1px solid #e6eefc;
+    border-radius:999px; padding:7px 12px; text-decoration:none; font-weight:700;
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+    transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+    white-space:nowrap;
+  }
+  .ilv-back:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(0,0,0,.12); border-color:#d7e5ff; }
+
+  /* Layout 2 kolom */
+  .ilv-grid{
+    margin-top: clamp(14px,2vw,20px);
+    display:grid; grid-template-columns: 1fr; gap:14px;
+  }
+  @media (min-width: 992px){ .ilv-grid{ grid-template-columns: 380px 1fr; } }
+
+  /* Card */
+  .ilv-card{
+    background:var(--card-bg); border:1px solid var(--card-br);
+    border-radius:16px; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.08);
+  }
+  .ilv-card .ilv-card-head{
+    background: linear-gradient(135deg, var(--blue-pastel), #e9faff);
+    border-bottom:1px solid #dfeaff; padding:12px 16px;
+  }
+  .ilv-card .ilv-card-head h6{ margin:0; color:#0e204a; font-weight:800; font-size:15px; }
+  .ilv-card .ilv-card-body{ padding:16px; }
+
+  /* Form */
+  .form-label{ font-weight:700; font-size:13px; color:#0e204a; margin-bottom:8px; }
+  .form-control, .select2-container .select2-selection--single{
+    height:46px; border-radius:12px; border:1px solid #e3e6ef; font-size:14px;
+  }
+  .select2-selection__rendered{ line-height:44px !important; padding-left:14px !important; }
+  .select2-selection__arrow{ height:44px !important; right:10px !important; }
+  .select2-container--default.select2-container--focus .select2-selection--single,
+  .form-control:focus{
+    border-color:#b9d6ff; box-shadow:0 0 0 3px rgba(51,136,255,.15);
+  }
+  .ilv-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  /* Tabel */
+  .table thead th{ white-space:nowrap; background:#f7fbff; border-color:#e6eefc; }
+  .table td, .table th{ vertical-align:middle; }
+  .table-responsive{ border:1px solid #eef3ff; border-radius:12px; overflow:hidden; }
+
+  /* Footer actions */
+  .ilv-footer-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+  /* Buttons */
+  .btn-soft{ border:1px solid #e6eefc; background:#fff; color:#0e204a; }
+  .btn-soft:hover{ border-color:#d7e5ff; background:#fff; box-shadow:0 8px 18px rgba(0,0,0,.08); }
+</style>
+
+<!-- Overlay boot (halaman ditampilkan setelah JS siap) -->
+<div id="pageOverlay" class="app-overlay" aria-live="polite" aria-busy="true">
+  <div class="loader">
+    <div class="ring" aria-hidden="true"></div>
+    <div class="loader-label">Memuat komponen…</div>
+  </div>
+</div>
+
+<div id="appRoot" class="boot-hide">
+  <div class="ilv-check">
+    <div class="ilv-container">
+
+      <!-- HERO -->
+      <section class="ilv-hero" aria-label="Sell — Checkout Session">
+        <nav aria-label="breadcrumb">
+          <div class="ilv-crumbs">
+            <a href="<?= base_url('dashboard') ?>"><i class="fas fa-home"></i>&nbsp;Dashboard</a>
+            <span class="sep">›</span>
+            <a href="<?= base_url('transaction') ?>">Transaction</a>
+            <span class="sep">›</span>
+            <a href="<?= base_url('transaction/sell') ?>">Sell</a>
+            <span class="sep">›</span>
+            <span style="opacity:.9">Cart</span>
+          </div>
+        </nav>
+
+        <div class="ilv-head">
+          <div>
+            <h1>Sell — Checkout Session</h1>
+            <p>Review item dan lanjutkan proses checkout. Customer: <strong><?= htmlspecialchars($nameCustomer ?? '-', ENT_QUOTES) ?></strong></p>
+          </div>
+          <a href="<?= base_url('transaction/sell') ?>" class="ilv-back" aria-label="Kembali ke daftar material">
+            <i class="<?= htmlspecialchars($iconBack, ENT_QUOTES) ?>"></i> Kembali
+          </a>
+        </div>
+      </section>
+
+      <!-- GRID -->
+      <div class="ilv-grid">
+
+        <!-- KIRI: FORM -->
+        <section class="ilv-card">
+          <div class="ilv-card-head">
+            <h6>MATERIAL DETAIL (<?= htmlspecialchars($materianName ?? '-', ENT_QUOTES) ?>)</h6>
+          </div>
+          <div class="ilv-card-body">
+            <form action="<?= base_url('transaction/sell-add-to-cart/') ?>" method="post" autocomplete="off">
+              <input type="hidden" name="idMaterial" value="<?= htmlspecialchars($mSeg, ENT_QUOTES) ?>">
+
+              <?php if (in_array($mSeg, ["13"])): ?>
+                <div class="form-group">
+                  <label class="form-label">POTONGAN</label>
+                  <select required class="select2 form-control" name="tahun_potongan" style="width:100%">
+                    <option value="">Pilih Potongan</option>
+                    <?php for ($th=2018; $th<=date('Y')+1; $th++): ?>
+                      <option value="<?= $th ?>">LM Certi <?= $th ?></option>
+                    <?php endfor; ?>
+                  </select>
+                </div>
+              <?php endif; ?>
+
+              <div class="form-group">
+                <label class="form-label">WEIGHT</label>
+                <input type="number" step="any" inputmode="decimal" pattern="[0-9]*" name="weight" id="weight" required class="form-control aang" placeholder="0">
+              </div>
+
+              <div class="ilv-actions">
+                <button type="submit" class="btn btn-primary btn-block">Add To Cart</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- KANAN: CART -->
+        <section class="ilv-card">
+          <div class="ilv-card-head">
+            <h6>SELL CART (<?= htmlspecialchars($nameCustomer ?? '-', ENT_QUOTES) ?>) — <span style="color:#0b1f4f">Rp <?= nominal($total) ?></span></h6>
+          </div>
+          <div class="ilv-card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered mb-2" width="100%" cellspacing="0" style="font-size:14px;">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Material</th>
+                    <th>Type</th>
+                    <th>Carat</th>
+                    <th>Weight</th>
+                    <th style="min-width:100px;">Price/Gr</th>
+                    <th style="min-width:120px;">Total Price</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <?php $no=0; foreach($this->cart->contents() as $a): $no++; $opt = $a['options'] ?? []; ?>
+                  <tr>
+                    <td><?= $no ?></td>
+                    <td><?= htmlspecialchars($opt['materialName'] ?? $a['name'], ENT_QUOTES) ?></td>
+                    <td><?= htmlspecialchars($opt['materialType'] ?? '', ENT_QUOTES) ?></td>
+                    <td><?= htmlspecialchars($opt['carat'] ?? '', ENT_QUOTES) ?></td>
+                    <td><?= htmlspecialchars($opt['weight'] ?? '', ENT_QUOTES) ?></td>
+                    <td>
+                      <?php
+                        $isDiamond = (strtoupper($opt['materialName'] ?? $a['name']) === 'DIAMOND');
+                        echo $isDiamond ? (float)$a['price'] : nominal($a['price']);
+                      ?>
+                    </td>
+                    <td><?= nominal( isset($opt['priceTotal']) && is_numeric($opt['priceTotal']) ? $opt['priceTotal'] : $a['subtotal'] ) ?></td>
+                    <td class="text-center">
+                      <a href="<?= base_url('transaction/sell-add-to-cart-reset/?idMaterial='.$mSeg.'&idRow='.$a['rowid']) ?>"
+                         class="btn btn-danger btn-sm" title="Remove">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Admin fee -->
+            <form action="<?= base_url('transaction/sell-checkout/') ?>" class="mt-3">
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label class="form-label">PLUS / MINUS BIAYA ADMIN</label>
+                  <select class="form-control" name="operator">
+                    <option value="+">Plus (+)</option>
+                    <option value="-">Minus (-)</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-8">
+                  <label class="form-label">Nominal</label>
+                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*" class="form-control biayaAdmin aang" name="biayaAdmin" placeholder="0">
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="ilv-footer-actions">
+                <a href="#" data-toggle="modal" data-target="#resetModal" class="btn btn-outline-danger">
+                  <i class="fa fa-times"></i> Reset
                 </a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card shadow mb-4">
-                            <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                <h6 class="m-0 font-weight-bold text-primary">MATERIAL DETAIL (<?=$materianName?>)</h6>
-                            </a>
-                            <div class="collapse show" id="collapseCardExample" style="">
-                                <div class="card-body">
-                                    <form action="<?=base_url()?>transaction/sell-add-to-cart/" method="post">
-                                        <input type="hidden" name="idMaterial" value="<?=$this->uri->segment(3)?>">
-                                        <?php if(in_array($this->uri->segment(3), array("13"))){ ?>
-                                            <div class="form-group">
-                                                <label>POTONGAN</label>
-                                                <select required class="zein form-control select2" name="tahun_potongan">
-                                                    <option value="">Pilih Potongan</option>
-                                                    <?php 
-                                                    $tahun_mulai = 2018;
-                                                    while ($tahun_mulai <= date('Y')+1) { ?>
-                                                        <option value="<?=$tahun_mulai?>">LM Certi <?=$tahun_mulai?></option>
-                                                    <?php $tahun_mulai++; } ?>
-                                                </select>
-                                            </div>
-                                        <?php } ?>
-                                        <div class="form-group">
-                                            <label>WEIGHT</label>
-                                            <input type="number" step="any" name="weight" id="weight" required class="form-control">
-                                        </div>
-                                        <div class="form-group mb-0">
-                                            <input type="submit" class="btn btn-primary btn-block btn-lg mb-0" value="Add To Cart">
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                <a href="#" data-toggle="modal" data-target="#checkoutModal" class="btn btn-primary">
+                  <i class="fa fa-check"></i> Checkout
+                </a>
+              </div>
+
+              <!-- Modal Checkout -->
+              <div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document" style="top:84px;">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Ready to Checkout?</h5>
+                      <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                      </button>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card shadow mb-4">
-                    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                        <h6 class="m-0 font-weight-bold text-primary">SELL CART <?='('.$nameCustomer.')'?> => IDR <?=nominal($total)?></h6>
-                    </a>
-                    <div class="collapse show" id="collapseCardExample" style="">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size:15px;">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Material</th>
-                                            <th>Type</th>
-                                            <th>Carat</th>
-                                            <th>Weight</th>
-                                            <th stlye="min-width:100px;">Price/Gr</th>
-                                            <th stlye="min-width:100px;">Total Price</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php $no=0; foreach($this->cart->contents() as $a){ $no++; $opt = isset($a['options']) ? $a['options'] : []; ?>
-                                        <tr>
-                                            <td><?=$no?></td>
-                                            <td><?= !empty($opt['materialName']) ? $opt['materialName'] : $a['name'] ?></td>
-                                            <td><?= $opt['materialType'] ?? '' ?></td>
-                                            <td><?= $opt['carat'] ?? '' ?></td>
-                                            <td><?= $opt['weight'] ?? '' ?></td>
-                                            <td>
-                                                <?php 
-                                                $isDiamond = (strtoupper($opt['materialName'] ?? $a['name']) === 'DIAMOND');
-                                                echo $isDiamond ? ($a['price']) : nominal($a['price']);
-                                                ?>
-                                            </td>
-                                            <td><?= nominal( isset($opt['priceTotal']) && is_numeric($opt['priceTotal']) ? $opt['priceTotal'] : $a['subtotal'] ) ?></td>
-                                            <td>
-                                                <a href="<?=base_url()?>transaction/sell-add-to-cart-reset/?idMaterial=<?=$this->uri->segment(3);?>&idRow=<?=$a['rowid']?>" class="btn btn-danger btn-circle btn-sm">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <?php } ?>
-                                    </tbody>
-                                </table>
-
-                                <form action="<?=base_url()?>transaction/sell-checkout/">
-                                    <div class="row">
-                                        <div class="col-md-2">
-                                            <p>PLUS/MINUS</p>
-                                            <select type="number" step="any" class="form-control" name="operator">
-                                                <option>+</option>
-                                                <option>-</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-10">
-                                            <p>BIAYA ADMIN</p>
-                                            <input type="number" step="any" class="form-control biayaAdmin" name="biayaAdmin">
-                                        </div>
-                                    </div>
-
-                                    <div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document" style="top: 84px;">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Ready to Checkout?</h5>
-                                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">×</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">Select "Checkout" below if you are ready to end your cart session.</div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-outline-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                                    <button type="submit" class="btn btn-success">Checkout</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-
-                            </div>
-                            <a href="#" data-toggle="modal" data-target="#resetModal" class="btn btn-danger btn-icon-split btn-lg mt-3" style="margin-right:13px">
-                                <span class="icon text-white-50">
-                                    <i class="fa fa-times"></i>
-                                </span>
-                                <span class="text">Reset</span>
-                            </a>
-                            <a href="#" data-toggle="modal" data-target="#checkoutModal" class="btn btn-primary btn-icon-split btn-lg mt-3" style="margin-right:13px">
-                                <span class="icon text-white-50">
-                                    <i class="fa fa-check"></i>
-                                </span>
-                                <span class="text">Checkout</span>
-                            </a>
-                        </div>
+                    <div class="modal-body">Pilih "Checkout" untuk menyelesaikan sesi cart.</div>
+                    <div class="modal-footer">
+                      <button class="btn btn-soft" type="button" data-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-success">Checkout</button>
                     </div>
+                  </div>
                 </div>
-            </div>
-        </div>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+      </div>
     </div>
+  </div>
 </div>
 
-<script type="text/javascript">
-$("#materialType").select2();
-$(".select2").select2();
-</script>
-
-<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="top: 84px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Reset?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Reset" below if you are ready to end your cart session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger" href="<?=base_url()?>transaction/sell-add-to-cart-reset/?idMaterial=<?=$this->uri->segment(3);?>">Reset</a>
-            </div>
-        </div>
+<!-- Modal Reset -->
+<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="top:84px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ready to Reset?</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Pilih "Reset" untuk mengosongkan sesi cart.</div>
+      <div class="modal-footer">
+        <button class="btn btn-soft" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="<?= base_url('transaction/sell-add-to-cart-reset/?idMaterial='.$mSeg) ?>">Reset</a>
+      </div>
     </div>
+  </div>
 </div>
 
+<!-- Boot JS: tunggu jQuery + plugin, lalu tampilkan halaman -->
 <script>
-jQuery(function ($) {
-    $('.biayaAdmin').keyboard({
-        layout: 'num',
-        restrictInput : true,
-        preventPaste : true,
-        autoAccept : true
+(function boot(n){
+  var hasJQ = !!window.jQuery;
+  if (hasJQ) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function(){ init(window.jQuery); });
+    } else { init(window.jQuery); }
+    return;
+  }
+  if (n > 80) { reveal(); return; }         // fallback agar tidak blank bila jQuery gagal dimuat
+  setTimeout(function(){ boot(n+1); }, 100);
+})(0);
+
+function reveal(){
+  var root = document.getElementById('appRoot');
+  var overlay = document.getElementById('pageOverlay');
+  if (root){ root.classList.remove('boot-hide'); }
+  if (overlay){ overlay.classList.add('hidden'); overlay.setAttribute('aria-busy','false'); }
+}
+
+function init($){
+  // Select2
+  if ($.fn.select2){ $('.select2').select2({ width:'100%' }); }
+
+  // Virtual Keyboard (Mottie) + auto-reveal
+  if ($.fn.keyboard){
+    var $nums = $('.aang, .biayaAdmin');
+    $nums.keyboard({
+      layout: 'num',
+      restrictInput : true,
+      preventPaste : true,
+      autoAccept : true
     });
-    $('#weight').keyboard({
-        layout: 'num',
-        restrictInput : true,
-        preventPaste : true,
-        autoAccept : true
+    $(document).on('focus click', '.aang, .biayaAdmin', function(){
+      var kb = $(this).getkeyboard && $(this).getkeyboard();
+      if (kb && kb.isOpen !== true) { kb.reveal(); }
     });
-    prettyPrint();
-});
+  }
+
+  // tampilkan halaman
+  reveal();
+}
 </script>

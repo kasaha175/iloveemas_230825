@@ -101,6 +101,7 @@ $route['report/sell-print/(:num)']= 'ReportController/sellPrint/$1';
 $route['report/sell-print-action/(:num)'] = 'ReportController/sellPrintAction/$1';
 $route['report/sell/(:num)']      = 'ReportController/sellDetail/$1';
 $route['report/sell']             = 'ReportController/sell';
+$route['report/sell-items-json/(:num)'] = 'ReportController/sell_items_json/$1';
 
 // BUY (biarkan seperti sebelumnya)
 $route['report/buy-dt']           = 'ReportController/buy_dt';
@@ -109,6 +110,7 @@ $route['report/buy-print/(:num)'] = 'ReportController/buyPrint/$1';
 $route['report/buy-print-action/(:num)'] = 'ReportController/buyPrintAction/$1';
 $route['report/buy/(:num)']       = 'ReportController/buyDetail/$1';
 $route['report/buy']              = 'ReportController/buy';
+$route['report/buy-items-json/(:num)']  = 'ReportController/buy_items_json/$1';
 
 $route['report/test-dompdf']      = 'ReportController/testDompdf';
 

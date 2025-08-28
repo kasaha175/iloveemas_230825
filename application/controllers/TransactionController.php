@@ -1037,6 +1037,7 @@ class TransactionController extends CI_Controller
 				't_price_total'  => $total,
 				't_qtt'          => $qtt,
 				't_visible'      => 1,
+				't_price_grand_total'  => $total,
 			];
 			$idTransaction = $this->TransactionModel->buyCheckout($header);
 			$this->session->set_userdata([
@@ -1047,6 +1048,7 @@ class TransactionController extends CI_Controller
 			$this->db->update('tb_transaction', [
 				't_price_total' => $total,
 				't_qtt'         => $qtt,
+				't_price_grand_total'  => $total,
 			], ['t_id' => $idTransaction]);
 		}
 
@@ -1139,12 +1141,16 @@ class TransactionController extends CI_Controller
 		// Total & qty dari cart
 		list($total, $qtt) = $this->_cartTotalsBuy();
 
+		// GRAND TOTAL
+		$grand = $total + $biayaAdmin;
+
 		// Update header
 		$this->db->update('tb_transaction', [
 			't_status'      => 'CHECKOUT',
 			't_price_total' => $total,
 			't_price_admin' => $biayaAdmin,
 			't_qtt'         => $qtt,
+			't_price_grand_total'  => $grand, 
 		], ['t_id' => $idTransaction]);
 
 		// Tulis detail
@@ -1385,6 +1391,7 @@ class TransactionController extends CI_Controller
 				't_price_total'  => $total,
 				't_visible'      => 1,
 				't_qtt'          => $qtt,
+				't_price_grand_total'  => $total,
 			];
 			$idTransaction = $this->TransactionModel->sellCheckout($header);
 			$this->session->set_userdata(['idTransaction'=>$idTransaction,'jenis_transaksi'=>'sell']);
@@ -1402,20 +1409,29 @@ class TransactionController extends CI_Controller
 		$authUser = $this->session->userdata("authUser");
 		if (!$authUser) { return redirect(base_url()); }
 
-		$idMaterial = $this->input->get('idMaterial');
-		$idRow      = $this->input->get('idRow');
+		$idMaterial   = $this->input->get('idMaterial');
+		$idRow        = $this->input->get('idRow');
+		$idTransaction= (int)$this->session->userdata("idTransaction");
 
-		$idTransaction = (int)$this->session->userdata("idTransaction");
-
+		// Hapus item di cart
 		if (!empty($idRow)) {
-			$this->cart->update(['rowid'=>$idRow,'qty'=>0]);
+			$this->cart->update(['rowid' => $idRow, 'qty' => 0]);
 		} else {
 			$this->cart->destroy();
 		}
 
 		if ($idTransaction) {
+			// Hitung ulang total & qty dari cart yang tersisa
 			list($total, $qtt) = $this->_cartTotalsSell();
-			$this->db->update('tb_transaction_sell', ['t_price_total'=>$total,'t_qtt'=>$qtt], ['t_id'=>$idTransaction]);
+
+			// Update header: grand total sementara = total (admin dihitung saat checkout)
+			$this->db->update('tb_transaction_sell', [
+				't_price_total'        => $total,
+				't_qtt'                => $qtt,
+				't_price_grand_total'  => $total,
+			], ['t_id' => $idTransaction]);
+
+			// Tulis ulang detail (fungsi ini sudah menghapus detail lama)
 			$this->_writeSellDetailsFromCart($idTransaction);
 		}
 
@@ -1441,12 +1457,15 @@ class TransactionController extends CI_Controller
 		$admVal    = (float)$this->input->get('biayaAdmin');
 		$biayaAdmin= ($op === '-') ? -abs($admVal) : abs($admVal);
 
+		$grand     = $total + $biayaAdmin;
+
 		// Update header
 		$this->db->update('tb_transaction_sell', [
 			't_status'      => 'CHECKOUT',
 			't_price_total' => $total,
 			't_price_admin' => $biayaAdmin,
 			't_qtt'         => $qtt,
+			't_price_grand_total'  => $grand,
 		], ['t_id'=>$idTransaction]);
 
 		// Tulis detail dari cart

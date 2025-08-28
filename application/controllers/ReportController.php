@@ -254,7 +254,7 @@ class ReportController extends CI_Controller
 		// mapping index kolom -> nama kolom
 		$cols = [
 			0=>'t_id', 1=>null, 2=>'t_no_order', 3=>'t_status', 4=>'t_date_created',
-			5=>'nameCreator', 6=>'nameReceive', 7=>'nameCustomer', 8=>'t_qtt', 9=>'t_price_total'
+			5=>'nameCreator', 6=>'nameReceive', 7=>'nameCustomer', 8=>'t_qtt', 9=>'t_price_grand_total'
 		];
 		$orderBy = $cols[(int)$order0['column']] ?? 't_date_created';
 		$dir     = (isset($order0['dir']) && strtolower($order0['dir'])==='asc') ? 'ASC' : 'DESC';
@@ -296,7 +296,7 @@ class ReportController extends CI_Controller
 
 		$cols = [
 			0=>'t_id', 1=>null, 2=>'t_no_order', 3=>'t_status', 4=>'t_date_created',
-			5=>'nameCreator', 6=>'nameReceive', 7=>'nameCustomer', 8=>'t_qtt', 9=>'t_price_total'
+			5=>'nameCreator', 6=>'nameReceive', 7=>'nameCustomer', 8=>'t_qtt', 9=>'t_price_grand_total'
 		];
 		$orderBy = $cols[(int)$order0['column']] ?? 't_date_created';
 		$dir     = (isset($order0['dir']) && strtolower($order0['dir'])==='asc') ? 'ASC' : 'DESC';
@@ -314,5 +314,144 @@ class ReportController extends CI_Controller
 			$this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
 		], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
 	}
+
+    public function buy_items_json($id)
+    {
+        $this->output->set_content_type('application/json', 'utf-8');
+
+        // Wajib login
+        if ($this->session->userdata('authUser') !== true) {
+            return $this->output
+                ->set_status_header(401)
+                ->set_output(json_encode([
+                    'ok' => false,
+                    'msg' => 'Unauthorized',
+                    $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+                ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+        }
+
+        $id = (int)$id;
+        if ($id <= 0) {
+            return $this->_json_items_error('Invalid ID', 400);
+        }
+
+        // Header transaksi
+        $qHeader = $this->TransactionModel->buyTransactionData($id);
+        if (!$qHeader || $qHeader->num_rows() === 0) {
+            return $this->_json_items_error('Transaction not found', 404);
+        }
+        $header = $qHeader->row();
+
+        // Ambil items
+        $qItems = $this->TransactionModel->buyTransactionItemsData($id);
+        $items  = [];
+        $subtotal = 0;
+
+        foreach ($qItems->result() as $r) {
+            // Penamaan kolom “ti_*” menyesuaikan skema yang sudah ada
+            $name  = $r->ti_material  ?? ($r->ti_name ?? '-');
+            $qty   = (float)($r->ti_qtt ?? $r->ti_qty ?? 0);
+            $unit  = $r->ti_unit      ?? '';
+            $price = (float)($r->ti_price ?? 0);
+            $total = (float)($r->ti_price_total ?? ($qty * $price));
+
+            $subtotal += $total;
+
+            $items[] = [
+                'name'  => $name,
+                'qty'   => $qty,
+                'unit'  => $unit,
+                'price' => $price,
+                'total' => $total,
+            ];
+        }
+
+        // Grand total & admin fee (pakai kolom grand total jika ada, fallback ke price_total)
+        $grand = (float)($header->t_price_grand_total ?? $header->t_price_total ?? 0);
+        $admin = $grand - $subtotal;
+        if ($admin < 0) $admin = 0;
+
+        return $this->output->set_output(json_encode([
+            'ok'          => true,
+            'items'       => $items,
+            'subtotal'    => $subtotal,
+            'admin_fee'   => $admin,
+            'grand_total' => $grand,
+            $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+        ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+    }
+
+    public function sell_items_json($id)
+    {
+        $this->output->set_content_type('application/json', 'utf-8');
+
+        if ($this->session->userdata('authUser') !== true) {
+            return $this->output
+                ->set_status_header(401)
+                ->set_output(json_encode([
+                    'ok' => false,
+                    'msg' => 'Unauthorized',
+                    $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+                ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+        }
+
+        $id = (int)$id;
+        if ($id <= 0) {
+            return $this->_json_items_error('Invalid ID', 400);
+        }
+
+        $qHeader = $this->TransactionModel->sellTransactionData($id);
+        if (!$qHeader || $qHeader->num_rows() === 0) {
+            return $this->_json_items_error('Transaction not found', 404);
+        }
+        $header = $qHeader->row();
+
+        $qItems = $this->TransactionModel->sellTransactionItemsData($id);
+        $items  = [];
+        $subtotal = 0;
+
+        foreach ($qItems->result() as $r) {
+            $name  = $r->ti_material  ?? ($r->ti_name ?? '-');
+            $qty   = (float)($r->ti_qtt ?? $r->ti_qty ?? 0);
+            $unit  = $r->ti_unit      ?? '';
+            $price = (float)($r->ti_price ?? 0);
+            $total = (float)($r->ti_price_total ?? ($qty * $price));
+
+            $subtotal += $total;
+
+            $items[] = [
+                'name'  => $name,
+                'qty'   => $qty,
+                'unit'  => $unit,
+                'price' => $price,
+                'total' => $total,
+            ];
+        }
+
+        $grand = (float)($header->t_price_grand_total ?? $header->t_price_total ?? 0);
+        $admin = $grand - $subtotal;
+        if ($admin < 0) $admin = 0;
+
+        return $this->output->set_output(json_encode([
+            'ok'          => true,
+            'items'       => $items,
+            'subtotal'    => $subtotal,
+            'admin_fee'   => $admin,
+            'grand_total' => $grand,
+            $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+        ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+    }
+
+    /** Helper error JSON untuk endpoint items */
+    private function _json_items_error(string $msg, int $code = 400)
+    {
+        return $this->output
+            ->set_status_header($code)
+            ->set_output(json_encode([
+                'ok' => false,
+                'msg' => $msg,
+                $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
+            ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+    }
 
 }

@@ -367,19 +367,19 @@ if (!defined('BASEPATH'))
 	// TransactionModel.php
 
 	public function dtBuy(int $start, int $length, string $dateStart, string $dateEnd,
-						string $search = '', string $orderBy = 't_date_created', string $dir = 'DESC'): array
+                      string $search = '', string $orderBy = 't_date_created', string $dir = 'DESC'): array
 	{
 		$startDT = $dateStart . ' 00:00:00';
 		$endDT   = $dateEnd   . ' 23:59:59';
 
-		// --- total (tanpa search) ---
+		// total (tanpa search)
 		$this->db->from('tb_transaction a')
 				->where('a.t_visible', 1)
 				->where('a.t_date_created >=', $startDT)
 				->where('a.t_date_created <=', $endDT);
 		$total = (int)$this->db->count_all_results();
 
-		// --- base + join + search ---
+		// base + join + search
 		$this->db->select('a.*, b.u_name AS nameCreator, c.u_name AS nameReceive, d.c_name AS nameCustomer')
 				->from('tb_transaction a')
 				->join('tb_user b','a.t_created_by=b.u_id','left')
@@ -399,33 +399,46 @@ if (!defined('BASEPATH'))
 					->group_end();
 		}
 
-		// hitung filtered (jangan reset builder)
 		$filtered = (int)$this->db->count_all_results('', false);
 
-		// order map
-		$orderMap = [
-			't_id'          => 'a.t_id',
-			't_no_order'    => 'a.t_no_order',
-			't_status'      => 'a.t_status',
-			't_date_created'=> 'a.t_date_created',
-			'nameCreator'   => 'b.u_name',
-			'nameReceive'   => 'c.u_name',
-			'nameCustomer'  => 'd.c_name',
-			't_qtt'         => 'a.t_qtt',
-			't_price_total' => 'a.t_price_total',
-		];
-		$orderCol = $orderMap[$orderBy] ?? 'a.t_date_created';
-		$this->db->order_by($orderCol, $dir);
+		// ORDER BY (harga: gunakan COALESCE grand_total -> total)
+		$dir = (strtoupper($dir) === 'ASC') ? 'ASC' : 'DESC';
+		if ($orderBy === 't_price_grand_total' || $orderBy === 't_price_total') {
+			// ekspresi mentah -> jangan di-escape
+			$this->db->order_by('COALESCE(a.t_price_grand_total, a.t_price_total)', $dir, false);
+		} else {
+			$orderMap = [
+				't_id'           => 'a.t_id',
+				't_no_order'     => 'a.t_no_order',
+				't_status'       => 'a.t_status',
+				't_date_created' => 'a.t_date_created',
+				'nameCreator'    => 'b.u_name',
+				'nameReceive'    => 'c.u_name',
+				'nameCustomer'   => 'd.c_name',
+				't_qtt'          => 'a.t_qtt',
+			];
+			$orderCol = $orderMap[$orderBy] ?? 'a.t_date_created';
+			$this->db->order_by($orderCol, $dir);
+		}
 
 		if ($length !== -1) $this->db->limit($length, $start);
 
 		$rows = $this->db->get()->result();
 
-		// Format baris sesuai kolom DataTables (biar controller simple)
+		// Format ke baris DataTables
 		$outRows = [];
 		$no = $start;
 		foreach ($rows as $r) {
-			$no++; $id = (int)$r->t_id;
+			$no++;
+			$id = (int)$r->t_id;
+
+			// grand total dengan fallback
+			$grand = (float) (
+				isset($r->t_price_grand_total) && $r->t_price_grand_total !== null
+					? $r->t_price_grand_total
+					: ($r->t_price_total ?? 0)
+			);
+
 			$act =
 				'<a href="#" class="btn btn-danger btn-circle btn-sm mr-2 js-open-delete" data-id="'.$id.
 				'" data-no="'.htmlspecialchars($r->t_no_order,ENT_QUOTES).'"><i class="fas fa-trash"></i></a>'.
@@ -438,7 +451,7 @@ if (!defined('BASEPATH'))
 				$r->t_no_order, $r->t_status, $r->t_date_created,
 				$r->nameCreator, $r->nameReceive, $r->nameCustomer,
 				(int)$r->t_qtt,
-				'IDR '.number_format((float)$r->t_price_total,0,',','.')
+				'IDR '.number_format($grand, 0, ',', '.'),
 			];
 		}
 
@@ -446,7 +459,7 @@ if (!defined('BASEPATH'))
 	}
 
 	public function dtSell(int $start, int $length, string $dateStart, string $dateEnd,
-						string $search = '', string $orderBy = 't_date_created', string $dir = 'DESC'): array
+                      string $search = '', string $orderBy = 't_date_created', string $dir = 'DESC'): array
 	{
 		$startDT = $dateStart . ' 00:00:00';
 		$endDT   = $dateEnd   . ' 23:59:59';
@@ -480,19 +493,24 @@ if (!defined('BASEPATH'))
 
 		$filtered = (int)$this->db->count_all_results('', false);
 
-		$orderMap = [
-			't_id'          => 'a.t_id',
-			't_no_order'    => 'a.t_no_order',
-			't_status'      => 'a.t_status',
-			't_date_created'=> 'a.t_date_created',
-			'nameCreator'   => 'b.u_name',
-			'nameReceive'   => 'c.u_name',
-			'nameCustomer'  => 'd.c_name',
-			't_qtt'         => 'a.t_qtt',
-			't_price_total' => 'a.t_price_total',
-		];
-		$orderCol = $orderMap[$orderBy] ?? 'a.t_date_created';
-		$this->db->order_by($orderCol, $dir);
+		// ORDER BY (harga: gunakan COALESCE grand_total -> total)
+		$dir = (strtoupper($dir) === 'ASC') ? 'ASC' : 'DESC';
+		if ($orderBy === 't_price_grand_total' || $orderBy === 't_price_total') {
+			$this->db->order_by('COALESCE(a.t_price_grand_total, a.t_price_total)', $dir, false);
+		} else {
+			$orderMap = [
+				't_id'           => 'a.t_id',
+				't_no_order'     => 'a.t_no_order',
+				't_status'       => 'a.t_status',
+				't_date_created' => 'a.t_date_created',
+				'nameCreator'    => 'b.u_name',
+				'nameReceive'    => 'c.u_name',
+				'nameCustomer'   => 'd.c_name',
+				't_qtt'          => 'a.t_qtt',
+			];
+			$orderCol = $orderMap[$orderBy] ?? 'a.t_date_created';
+			$this->db->order_by($orderCol, $dir);
+		}
 
 		if ($length !== -1) $this->db->limit($length, $start);
 
@@ -501,7 +519,16 @@ if (!defined('BASEPATH'))
 		$outRows = [];
 		$no = $start;
 		foreach ($rows as $r) {
-			$no++; $id = (int)$r->t_id;
+			$no++;
+			$id = (int)$r->t_id;
+
+			// grand total dengan fallback
+			$grand = (float) (
+				isset($r->t_price_grand_total) && $r->t_price_grand_total !== null
+					? $r->t_price_grand_total
+					: ($r->t_price_total ?? 0)
+			);
+
 			$act =
 				'<a href="#" class="btn btn-danger btn-circle btn-sm mr-2 js-open-delete" data-id="'.$id.
 				'" data-no="'.htmlspecialchars($r->t_no_order,ENT_QUOTES).'"><i class="fas fa-trash"></i></a>'.
@@ -514,7 +541,7 @@ if (!defined('BASEPATH'))
 				$r->t_no_order, $r->t_status, $r->t_date_created,
 				$r->nameCreator, $r->nameReceive, $r->nameCustomer,
 				(int)$r->t_qtt,
-				'IDR '.number_format((float)$r->t_price_total,0,',','.')
+				'IDR '.number_format($grand, 0, ',', '.'),
 			];
 		}
 

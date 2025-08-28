@@ -14,6 +14,9 @@ $materials = [
   ["url" => "buy/ruthenium/select", "img" => "ruthenium.png",  "name" => "Ruthenium"],
   ["url" => "buy/21",               "img" => "tantalum.png",   "name" => "Tantalum"],
 ];
+
+// Ikon back dari config (fallback)
+$iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
 ?>
 
 <style>

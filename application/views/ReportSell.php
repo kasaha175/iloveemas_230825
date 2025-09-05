@@ -4,14 +4,14 @@
 $dateStart = $this->input->get('dateStart') ?: date('Y-m-01');
 $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
 
-// ===== Brand colors from app config (safe fallback)
-$cfg    = isset($config) && is_array($config) ? $config : [];
-$brand  = $cfg['color_primary']    ?? $cfg['primary_color'] ?? '#2563eb';
-$brand2 = $cfg['color_primary_2']  ?? '#1d4ed8';
-$pastel = $cfg['color_pastel']     ?? '#e7f1ff';
-$ink    = $cfg['color_text']       ?? '#0e204a';
-$accent = $cfg['color_accent']     ?? '#4a7dff';
-$line   = '#e6eefc';
+/* ===== Ambil warna dari konfigurasi aplikasi (fallback aman) ===== */
+$cfg = isset($config) && is_array($config) ? $config : [];
+$brand     = $cfg['color_primary']   ?? $cfg['primary_color'] ?? '#2563eb';
+$brand2    = $cfg['color_primary_2'] ?? '#1d4ed8';
+$pastel    = $cfg['color_pastel']    ?? '#e7f1ff';
+$ink       = $cfg['color_text']      ?? '#0e204a';
+$accent    = $cfg['color_accent']    ?? '#4a7dff';
+$mutedLine = '#e6eefc';
 ?>
 <style>
 /* ===== Scoped styles ===== */
@@ -317,7 +317,7 @@ $line   = '#e6eefc';
           <i class="fa fa-times mr-1"></i> Tutup
         </button>
         <a id="sdBtnPrint" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
-          <i class="fa fa-print mr-1"></i> Print
+          <i class="fa fa-print mr-1"></i> Print 123
         </a>
       </div>
     </div>
@@ -330,7 +330,7 @@ $line   = '#e6eefc';
   const CSRF_NAME = "<?= $this->security->get_csrf_token_name(); ?>";
   let   CSRF_HASH = "<?= $this->security->get_csrf_hash(); ?>";
 
-  // Preloader (min 1.5s)
+  // Overlay
   const Overlay = (function(){
     const el = document.getElementById('rsOverlay');
     let minTimer=null, minDone=false, waiting=true;
@@ -396,17 +396,17 @@ $line   = '#e6eefc';
           { extend:'pdfHtml5',   text:'<i class="fas fa-file-pdf"></i>',       className:'btn btn-light btn-sm', orientation:'landscape', pageSize:'A4' }
         ],
         columnDefs:[
-          { targets:[0,1,3,8], className:'text-center text-nowrap' }, // No, Action, Status, Qty center
+          { targets:[0,1,3,8], className:'text-center text-nowrap' },
           { targets:[5,6,7],   className:'text-wrap' },
-          { targets:[9],       className:'text-right text-nowrap' }   // Grand Total right
+          { targets:[9],       className:'text-right text-nowrap' }
         ],
         createdRow:function(row){
           const $cells=$('td',row), $act=$cells.eq(1);
           const $tmp=$('<div/>').html($act.html());
           const $del=$tmp.find('.js-open-delete').first();
-          const $print=$tmp.find('a[href*="report/sell-print"]').first();
           const $edit=$tmp.find('button[onclick^="openModalEdit"]').first();
 
+          const trxId   = $del.data('id') || '';
           const noOrder = $cells.eq(2).text().trim();
           const status  = $cells.eq(3).text().trim();
           const date    = $cells.eq(4).text().trim();
@@ -416,18 +416,18 @@ $line   = '#e6eefc';
           const qty     = $cells.eq(8).text().trim();
           const total   = $cells.eq(9).text().trim();
 
-          const idFromPrint = ($print.attr('href')||'').match(/\/(\d+)\/?$/);
-          const id = $del.data('id') || (idFromPrint? idFromPrint[1] : '');
+          const previewUrl = BASE_URL + 'transaction/print-file/sell/' + encodeURIComponent(trxId) +
+                             '?no=' + encodeURIComponent(noOrder);
 
           const dropdown =
             '<div class="dropdown">'+
               '<button class="btn btn-outline-primary btn-action dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
-                '<i class="fas fa-cog mr-1"></i> Actions'+
-              '</button>'+
+                '<i class="fas fa-cog mr-1"></i> Actions</button>'+
               '<div class="dropdown-menu dropdown-menu-right">'+
-                ($print.length? ('<a class="dropdown-item" target="_blank" href="'+$print.attr('href')+'"><i class="fas fa-print mr-2"></i> Print</a>') : '')+
+                '<a class="dropdown-item text-primary" target="_blank" rel="noopener" href="'+ previewUrl +'">'+
+                  '<i class="fas fa-file-pdf mr-2"></i> Preview PDF</a>'+
                 '<a class="dropdown-item text-info js-sell-detail" href="#" '+
-                   'data-id="'+(id||'')+'" '+
+                   'data-id="'+(trxId||'')+'" '+
                    'data-no="'+$('<div/>').text(noOrder).html()+'" '+
                    'data-status="'+$('<div/>').text(status).html()+'" '+
                    'data-date="'+$('<div/>').text(date).html()+'" '+
@@ -438,15 +438,15 @@ $line   = '#e6eefc';
                    'data-total="'+$('<div/>').text(total).html()+'">'+
                    '<i class="fas fa-info-circle mr-2"></i> Detail</a>'+
                 ($edit.length? ('<a class="dropdown-item text-warning" href="#" onclick="'+$edit.attr('onclick')+'"><i class="fas fa-edit mr-2"></i> Edit</a>') : '')+
-                (($del.length||id)? '<div class="dropdown-divider"></div>' : '')+
-                '<a class="dropdown-item text-danger js-open-delete" href="#" data-id="'+(id||'')+'" data-no="'+$('<div/>').text(noOrder).html()+'"><i class="fas fa-trash mr-2"></i> Delete</a>'+
-              '</div>'+
-            '</div>';
+                (($del.length||trxId)? '<div class="dropdown-divider"></div>' : '')+
+                '<a class="dropdown-item text-danger js-open-delete" href="#" data-id="'+(trxId||'')+'" data-no="'+$('<div/>').text(noOrder).html()+'">'+
+                  '<i class="fas fa-trash mr-2"></i> Delete</a>'+
+              '</div></div>';
           $act.html(dropdown);
         }
       });
 
-      // Ensure filter params + CSRF are always sent (fix date filter)
+      // Ensure filter params + CSRF are always sent
       $('#dataTable').on('preXhr.dt', function(e, settings, data){
         data.dateStart  = $('#dateStart').val() || '<?= html_escape($dateStart) ?>';
         data.dateEnd    = $('#dateEnd').val()   || '<?= html_escape($dateEnd) ?>';
@@ -459,7 +459,7 @@ $line   = '#e6eefc';
       // Move export buttons
       $('.dt-btns').appendTo($('.dt-topbar'));
 
-      // Filter submit → draw ulang dari page 1
+      // Filter submit → redraw
       $('#filterForm').on('submit', function(e){
         e.preventDefault();
         var s=$('#dateStart').val(), f=$('#dateEnd').val();
@@ -476,10 +476,10 @@ $line   = '#e6eefc';
         $('#deleteModal').modal('show');
       });
 
-      // Detail modal (AJAX load items)
+      // ===== DETAIL =====
       $(document).on('click','.js-sell-detail',function(e){
         e.preventDefault();
-        const d=$(this).data(); const id=d.id||'';
+        const d=$(this).data();
 
         $('#sd_no').text(d.no||'');
         $('#sd_status').text(d.status||'');
@@ -489,14 +489,18 @@ $line   = '#e6eefc';
         $('#sd_qty').text(d.qty||'');
         $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Loading item…</td></tr>');
         $('#sd_subtotal').text('IDR 0'); $('#sd_admin').text('IDR 0'); $('#sd_grand').text(d.total||'IDR 0');
-        $('#sdBtnPrint').attr('href', BASE_URL+'report/sell-print/'+(id||'')+'/');
+
+        // Tombol PRINT di modal: pakai t_id + no_order
+        $('#sdBtnPrint')
+          .attr('href', BASE_URL + 'transaction/print-file/sell/' + encodeURIComponent(d.id || '') + '?no=' + encodeURIComponent(d.no || ''))
+          .attr('target','_blank').attr('rel','noopener');
 
         $('#sellDetailModal').modal('show');
 
-        if(!id){ $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Detail item tidak tersedia.</td></tr>'); return; }
+        if(!d.id){ $('#sd_itemsBody').html('<tr><td colspan="5" class="text-center text-muted">Detail item tidak tersedia.</td></tr>'); return; }
 
         $.ajax({
-          url: BASE_URL + 'report/sell-items-json/' + id,
+          url: BASE_URL + 'report/sell-items-json/' + d.id,
           type:'POST',
           dataType:'json',
           data:(function(){ var p={}; p[CSRF_NAME]=CSRF_HASH; return p; })()
@@ -534,3 +538,6 @@ $line   = '#e6eefc';
   });
 })();
 </script>
+
+
+

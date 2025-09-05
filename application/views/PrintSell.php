@@ -107,24 +107,25 @@ function terbilang($nilai)
 						<table style="width: 100%">
 							<tr>
 							<?php
-								$this->db->order_by('urutan_cabang', 'ASC');
-								$this->db->where('status', 'ENABLE');
-								$cabang = $this->db->get('tb_cabang')->result();
-								foreach ($cabang as $key => $value) : 
-									if($key%2 == 0){ echo '</tr><tr>'; }
-								?>
-									
-									<td style="width: 5%">
-										<p style="font-size:12px; margin: 0px;">
-											<input type="checkbox" />
-										</p>
-									</td>
-									<td style="width: 45%">
-										<p style="font-size:12px; margin: 0px;">
-											<?= $value->nama_cabang ?> : <?= $value->alamat_cabang ?>
-										</p>
-									</td>
-								<?php endforeach; ?>
+							$this->db->order_by('urutan_cabang', 'ASC');
+							$this->db->where('status', 'ENABLE');
+							$cabang = $this->db->get('tb_cabang')->result();
+							foreach ($cabang as $key => $value):
+								if($key % 2 == 0) echo '</tr><tr>';
+								$cid   = isset($value->id_cabang) ? $value->id_cabang : ($key+1);
+								$label = trim($value->nama_cabang.' : '.$value->alamat_cabang);
+							?>
+							<td style="width:5%">
+								<p style="font-size:12px; margin:0;">
+								<input class="cb-cabang" type="checkbox"
+										value="<?= htmlspecialchars($cid) ?>"
+										data-label="<?= htmlspecialchars($label) ?>" />
+								</p>
+							</td>
+							<td style="width:45%">
+								<p style="font-size:12px; margin:0;"><?= $label ?></p>
+							</td>
+							<?php endforeach; ?>
 							</tr>
 						</table>
 						<p style="text-align:center; font-size: 10px;"><a href="https://www.iloveemas.co.id/" style="text-decoration:none; color:black">www.iloveemas.co.id</a></p>
@@ -252,11 +253,11 @@ function terbilang($nilai)
 						</td>
 					</tr>
 					<tr>
-						<td style="border: 1px solid black !important; font-size: 14px" colspan="5">
-							<span><input style="margin:10px 5px 10px 5px;" type="checkbox"><span>Cash</span></span>
-							<span><input style="margin:10px 5px 10px 65px;" type="checkbox"><span>Credit</span></span>
-							<span><input style="margin:10px 5px 10px 65px;" type="checkbox"><span>Debit</span></span>
-							<span><input style="margin:10px 5px 10px 65px;" type="checkbox"><span>Transfer</span></span>
+						<td style="border:1px solid #000; font-size:14px" colspan="5">
+							<span><input class="cb-pay" style="margin:10px 5px" type="checkbox" value="CASH"><span>Cash</span></span>
+							<span><input class="cb-pay" style="margin:10px 5px 10px 65px" type="checkbox" value="CREDIT"><span>Credit</span></span>
+							<span><input class="cb-pay" style="margin:10px 5px 10px 65px" type="checkbox" value="DEBIT"><span>Debit</span></span>
+							<span><input class="cb-pay" style="margin:10px 5px 10px 65px" type="checkbox" value="TRANSFER"><span>Transfer</span></span>
 						</td>
 						<td style="min-width:145px; border: 1px solid black !important;text-align:center; font-weight: bold; font-size: 14px">
 							TOTAL
@@ -323,33 +324,79 @@ function terbilang($nilai)
 			</div>
 		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<!-- Tambahan: variabel global untuk AJAX simpan PDF -->
 		<script>
-			$("#doPrint").click(function() {
-				window.print();
-				ajaxdestroy();
-				// clickBack();
-			});
-
-			$("#doPrint").touches(function() {
-				window.print();
-				ajaxdestroy();
-				// clickBack();
-			});
-
-			function ajaxdestroy() {
-				jQuery.ajax({
-					url: '<?= base_url('transaction/chart-destroy') ?>',
-					success: function(data, textStatus, xhr) {
-						window.location.href = '<?= base_url() ?>report/sell';
-					},
-				});
-			}
-
-			function clickBack() {
-				// window.history.back();
-				window.location.href = "<?= base_url('dashboard') ?>";
-			}
+			window.__TRANS_TYPE = 'sell';  /* view ini untuk BUY */
+			window.__TRANS_ID   = <?= (int)($a->t_id ?? 0) ?>;
+			window.__BASE_URL   = "<?= base_url() ?>";
+			window.__CSRF_NAME  = "<?= $this->security->get_csrf_token_name(); ?>";
+			window.__CSRF_HASH  = "<?= $this->security->get_csrf_hash(); ?>";
 		</script>
+		<script>
+      // Handler baru: simpan meta & generate PDF di server, lalu (opsional) print + destroy
+      (function($){
+        function collectCabang(){
+          var out = [];
+          $('.cb-cabang:checked').each(function(){
+            out.push({ id: $(this).val(), label: $(this).data('label') });
+          });
+          return out;
+        }
+        function collectPayments(){
+          var out = [];
+          $('.cb-pay:checked').each(function(){ out.push($(this).val()); });
+          return out;
+        }
+        function savePrintThenNext(opts){
+          var url = window.__BASE_URL + 'transaction/savePrint/' + window.__TRANS_TYPE + '/' + window.__TRANS_ID;
+          var payload = {
+            cabang: collectCabang(),
+            payments: collectPayments(),
+            paper: 'A4',
+            orientation: 'portrait',
+            rawHtml: document.getElementById('printNow').outerHTML // simpan juga HTML final (sesuai instruksi)
+          };
+          payload[window.__CSRF_NAME] = window.__CSRF_HASH;
+
+          $('#doPrint').css('opacity',.6).css('pointer-events','none');
+
+          $.ajax({ url:url, type:'POST', dataType:'json', data:payload })
+          .done(function(r){
+            // refresh token jika ada
+            if (r && r[window.__CSRF_NAME]) { window.__CSRF_HASH = r[window.__CSRF_NAME]; }
+            if (r && r.ok){
+              if (opts && opts.browserPrint === true) { setTimeout(function(){ window.print(); }, 120); }
+              if (opts && opts.finish === true) { ajaxdestroy(); }
+              else { $('#doPrint').css('opacity',1).css('pointer-events','auto'); }
+            } else {
+              alert((r && r.msg) ? r.msg : 'Gagal menyimpan PDF');
+              $('#doPrint').css('opacity',1).css('pointer-events','auto');
+            }
+          })
+          .fail(function(){
+            alert('Gagal terhubung ke server.');
+            $('#doPrint').css('opacity',1).css('pointer-events','auto');
+          });
+        }
+
+        // Gantikan handler lama: sekarang simpan dulu, lalu print+destroy (tetap mempertahankan flow kamu)
+        $('#doPrint').on('click', function(e){
+          e.preventDefault();
+          savePrintThenNext({ browserPrint:true, finish:true });
+        });
+      })(jQuery);
+
+      // Fungsi existing: dipertahankan
+      function ajaxdestroy() {
+        jQuery.ajax({
+          url: '<?= base_url('transaction/chart-destroy') ?>',
+          success: function(){ window.location.href = "<?= base_url('dashboard') ?>"; },
+        });
+      }
+      function clickBack() {
+        window.location.href = "<?= base_url('dashboard') ?>";
+      }
+    </script>
 	</div>
 </body>
 

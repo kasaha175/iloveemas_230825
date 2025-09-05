@@ -394,19 +394,7 @@ $mutedLine = '#e6eefc';
   const CSRF_NAME = "<?= $this->security->get_csrf_token_name(); ?>";
   let   CSRF_HASH = "<?= $this->security->get_csrf_hash(); ?>";
 
-  /* helper: buat URL PDF dari NoOrder & Date */
-  function buildPdfUrl(noOrder, dateStr){
-    // Ambil YYYY dan MM dari kolom Date (format Y-m-d / Y-m-d H:i:s)
-    const m = (dateStr||'').match(/(\d{4})[-/](\d{2})/);
-    const yyyy = m ? m[1] : '';
-    const mm   = m ? m[2] : '';
-    // Nama file = NoOrder + ".pdf"
-    const file = (String(noOrder||'').replace(/[^\w\-]/g, '')) + '.pdf';
-    // Path sesuai pola penyimpanan
-    return BASE_URL + 'uploads/prints/buy/' + yyyy + '/' + mm + '/' + encodeURIComponent(file);
-  }
-
-  /* ===== Overlay ===== */
+  // Overlay
   const Overlay = (function(){
     const el = document.getElementById('rbOverlay');
     let minTimer=null, minDone=false, waitingXHR=true;
@@ -432,6 +420,7 @@ $mutedLine = '#e6eefc';
       Overlay.show();
       $('#modalEdit, #deleteModal, #detailModal').appendTo('body');
 
+      // Konfirmasi edit
       window.openModalEdit = function(id){ $('#edit_id').val(id); $('#modalEdit').modal('show'); };
       window.submitKonfirmasi = function(){
         $.post({
@@ -474,27 +463,27 @@ $mutedLine = '#e6eefc';
           { targets:[9],       className:'text-right text-nowrap' }
         ],
 
-        /* ==== ACTION: ubah ke Preview PDF yang ambil dari path ==== */
+        // ==== ACTION: Preview PDF via controller print-file (pakai t_id + no_order) ====
         createdRow: function(row){
           const $cells  = $('td', row);
           const $actTd  = $cells.eq(1);
           const $tmp    = $('<div/>').html($actTd.html());
           const $del    = $tmp.find('.js-open-delete').first();
-          const $edit   = $tmp.find('button[onclick^="openModalEdit"]').first();
 
-          const noOrder = $cells.eq(2).text().trim();   // ex: PB-2508-1385
-          const dateTxt = $cells.eq(4).text().trim();   // ex: 2025-08-28 20:50:11
-          const id      = $del.data('id') || '';
-
-          // Bangun URL PDF dari path yang disimpan (uploads/prints/buy/YYYY/MM/NoOrder.pdf)
-          const previewUrl = buildPdfUrl(noOrder, dateTxt);
-
+          const trxId   = $del.data('id') || '';               // ambil t_id yang stabil dari tombol delete
+          const noOrder = $cells.eq(2).text().trim();          // No Order di kolom table
+          const dateTxt = $cells.eq(4).text().trim();
           const status  = $cells.eq(3).text().trim();
           const created = $cells.eq(5).text().trim();
           const receive = $cells.eq(6).text().trim();
           const cust    = $cells.eq(7).text().trim();
           const qty     = $cells.eq(8).text().trim();
           const total   = $cells.eq(9).text().trim();
+
+          const previewUrl = BASE_URL + 'transaction/print-file/buy/' + encodeURIComponent(trxId) +
+                             '?no=' + encodeURIComponent(noOrder);
+
+          const $edit = $tmp.find('button[onclick^="openModalEdit"]').first();
 
           const dropdown =
             '<div class="dropdown">' +
@@ -505,7 +494,7 @@ $mutedLine = '#e6eefc';
                 '<a class="dropdown-item text-primary" href="'+ previewUrl +'" target="_blank" rel="noopener">' +
                   '<i class="fas fa-file-pdf mr-2"></i> Preview PDF</a>' +
                 '<a class="dropdown-item text-info js-show-detail" href="#" '+
-                   'data-id="'+(id||'')+'" '+
+                   'data-id="'+(trxId||'')+'" '+
                    'data-no="'+$('<div/>').text(noOrder).html()+'" '+
                    'data-status="'+$('<div/>').text(status).html()+'" '+
                    'data-date="'+$('<div/>').text(dateTxt).html()+'" '+
@@ -516,8 +505,8 @@ $mutedLine = '#e6eefc';
                    'data-total="'+$('<div/>').text(total).html()+'">'+
                    '<i class="fas fa-info-circle mr-2"></i> Detail</a>' +
                 ($edit.length ? ('<a class="dropdown-item text-warning" href="#" onclick="'+$edit.attr('onclick')+'"><i class="fas fa-edit mr-2"></i> Edit</a>') : '') +
-                (($del.length || id) ? '<div class="dropdown-divider"></div>' : '') +
-                '<a class="dropdown-item text-danger js-open-delete" href="#" data-id="'+(id||'')+'" data-no="'+$('<div/>').text(noOrder).html()+'"><i class="fas fa-trash mr-2"></i> Delete</a>' +
+                (($del.length || trxId) ? '<div class="dropdown-divider"></div>' : '') +
+                '<a class="dropdown-item text-danger js-open-delete" href="#" data-id="'+(trxId||'')+'" data-no="'+$('<div/>').text(noOrder).html()+'"><i class="fas fa-trash mr-2"></i> Delete</a>' +
               '</div>' +
             '</div>';
 
@@ -525,7 +514,7 @@ $mutedLine = '#e6eefc';
         }
       });
 
-      // kirim filter + CSRF di setiap request
+      // Kirim filter + CSRF
       $('#dataTable').on('preXhr.dt', function (e, settings, data) {
         data.dateStart  = $('#dateStart').val() || '<?= html_escape($dateStart) ?>';
         data.dateEnd    = $('#dateEnd').val()   || '<?= html_escape($dateEnd) ?>';
@@ -547,18 +536,19 @@ $mutedLine = '#e6eefc';
         dt.page('first').draw(false);
       });
 
+      // Delete modal
       $(document).on('click', '.js-open-delete', function(e){
         e.preventDefault();
-        const id = $(this).data('id'); const no = $(this).data('no');
+        const id = $(this).data('id'), no = $(this).data('no');
         $('#deleteModal .js-no-order').text(no||'');
         $('#deleteModal .js-delete-link').attr('href', BASE_URL + "transaction/buy-delete-transaction/" + id);
         $('#deleteModal').modal('show');
       });
 
-      /* ===== DETAIL handler ===== */
+      // ===== DETAIL =====
       $(document).on('click', '.js-show-detail', function(e){
         e.preventDefault();
-        const d   = $(this).data();
+        const d = $(this).data();
 
         // Ringkasan
         $('#d_no').text(d.no || '');
@@ -573,8 +563,10 @@ $mutedLine = '#e6eefc';
         $('#ft_admin').text('IDR 0');
         $('#ft_grand').text(d.total || 'IDR 0');
 
-        // tombol preview PDF di modal → pakai path (NoOrder + Date)
-        $('#rbBtnPrint').attr('href', buildPdfUrl(d.no, d.date));
+        // Tombol PRINT di modal: pakai t_id + no_order
+        $('#rbBtnPrint')
+          .attr('href', BASE_URL + 'transaction/print-file/buy/' + encodeURIComponent(d.id || '') + '?no=' + encodeURIComponent(d.no || ''))
+          .attr('target','_blank').attr('rel','noopener');
 
         $('#detailModal').modal('show');
 
@@ -627,6 +619,9 @@ $mutedLine = '#e6eefc';
   });
 })();
 </script>
+
+
+
 
 
 

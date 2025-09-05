@@ -60,6 +60,8 @@ $route['transaction/savePrint/(:any)/(:num)']['GET']  = 'TransactionController/s
 // === Unduh file PDF yang sudah tersimpan ===
 $route['transaction/print-file/(:any)/(:num)']['GET'] = 'TransactionController/printFile/$1/$2';
 
+$route['diagnose/test-chrome'] = 'TransactionController/testChromePing';
+
 /* =============================== ARCHIVE =============================== */
 $route['archive']                = 'MasterController/archive';
 $route['archive/buy']            = 'MasterController/buy';

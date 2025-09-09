@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php
+// ===== Defaults
 $dateStart = $this->input->get('dateStart') ?: date('Y-m-01');
 $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
 
@@ -207,6 +208,9 @@ $mutedLine = '#e6eefc';
               <div class="form-group col-md-4">
                 <label>&nbsp;</label>
                 <button type="submit" class="btn btn-brand btn-block btn-sm">Filter</button>
+                <button id="btn-download-zip" class="btn btn-danger btn-block btn-sm">
+                  <i class="fa fa-file-archive-o"></i> Download PDF
+                </button>
               </div>
             </div>
           </form>
@@ -305,7 +309,7 @@ $mutedLine = '#e6eefc';
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-        <button class="btn btn-brand" type="button" onclick="submitKonfirmasi()"><i class="fa fa-save mr-1"></i> Submit</button>
+        <button class="btn btn-primary btn-sm" type="button" onclick="submitKonfirmasi()"><i class="fa fa-save mr-1"></i> Submit</button>
       </div>
     </div>
   </div>
@@ -381,7 +385,7 @@ $mutedLine = '#e6eefc';
           target="_blank"
           rel="noopener"
           class="btn btn-primary btn-sm">
-          <i class="fa fa-print fas" aria-hidden="true"></i> Print
+          <i class="fa fa-file fas" aria-hidden="true"></i> Lihat File
         </a>
       </div>
     </div>
@@ -616,6 +620,25 @@ $mutedLine = '#e6eefc';
       });
 
     });
+  });
+})();
+</script>
+<script>
+(function(){
+  // Ganti selector sesuai input filter Anda
+  const $dateStart = document.querySelector('[name="dateStart"]');
+  const $dateEnd   = document.querySelector('[name="dateEnd"]');
+  // hardcode tipe berdasarkan halaman
+  const type = <?= (strpos(strtolower(__FILE__), 'sell') !== false) ? json_encode('sell') : json_encode('buy') ?>;
+
+  document.getElementById('btn-download-zip')?.addEventListener('click', function(){
+    const ds = $dateStart?.value || '<?= date('Y-m-01'); ?>';
+    const de = $dateEnd?.value   || '<?= date('Y-m-t'); ?>';
+
+    // arahkan ke endpoint ZIP dengan query filter,
+    // biar browser langsung download.
+    const url = `<?= site_url('report/zip'); ?>/${type}?dateStart=${encodeURIComponent(ds)}&dateEnd=${encodeURIComponent(de)}`;
+    window.location.href = url;
   });
 })();
 </script>

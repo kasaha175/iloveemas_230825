@@ -159,6 +159,9 @@ $mutedLine = '#e6eefc';
               <div class="form-group col-md-4">
                 <label>&nbsp;</label>
                 <button type="submit" class="btn btn-brand btn-block btn-sm">Filter</button>
+                <button id="btn-download-zip-sell" class="btn btn-danger btn-block btn-sm">
+                  <i class="fa fa-file-archive-o"></i> Download PDF
+                </button>
               </div>
             </div>
           </form>
@@ -256,8 +259,8 @@ $mutedLine = '#e6eefc';
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-        <button class="btn btn-brand" type="button" onclick="submitKonfirmasi()"><i class="fa fa-save mr-1"></i> Submit</button>
+        <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Batal</button>
+        <button class="btn btn-primary btn-sm" type="button" onclick="submitKonfirmasi()"><i class="fa fa-save mr-1"></i> Submit</button>
       </div>
     </div>
   </div>
@@ -317,7 +320,7 @@ $mutedLine = '#e6eefc';
           <i class="fa fa-times mr-1"></i> Tutup
         </button>
         <a id="sdBtnPrint" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
-          <i class="fa fa-print mr-1"></i> Print 123
+          <i class="fa fa-file mr-1"></i> Lihat File
         </a>
       </div>
     </div>
@@ -535,6 +538,19 @@ $mutedLine = '#e6eefc';
       });
 
     });
+  });
+})();
+</script>
+<script>
+(function(){
+  const $dateStart = document.querySelector('[name="dateStart"]');
+  const $dateEnd   = document.querySelector('[name="dateEnd"]');
+
+  document.getElementById('btn-download-zip-sell')?.addEventListener('click', function(){
+    const ds = $dateStart?.value || '<?= date('Y-m-01'); ?>';
+    const de = $dateEnd?.value   || '<?= date('Y-m-t'); ?>';
+    const url = `<?= site_url('report/zip'); ?>/sell?dateStart=${encodeURIComponent(ds)}&dateEnd=${encodeURIComponent(de)}`;
+    window.location.href = url;
   });
 })();
 </script>

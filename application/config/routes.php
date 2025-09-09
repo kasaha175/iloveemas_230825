@@ -124,6 +124,8 @@ $route['report/buy-items-json/(:num)']  = 'ReportController/buy_items_json/$1';
 
 $route['report/test-dompdf']      = 'ReportController/testDompdf';
 
+$route['report/zip/(:any)'] = 'ReportController/downloadZip/$1';
+
 // Maintenance (admin-only)
 $route['maintenance/truncate']['get']  = 'MaintenanceController/truncate';
 $route['maintenance/truncate']['post'] = 'MaintenanceController/truncateRun';

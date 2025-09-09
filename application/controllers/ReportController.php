@@ -454,4 +454,185 @@ class ReportController extends CI_Controller
             ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
     }
 
+    public function downloadZip($type = 'buy')
+    {
+        $type = strtolower((string)$type);
+        if (!in_array($type, ['buy','sell'], true)) show_404();
+
+        $dateStart = $this->input->get('dateStart') ?: date('Y-m-01');
+        $dateEnd   = $this->input->get('dateEnd')   ?: date('Y-m-t');
+        $debugMode = (string)$this->input->get('debug') === '1';
+        $dateEndInclusive = date('Y-m-d 23:59:59', strtotime($dateEnd));
+
+        // ===== mapping tabel & kandidat kolom tanggal
+        $table = ($type === 'buy') ? 'tb_transaction' : 'tb_transaction_sell';
+        $dateCandidates = ['t_date_created','created_at','t_date_printed','date']; // sesuai skema kamu untuk buy & sell
+
+        // deteksi kolom tanggal
+        $dateCol = null;
+        foreach ($dateCandidates as $cand) {
+            if ($this->db->field_exists($cand, $table)) { $dateCol = $cand; break; }
+        }
+        if (!$dateCol) {
+            return $this->output->set_status_header(500)
+                ->set_content_type('application/json','utf-8')
+                ->set_output(json_encode([
+                    'ok' => false,
+                    'error' => "Kolom tanggal tidak ditemukan pada tabel $table. Coba: ".implode(', ',$dateCandidates)
+                ], JSON_PRETTY_PRINT));
+        }
+
+        // ===== ambil transaksi (ikutkan t_no_order bila ada, biar nama file rapi)
+        $selectCols = "t_id, {$dateCol} AS tanggal";
+        if ($this->db->field_exists('t_no_order', $table)) $selectCols .= ", t_no_order";
+
+        $q = $this->db->select($selectCols)
+            ->from($table)
+            ->where("{$dateCol} >=", $dateStart)
+            ->where("{$dateCol} <=", $dateEndInclusive)
+            ->order_by("{$dateCol}", 'ASC')
+            ->get();
+
+        if ($q === false) {
+            $err = $this->db->error();
+            return $this->output->set_status_header(500)
+                ->set_content_type('application/json','utf-8')
+                ->set_output(json_encode([
+                    'ok' => false,
+                    'sql' => $this->db->last_query(),
+                    'db_error_code' => $err['code'] ?? null,
+                    'db_error_msg'  => $err['message'] ?? null,
+                ], JSON_PRETTY_PRINT));
+        }
+
+        $rows = $q->result();
+        if (empty($rows)) {
+            return $this->output->set_content_type('application/json','utf-8')
+                ->set_output(json_encode([
+                    'ok' => true,
+                    'info' => [
+                        'type' => $type, 'table' => $table, 'date_column' => $dateCol,
+                        'filter' => [$dateStart, $dateEndInclusive], 'count' => 0
+                    ],
+                    'data' => [], 'zip' => ['added' => 0, 'skipped' => 0]
+                ], JSON_PRETTY_PRINT));
+        }
+
+        // ===== proses ZIP + logging
+        $this->load->library('zip');
+        $log = [];
+        $added = 0; $skipped = 0;
+
+        foreach ($rows as $r) {
+            // 1) coba ambil dari tb_transaction_prints (paling baru)
+            $pdfRow = $this->db->select('pdf_path, created_at')
+                ->from('tb_transaction_prints')
+                ->where('t_type', strtoupper($type))    // 'BUY' atau 'SELL'
+                ->where('t_id', (int)$r->t_id)
+                ->order_by('created_at','DESC')
+                ->order_by('id','DESC')
+                ->limit(1)
+                ->get()->row();
+
+            $src    = null;
+            $dbPath = $pdfRow->pdf_path ?? null;
+
+            // 2) fallback ke kolom lama di tabel masing-masing (t_pdf_path)
+            if (!$dbPath) {
+                if ($type === 'buy'  && $this->db->field_exists('t_pdf_path', 'tb_transaction')) {
+                    $fb = $this->db->select('t_pdf_path')->from('tb_transaction')
+                        ->where('t_id', (int)$r->t_id)->limit(1)->get()->row();
+                    if ($fb && !empty($fb->t_pdf_path)) {
+                        $dbPath = $fb->t_pdf_path;
+                        $src    = 'tb_transaction.t_pdf_path';
+                    }
+                } elseif ($type === 'sell' && $this->db->field_exists('t_pdf_path', 'tb_transaction_sell')) {
+                    $fb = $this->db->select('t_pdf_path')->from('tb_transaction_sell')
+                        ->where('t_id', (int)$r->t_id)->limit(1)->get()->row();
+                    if ($fb && !empty($fb->t_pdf_path)) {
+                        $dbPath = $fb->t_pdf_path;
+                        $src    = 'tb_transaction_sell.t_pdf_path';
+                    }
+                }
+            }
+
+            if (!$src) $src = $dbPath ? 'tb_transaction_prints' : 'none';
+
+            // 3) resolve ke absolute path & cek file
+            $abs    = $this->_resolvePdfPath($dbPath);
+            $exists = ($abs && is_file($abs));
+
+            // 4) nama file di ZIP (pakai t_no_order kalau ada)
+            $noOrder = isset($r->t_no_order) && $r->t_no_order ? preg_replace('~[^A-Za-z0-9_\-]~','-', $r->t_no_order) : null;
+            $basename = $noOrder ?: (string)(int)$r->t_id;
+            $nameInZip = sprintf('%s/%s-%s.pdf', $type, $type, $basename);
+
+            // 5) add/skip
+            if ($exists) {
+                $this->zip->read_file($abs, false, $nameInZip);
+                $status = 'added';
+                $added++;
+            } else {
+                $status = $dbPath ? 'skipped_missing_file' : 'skipped_no_path';
+                $skipped++;
+            }
+
+            $log[] = [
+                't_id'        => (int)$r->t_id,
+                't_no_order'  => $noOrder ?: null,
+                'tanggal'     => $r->tanggal,
+                'date_column' => $dateCol,
+                'pdf_path_db' => $dbPath,
+                'pdf_path_abs'=> $abs,
+                'source'      => $src,
+                'status'      => $status,
+                'zip_name'    => $nameInZip
+            ];
+        }
+
+        // ===== mode debug → tampilkan log JSON
+        if ($debugMode) {
+            return $this->output->set_content_type('application/json','utf-8')
+                ->set_output(json_encode([
+                    'ok' => true,
+                    'info' => [
+                        'type' => $type, 'table' => $table, 'date_column' => $dateCol,
+                        'filter' => [$dateStart, $dateEndInclusive],
+                        'rows_scanned' => count($rows)
+                    ],
+                    'zip' => ['added' => $added, 'skipped' => $skipped],
+                    'data' => $log
+                ], JSON_PRETTY_PRINT));
+        }
+
+        // ===== download ZIP atau beri info kosong
+        if ($added === 0) {
+            return $this->output
+                ->set_status_header(404)
+                ->set_content_type('application/json','utf-8')
+                ->set_output(json_encode([
+                    'ok' => false,
+                    'message' => 'Tidak ada PDF yang bisa di-zip untuk filter tersebut.',
+                    'summary' => ['added' => $added, 'skipped' => $skipped],
+                    'hint' => 'Gunakan ?debug=1 untuk melihat detail path yang hilang.'
+                ], JSON_PRETTY_PRINT));
+        }
+
+        $zipName = sprintf('report-%s-%s_to_%s.zip',
+            $type, date('Ymd', strtotime($dateStart)), date('Ymd', strtotime($dateEnd))
+        );
+
+        header('X-Zip-Report: type='.$type.', added='.$added.', skipped='.$skipped);
+        $this->zip->download($zipName);
+    }
+
+    private function _resolvePdfPath($dbPath)
+    {
+        $path = trim((string)$dbPath);
+        if ($path === '') return '';
+        if (preg_match('~^([a-zA-Z]:\\\\|/)~', $path)) return $path; // absolute (Windows/Unix)
+        if (preg_match('~^https?://~i', $path)) return '';          // URL → tidak kita unduh di sini
+        return FCPATH . ltrim($path, '/\\');                        // relatif → FCPATH
+    }
+
 }

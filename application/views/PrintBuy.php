@@ -34,7 +34,12 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
 
   <style>
     @page { margin: 0; }
-    table { border-collapse: collapse; }
+    table { 
+      border-collapse: collapse; 
+      /* width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;         */
+    }
     body { font-family: sans-serif; margin: 0 !important; }
     input[type=checkbox] { transform: scale(1.5); }
     .no-margin p { margin: 0px !important; }
@@ -138,7 +143,7 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
         </div>
       </div>
 
-      <div style="width:100%;margin-top:15px;">
+      <div style="width:100%; margin-top:15px;">
         <table style="padding-right:5px; width:100%; display:inline-block;vertical-align:text-top; page-break-inside:auto">
           <tr>
             <td style="padding:10px 0px; width:15px; border: 1px solid black !important; text-align:center; font-weight: bold; font-size: 14px">No</td>

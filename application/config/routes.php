@@ -58,7 +58,7 @@ $route['transaction/savePrint/(:any)/(:num)']['POST'] = 'TransactionController/s
 $route['transaction/savePrint/(:any)/(:num)']['GET']  = 'TransactionController/savePrint/$1/$2';
 
 // === Unduh file PDF yang sudah tersimpan ===
-$route['transaction/print-file/(:any)/(:num)']['GET'] = 'TransactionController/printFile/$1/$2';
+$route['transaction/print-file/(:any)/(:num)']['GET'] = 'TransactionController/print_file/$1/$2';
 
 $route['diagnose/test-chrome'] = 'TransactionController/testChromePing';
 

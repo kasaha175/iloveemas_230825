@@ -1704,11 +1704,6 @@ public function getCustomers()
 		}
 	}
 
-	// pastikan folder ada
-	private function _ensureDir(string $dir): void {
-		if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
-	}
-
 	// tandai checkbox "checked" di HTML sesuai payload
 	private function _applyChecksToHtml(string $html, array $checkedBranchIds, array $checkedPays): string
 	{
@@ -1733,35 +1728,17 @@ public function getCustomers()
 		return $html;
 	}
 
-	// generate PDF (TCPDF) ke file
-	// ===== Tambahkan di TransactionController (private method) =====
 	private function _generatePdf(string $html, string $destPath, string $paper='A4', string $orientation='portrait'): void
 	{
 		log_message('debug', 'PDF: mencoba Chrome...');
-	try {
-		$this->load->library('ChromePrinter');                            
-		$this->chromeprinter->htmlToPdf($html, $destPath, $paper, $orientation);
-		log_message('debug', 'PDF: sukses Chrome -> '.$destPath.' | log: '.json_encode($res));
-		return;
-	} catch (\Throwable $e) {
-		log_message('error', 'PDF: Chrome gagal => '.$e->getMessage());
-		log_message('debug', 'PDF: pakai TCPDF fallback');
-	}
-
-		// ===== Fallback: TCPDF (kode lama milikmu) =====
-		$this->load->library('Pdf');
-		$ori = (strtolower($orientation) === 'landscape') ? 'L' : 'P';
-
-		$pdf = new TCPDF($ori, 'mm', $paper, true, 'UTF-8', false);
-		$pdf->setPrintHeader(false);
-		$pdf->setPrintFooter(false);
-		$pdf->SetMargins(0, 0, 0);
-		$pdf->AddPage();
-
-		$wrap = '<style>@page{margin:0}body{font-family:sans-serif;margin:0}</style>' . $html;
-		$pdf->writeHTML($wrap, true, false, true, false, '');
-		$this->_ensureDir(dirname($destPath));
-		$pdf->Output($destPath, 'F');
+		try {
+			$this->load->library('ChromePrinter');
+			$res = $this->chromeprinter->htmlToPdf($html, $destPath, $paper, $orientation);
+			log_message('debug', 'PDF: sukses Chrome -> '.$destPath.' | log: '.json_encode($res));
+		} catch (\Throwable $e) {
+			log_message('error', 'PDF: Chrome gagal => '.$e->getMessage());
+			throw $e;
+		}
 	}
 
 	private function _downloadFile(string $full, string $filename): void
@@ -1829,42 +1806,66 @@ public function getCustomers()
 		// ===== Tandai checkbox di HTML (1:1 di PDF) =====
 		$htmlFinal = $this->_applyChecksToHtml($rawHtml, $branchIds, $payments);
 
-		// ===== No Order & tanggal (kompatibel buy/sell) =====
-		$tDate   = isset($row->t_date_created) ? $row->t_date_created : (isset($row->date_created) ? $row->date_created : date('Y-m-d'));
+		// ===== Dapatkan no_order & tanggal Transaksi =====
 		$noOrder = null;
-		foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no'] as $c) {
-			if (!empty($row->{$c})) { $noOrder = $row->{$c}; break; }
+		foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no','no_invoice'] as $c) {
+			if (!empty($row->{$c})) { $noOrder = (string)$row->{$c}; break; }
 		}
 		if (!$noOrder) { $noOrder = strtoupper($type).'-'.$id; } // fallback aman
 
-		// ===== Build path penyimpanan =====
-		$tahun    = date('Y', strtotime($tDate));
-		$bulan    = date('m', strtotime($tDate));
-		$stamp    = date('Ymd-His');                 // timestamp unik
-		$fileName = $noOrder . '-' . $stamp . '.pdf';
+		$tDate = null;
+		foreach (['t_date_created','date_created','created_at','t_date'] as $c) {
+			if (!empty($row->{$c})) { $tDate = (string)$row->{$c}; break; }
+		}
+		if (!$tDate) { $tDate = date('Y-m-d'); }
 
-		$relDir   = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
-		$relPath  = $relDir . $fileName;            // simpan RELATIVE
-		$relPath  = str_replace('\\','/', $relPath);
-
-		$absDir   = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
-		$absPath  = $absDir . $fileName;
+		// ===== Build direktori penyimpanan (RELATIVE & ABSOLUTE) =====
+		$tahun   = date('Y', strtotime($tDate));
+		$bulan   = date('m', strtotime($tDate));
+		$relDir  = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
+		$absDir  = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
 
 		// Pastikan folder ada
-		if (!is_dir($absDir)) { @mkdir($absDir, 0775, true); }
+		if (!is_dir($absDir) && !@mkdir($absDir, 0775, true)) {
+			return $this->output->set_status_header(500)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'Tidak bisa membuat folder penyimpanan PDF.']));
+		}
+
+		// ===== Hapus SEMUA file lama transaksi ini (NOORDER-*.pdf) =====
+		// Jika ada file yang tidak bisa dihapus (locked), hentikan dengan 423
+		$pattern  = $absDir . $noOrder . '-*.pdf';
+		$oldFiles = glob($pattern) ?: [];
+		foreach ($oldFiles as $old) {
+			if (@is_file($old) && !@unlink($old)) {
+				return $this->output->set_status_header(423) // Locked
+					->set_content_type('application/json','utf-8')
+					->set_output(json_encode([
+						'ok'  => false,
+						'msg' => 'File PDF lama sedang dibuka. Tutup halaman PDF terlebih dahulu, lalu ulangi.'
+					]));
+			}
+		}
+
+		// ===== Nama file BARU: {NOORDER}-{YYYYMMDD-HHMMSS}.pdf =====
+		$stamp    = date('Ymd-His');
+		$fileName = $noOrder . '-' . $stamp . '.pdf';
+		$relPath  = str_replace('\\','/', $relDir . $fileName); // simpan RELATIVE
+		$absPath  = $absDir . $fileName;
 
 		// ===== Generate PDF: tulis ke temp lalu rename (atomic-ish) =====
 		try {
-			$tmpPath = $absPath.'.part';
-			$this->_generatePdf($htmlFinal, $tmpPath, $paper, $orientation); // generate ke temp
+			$tmpPath = $absPath . '.part';
+
+			// Chrome-only generator
+			$this->_generatePdf($htmlFinal, $tmpPath, $paper, $orientation);
+
 			// rename -> final
 			if (!@rename($tmpPath, $absPath)) {
-				// jika rename gagal (misal race condition), coba copy lalu unlink
-				if (!@copy($tmpPath, $absPath)) {
-					@unlink($tmpPath);
-					throw new \RuntimeException('Gagal menulis file PDF.');
-				}
 				@unlink($tmpPath);
+				return $this->output->set_status_header(500)
+					->set_content_type('application/json','utf-8')
+					->set_output(json_encode(['ok'=>false,'msg'=>'Gagal menyimpan PDF akhir.']));
 			}
 		} catch (\Throwable $e) {
 			return $this->output->set_status_header(500)
@@ -1872,12 +1873,10 @@ public function getCustomers()
 				->set_output(json_encode(['ok'=>false,'msg'=>'PDF gagal dibuat: '.$e->getMessage()]));
 		}
 
-		// (Opsional) Buat alias nama stabil: {NOORDER}.pdf → tidak fatal jika gagal (file lama mungkin sedang terbuka)
-		$aliasPath = $absDir . $noOrder . '.pdf';
-		@copy($absPath, $aliasPath);
+		// ===== Simpan/Update jejak ke DB — 1 baris per transaksi =====
+		$this->db->trans_start();
 
-		// ===== Simpan jejak ke DB =====
-		$this->db->insert('tb_transaction_prints', [
+		$payloadDb = [
 			't_type'        => strtoupper($type),
 			't_id'          => (int)$id,
 			'no_order'      => $noOrder,
@@ -1887,178 +1886,224 @@ public function getCustomers()
 			'payments_json' => json_encode($payments, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
 			'html_raw'      => $rawHtml,
 			'html_final'    => $htmlFinal,
-			'pdf_path'      => $relPath, // RELATIVE
-			'created_by'    => (int)$this->session->userdata('idUser'),
-			'created_at'    => date('Y-m-d H:i:s'),
-		]);
+			'pdf_path'      => $relPath, // RELATIVE (aktif terbaru)
+			'updated_at'    => date('Y-m-d H:i:s'),
+			'updated_by'    => (int)$this->session->userdata('idUser'),
+		];
+
+		// Upsert manual: coba update; jika tidak ada baris, insert
+		$this->db->where(['t_type'=>strtoupper($type), 't_id'=>$id])->update('tb_transaction_prints', $payloadDb);
+		if ($this->db->affected_rows() === 0) {
+			$payloadDb['created_at'] = $payloadDb['updated_at'];
+			$payloadDb['created_by'] = $payloadDb['updated_by'];
+			$this->db->insert('tb_transaction_prints', $payloadDb);
+		}
+
+		$this->db->trans_complete();
+		if (!$this->db->trans_status()) {
+			return $this->output->set_status_header(500)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'DB error saat menyimpan metadata PDF.']));
+		}
 
 		// ===== Response =====
 		return $this->output->set_content_type('application/json','utf-8')
 			->set_output(json_encode([
 				'ok'       => true,
 				'download' => base_url('transaction/print-file/'.$type.'/'.$id),
-				'path'     => $relPath,
+				'path'     => $relPath, // contoh: uploads/prints/buy/2025/09/NO123-20250909-183012.pdf
+				'note'     => 'PDF berhasil dibuat. 1 transaksi 1 file aktif; nama file memakai timestamp.'
 			], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
 	}
 
 	public function print_file($type = 'buy', $id = 0)
-{
-    $type = strtolower((string)$type);
-    $id   = (int)$id;
-    if (!$id || !in_array($type, ['buy','sell'], true)) { show_404(); }
+	{
+		$type = strtolower((string)$type);
+		$id   = (int)$id;
+		if (!$id || !in_array($type, ['buy','sell'], true)) { show_404(); }
 
-    // ========== DEBUG MODE ==========
-    $debugParam   = $this->input->get('debug');
-    if ($debugParam === null) { $debugParam = $this->input->get('dbg'); }
-    $hasDebug     = ($debugParam !== null);
-    $mode         = strtolower(trim((string)($debugParam ?? 'both')));
+		// ========== DEBUG MODE ==========
+		$debugParam   = $this->input->get('debug');
+		if ($debugParam === null) { $debugParam = $this->input->get('dbg'); }
+		$hasDebug     = ($debugParam !== null);
+		$mode         = strtolower(trim((string)($debugParam ?? 'both')));
 
-    // default bila ?debug tanpa nilai → both
-    if ($mode === '') { $mode = 'both'; }
+		// default bila ?debug tanpa nilai → both
+		if ($mode === '') { $mode = 'both'; }
 
-    $doView = $hasDebug && in_array($mode, ['1','true','yes','view','both','all','json'], true);
-    $doLog  = $hasDebug && in_array($mode, ['1','true','yes','log','both','all'], true);
+		$doView = $hasDebug && in_array($mode, ['1','true','yes','view','both','all','json'], true);
+		$doLog  = $hasDebug && in_array($mode, ['1','true','yes','log','both','all'], true);
 
-    // ========== HINTS ==========
-    $noParam = trim((string)$this->input->get('no')); // no_order
-    $crtRaw  = (string)($this->input->get('created_at') ?: $this->input->get('createdAt') ?: $this->input->get('ts'));
-    $crtTs   = $crtRaw ? @strtotime($crtRaw) : null;
-    $crt     = $crtTs ? date('Y-m-d H:i:s', $crtTs) : null;
+		// ========== HINTS ==========
+		$noParam = trim((string)$this->input->get('no')); // no_order
+		$crtRaw  = (string)($this->input->get('created_at') ?: $this->input->get('createdAt') ?: $this->input->get('ts'));
+		$crtTs   = $crtRaw ? @strtotime($crtRaw) : null;
+		$crt     = $crtTs ? date('Y-m-d H:i:s', $crtTs) : null;
 
-    $trace = [
-        'params' => ['type'=>$type,'t_id'=>$id,'no'=>$noParam,'created_at'=>$crt],
-        'tries'  => [],
-    ];
+		$trace = [
+			'params' => ['type'=>$type,'t_id'=>$id,'no'=>$noParam,'created_at'=>$crt],
+			'tries'  => [],
+		];
 
-    // ========== 1) Cari di tb_transaction_prints ==========
-    $row = null;
-    if ($this->db->table_exists('tb_transaction_prints')) {
-        // a) pakai created_at hint jika ada
-        $this->db->from('tb_transaction_prints');
-        $this->db->where('t_type', strtoupper($type));
-        $this->db->where('t_id', $id);
-        if ($noParam !== '') $this->db->where('no_order', $noParam);
-        if ($crt) $this->db->where('created_at <=', $crt);
-        $this->db->order_by('created_at','DESC')->order_by('id','DESC')->limit(1);
-        $row = $this->db->get()->row();
-        $trace['tries'][] = ['table'=>'tb_transaction_prints','with_created_at'=> (bool)$crt,'with_no'=> ($noParam!==''),
-                             'found'=> (bool)($row && !empty($row->pdf_path))];
+		// ========== 1) Cari di tb_transaction_prints ==========
+		$row = null;
+		if ($this->db->table_exists('tb_transaction_prints')) {
+			// a) pakai created_at hint jika ada
+			$this->db->from('tb_transaction_prints');
+			$this->db->where('t_type', strtoupper($type));
+			$this->db->where('t_id', $id);
+			if ($noParam !== '') $this->db->where('no_order', $noParam);
+			if ($crt) $this->db->where('created_at <=', $crt);
+			$this->db->order_by('created_at','DESC')->order_by('id','DESC')->limit(1);
+			$row = $this->db->get()->row();
+			$trace['tries'][] = ['table'=>'tb_transaction_prints','with_created_at'=> (bool)$crt,'with_no'=> ($noParam!==''),
+								'found'=> (bool)($row && !empty($row->pdf_path))];
 
-        // b) tanpa created_at bila a) tidak ketemu
-        if ((!$row || empty($row->pdf_path)) && $crt) {
-            $this->db->from('tb_transaction_prints');
-            $this->db->where('t_type', strtoupper($type));
-            $this->db->where('t_id', $id);
-            if ($noParam !== '') $this->db->where('no_order', $noParam);
-            $this->db->order_by('created_at','DESC')->order_by('id','DESC')->limit(1);
-            $row = $this->db->get()->row();
-            $trace['tries'][] = ['table'=>'tb_transaction_prints','with_created_at'=> false,'with_no'=> ($noParam!==''),
-                                 'found'=> (bool)($row && !empty($row->pdf_path))];
-        }
+			// b) tanpa created_at bila a) tidak ketemu
+			if ((!$row || empty($row->pdf_path)) && $crt) {
+				$this->db->from('tb_transaction_prints');
+				$this->db->where('t_type', strtoupper($type));
+				$this->db->where('t_id', $id);
+				if ($noParam !== '') $this->db->where('no_order', $noParam);
+				$this->db->order_by('created_at','DESC')->order_by('id','DESC')->limit(1);
+				$row = $this->db->get()->row();
+				$trace['tries'][] = ['table'=>'tb_transaction_prints','with_created_at'=> false,'with_no'=> ($noParam!==''),
+									'found'=> (bool)($row && !empty($row->pdf_path))];
+			}
 
-        // c) drop no_order bila b) tidak ketemu
-        if ((!$row || empty($row->pdf_path)) && $noParam !== '') {
-            $this->db->from('tb_transaction_prints');
-            $this->db->where('t_type', strtoupper($type));
-            $this->db->where('t_id', $id);
-            $this->db->order_by('created_at','DESC')->order_by('id','DESC')->limit(1);
-            $row = $this->db->get()->row();
-            $trace['tries'][] = ['table'=>'tb_transaction_prints','drop_no_order'=> true,
-                                 'found'=> (bool)($row && !empty($row->pdf_path))];
-        }
-    }
+			// c) drop no_order bila b) tidak ketemu
+			if ((!$row || empty($row->pdf_path)) && $noParam !== '') {
+				$this->db->from('tb_transaction_prints');
+				$this->db->where('t_type', strtoupper($type));
+				$this->db->where('t_id', $id);
+				$this->db->order_by('created_at','DESC')->order_by('id','DESC')->limit(1);
+				$row = $this->db->get()->row();
+				$trace['tries'][] = ['table'=>'tb_transaction_prints','drop_no_order'=> true,
+									'found'=> (bool)($row && !empty($row->pdf_path))];
+			}
+		}
 
-    // ========== 2) Fallback: tb_transaction_print (lama, opsional) ==========
-    if ((!$row || empty($row->pdf_path)) && $this->db->table_exists('tb_transaction_print')) {
-        $pathField = $this->db->field_exists('pdf_print','tb_transaction_print') ? 'pdf_print' : 'pdf_path';
+		// ========== 2) Fallback: tb_transaction_print (lama, opsional) ==========
+		if ((!$row || empty($row->pdf_path)) && $this->db->table_exists('tb_transaction_print')) {
+			$pathField = $this->db->field_exists('pdf_print','tb_transaction_print') ? 'pdf_print' : 'pdf_path';
 
-        $this->db->select($pathField.' AS pdf_path')->from('tb_transaction_print')->where('t_id', $id);
-        if ($this->db->field_exists('t_type','tb_transaction_print')) {
-            $this->db->where('t_type', strtoupper($type));
-        }
-        if ($noParam !== '' && $this->db->field_exists('no_order','tb_transaction_print')) {
-            $this->db->where('no_order', $noParam);
-        }
-        if ($crt && $this->db->field_exists('created_at','tb_transaction_print')) {
-            $this->db->where('created_at <=', $crt);
-        }
-        if ($this->db->field_exists('created_at','tb_transaction_print')) {
-            $this->db->order_by('created_at','DESC');
-        }
-        if ($this->db->field_exists('id','tb_transaction_print')) {
-            $this->db->order_by('id','DESC');
-        }
-        $this->db->limit(1);
-        $row2 = $this->db->get()->row();
+			$this->db->select($pathField.' AS pdf_path')->from('tb_transaction_print')->where('t_id', $id);
+			if ($this->db->field_exists('t_type','tb_transaction_print')) {
+				$this->db->where('t_type', strtoupper($type));
+			}
+			if ($noParam !== '' && $this->db->field_exists('no_order','tb_transaction_print')) {
+				$this->db->where('no_order', $noParam);
+			}
+			if ($crt && $this->db->field_exists('created_at','tb_transaction_print')) {
+				$this->db->where('created_at <=', $crt);
+			}
+			if ($this->db->field_exists('created_at','tb_transaction_print')) {
+				$this->db->order_by('created_at','DESC');
+			}
+			if ($this->db->field_exists('id','tb_transaction_print')) {
+				$this->db->order_by('id','DESC');
+			}
+			$this->db->limit(1);
+			$row2 = $this->db->get()->row();
 
-        $trace['tries'][] = ['table'=>'tb_transaction_print','found'=> (bool)($row2 && !empty($row2->pdf_path))];
+			$trace['tries'][] = ['table'=>'tb_transaction_print','found'=> (bool)($row2 && !empty($row2->pdf_path))];
 
-        if ($row2 && !empty($row2->pdf_path)) $row = $row2;
-    }
+			if ($row2 && !empty($row2->pdf_path)) $row = $row2;
+		}
 
-    // ========== DEBUG OUTPUT (sebelum streaming) ==========
-    if ($doLog) {
-        // log sebagai ERROR agar muncul meski log_threshold rendah
-        @log_message('error', '[print_file debug] '.json_encode([
-            'selected_pdf' => $row->pdf_path ?? null,
-            'trace'        => $trace
-        ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
-    }
-    if ($doView) {
-        return $this->output->set_content_type('application/json','utf-8')
-            ->set_output(json_encode([
-                'ok'        => (bool)($row && !empty($row->pdf_path)),
-                'pdf_path'  => $row->pdf_path ?? null,
-                'trace'     => $trace
-            ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
-    }
+		// ========== DEBUG OUTPUT (sebelum streaming) ==========
+		if ($doLog) {
+			// log sebagai ERROR agar muncul meski log_threshold rendah
+			@log_message('error', '[print_file debug] '.json_encode([
+				'selected_pdf' => $row->pdf_path ?? null,
+				'trace'        => $trace
+			], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+		}
+		if ($doView) {
+			return $this->output->set_content_type('application/json','utf-8')
+				->set_output(json_encode([
+					'ok'        => (bool)($row && !empty($row->pdf_path)),
+					'pdf_path'  => $row->pdf_path ?? null,
+					'trace'     => $trace
+				], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
+		}
 
-    // ========== Validasi hasil ==========
-    if (!$row || empty($row->pdf_path)) {
-        show_error('PDF belum pernah dibuat untuk transaksi ini.', 404);
-    }
+		// ========== Validasi hasil ==========
+		if (!$row || empty($row->pdf_path)) {
+			show_error('PDF belum pernah dibuat untuk transaksi ini.', 404);
+		}
 
-    $pdfPath = (string)$row->pdf_path;
+		$pdfPath = (string)$row->pdf_path;
 
-    // URL langsung?
-    if (preg_match('#^https?://#i', $pdfPath)) { redirect($pdfPath, 'location', 302); return; }
+		// URL langsung?
+		if (preg_match('#^https?://#i', $pdfPath)) { redirect($pdfPath, 'location', 302); return; }
 
-    // Path lokal → normalisasi & keamanan
-    $pdfPath = ltrim(str_replace('\\','/',$pdfPath), '/');
-    $abs     = FCPATH.$pdfPath;
+		// Path lokal → normalisasi & keamanan
+		$pdfPath = ltrim(str_replace('\\','/',$pdfPath), '/');
+		$abs     = FCPATH.$pdfPath;
 
-    $uploadsRoot = str_replace('\\','/', realpath(FCPATH.'uploads/prints'));
-    $absReal     = str_replace('\\','/', realpath($abs));
+		$uploadsRoot = str_replace('\\','/', realpath(FCPATH.'uploads/prints'));
+		$absReal     = str_replace('\\','/', realpath($abs));
 
-    if (!$absReal || ($uploadsRoot && strpos($absReal, $uploadsRoot) !== 0)) {
-        show_error('Lokasi file tidak valid.', 403);
-    }
-    if (!is_file($absReal)) {
-        show_error('File PDF tidak ditemukan di disk.', 404);
-    }
+		if (!$absReal || ($uploadsRoot && strpos($absReal, $uploadsRoot) !== 0)) {
+			show_error('Lokasi file tidak valid.', 403);
+		}
+		if (!is_file($absReal)) {
+			show_error('File PDF tidak ditemukan di disk.', 404);
+		}
 
-    // ========== Stream PDF ==========
-    if (function_exists('apache_setenv')) @apache_setenv('no-gzip', '1');
-    @ini_set('zlib.output_compression', 'Off');
-    while (ob_get_level() > 0) { @ob_end_clean(); }
-    $this->output->enable_profiler(false);
+		// ========== Stream PDF ==========
+		if (function_exists('apache_setenv')) @apache_setenv('no-gzip', '1');
+		@ini_set('zlib.output_compression', 'Off');
+		while (ob_get_level() > 0) { @ob_end_clean(); }
+		$this->output->enable_profiler(false);
 
-    $disp = ($this->input->get('dl') === '1') ? 'attachment' : 'inline';
-    $size = @filesize($absReal);
+		$disp = ($this->input->get('dl') === '1') ? 'attachment' : 'inline';
+		$size = @filesize($absReal);
 
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: '.$disp.'; filename="'.basename($absReal).'"');
-    if ($size) header('Content-Length: '.$size);
-    header('Accept-Ranges: bytes');
-    header('Cache-Control: private, max-age=0, must-revalidate');
-    header('Pragma: public');
-    header('Expires: 0');
+		header('Content-Type: application/pdf');
+		header('Content-Disposition: '.$disp.'; filename="'.basename($absReal).'"');
+		if ($size) header('Content-Length: '.$size);
+		header('Accept-Ranges: bytes');
+		header('Cache-Control: private, max-age=0, must-revalidate');
+		header('Pragma: public');
+		header('Expires: 0');
 
-    $fp = fopen($absReal, 'rb');
-    fpassthru($fp);
-    fclose($fp);
-    exit;
-}
+		$fp = fopen($absReal, 'rb');
+		fpassthru($fp);
+		fclose($fp);
+		exit;
+	}
+
+	private function _resolveOrderNo(object $row, string $type, int $id): string {
+		foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no','no_invoice'] as $c) {
+			if (!empty($row->{$c})) return (string)$row->{$c};
+		}
+		return strtoupper($type).'-'.$id;
+	}
+	private function _resolveTransDate(object $row): string {
+		foreach (['t_date_created','date_created','created_at','t_date'] as $c) {
+			if (!empty($row->{$c})) return (string)$row->{$c};
+		}
+		return date('Y-m-d');
+	}
+	private function _ensureDir(string $dir): void {
+		if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+			throw new \RuntimeException('Tidak bisa membuat folder penyimpanan PDF.');
+		}
+	}
+	/**
+	 * Kembalikan [relDir, absDir, baseNameNoOrder] tanpa filename final (karena pakai timestamp).
+	 */
+	private function _resolvePdfDir(string $type, object $row, int $id): array {
+		$noOrder = $this->_resolveOrderNo($row, $type, $id);
+		$tDate   = $this->_resolveTransDate($row);
+		$tahun   = date('Y', strtotime($tDate));
+		$bulan   = date('m', strtotime($tDate));
+		$relDir  = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
+		$absDir  = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
+		return [$relDir, $absDir, $noOrder];
+	}
 
 
 }

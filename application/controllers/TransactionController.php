@@ -653,12 +653,14 @@ class TransactionController extends CI_Controller
 		$address         = trim((string)$this->input->post("address"));
 		$residentAddress = trim((string)$this->input->post("resident_address"));
 		$phoneRaw        = trim((string)$this->input->post("phone"));
+		$emailRaw        = trim((string)$this->input->post("email"));
 
 		$idNumber = preg_replace('/\D+/', '', $idNumberRaw);
 		$phone    = preg_replace('/\D+/', '', $phoneRaw);
+		$email    = strtolower($emailRaw);
 
 		// Validasi mandatory
-		if ($name === '' || $idNumber === '' || $address === '' || $residentAddress === '' || $phone === '') {
+		if ($name === '' || $idNumber === '' || $address === '' || $residentAddress === '' || $phone === '' || $email === '') {
 			$this->session->set_userdata([
 				'status'  => 'error',
 				'message' => 'All fields are mandatory!'
@@ -685,6 +687,16 @@ class TransactionController extends CI_Controller
 			return;
 		}
 
+		// Validasi format email
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			$this->session->set_userdata([
+				'status'  => 'error',
+				'message' => 'Invalid email format!'
+			]);
+			redirect(base_url("transaction/new-customer?key=".$key));
+			return;
+		}
+
 		// Validasi duplikat berdasarkan c_id_number
 		$dup = $this->db->select('c_id')
 						->from('tb_customer')
@@ -706,7 +718,7 @@ class TransactionController extends CI_Controller
 		$now = isset($this->dateToday) && $this->dateToday ? $this->dateToday : date('Y-m-d H:i:s');
 
 		// Generate nomor order
-		$lastRow = $this->MasterModel->lastCustomer(); // harus ambil dari tb_customer
+		$lastRow = $this->MasterModel->lastCustomer();
 		$lastId  = 0;
 		if ($lastRow && method_exists($lastRow, 'row')) {
 			$tmp = $lastRow->row('c_id');
@@ -725,6 +737,7 @@ class TransactionController extends CI_Controller
 			'c_address'          => strtoupper($address),
 			'c_resident_address' => strtoupper($residentAddress),
 			'c_phone'            => $phone,
+			'c_email'            => $email,  // << tambahkan email
 			'c_u_id'             => $idUser,
 			'c_no_order'         => $noOrder,
 			'c_date_created'     => $now,

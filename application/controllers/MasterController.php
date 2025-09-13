@@ -88,7 +88,8 @@ class MasterController extends CI_Controller
         $postOrder = $this->input->post('order');
         $order0    = (is_array($postOrder) && isset($postOrder[0])) ? $postOrder[0] : ['column'=>2,'dir'=>'asc'];
 
-        $cols    = ['c_id', null, 'c_no_order','c_id_number','c_name','c_address','c_resident_address','c_phone','c_date_created','u_name'];
+        // tambahkan c_email di daftar kolom
+        $cols    = ['c_id', null, 'c_no_order','c_id_number','c_name','c_address','c_resident_address','c_phone','c_email','c_date_created','u_name'];
         $orderBy = isset($cols[$order0['column']]) ? $cols[$order0['column']] : 'c_no_order';
         $dir     = (isset($order0['dir']) && strtolower($order0['dir'])==='desc') ? 'DESC' : 'ASC';
 
@@ -103,8 +104,15 @@ class MasterController extends CI_Controller
 
             $data[] = [
                 $no, $aksi,
-                $r->c_no_order, $r->c_id_number,$r->c_name, $r->c_address, $r->c_resident_address,
-                $r->c_phone, $r->c_date_created, $r->u_name
+                $r->c_no_order,
+                $r->c_id_number,
+                $r->c_name,
+                $r->c_address,
+                $r->c_resident_address,
+                $r->c_phone,
+                $r->c_email ?: '<em class="text-muted">-</em>', // tampilkan email
+                $r->c_date_created,
+                $r->u_name
             ];
         }
 
@@ -120,7 +128,7 @@ class MasterController extends CI_Controller
             ->set_content_type('application/json','utf-8')
             ->set_output(json_encode($json, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES))
             ->_display();
-        exit; // cegah output lain ikut terkirim
+        exit;
     }
 
     public function detailCustomer()

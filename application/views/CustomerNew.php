@@ -143,6 +143,17 @@
             <input id="u_phone" type="text" name="phone" class="form-control" required inputmode="tel" maxlength="20" placeholder="08xxxxxxxxxx">
           </div>
 
+          <div class="form-group">
+            <label for="u_email">Email</label>
+            <input id="u_email" 
+                  type="email" 
+                  name="email" 
+                  class="form-control" 
+                  required 
+                  autocomplete="email" 
+                  placeholder="contoh: nama@email.com">
+          </div>
+
           <div class="btn-row">
             <button type="submit" class="btn-grad"><i class="fas fa-save"></i> Simpan</button>
             <a href="<?= base_url('master/customer') ?>" class="btn-soft"><i class="fas fa-arrow-left"></i> Kembali</a>
@@ -175,7 +186,7 @@
 
       // jqKeyboard (aman bila plugin ada)
       if ($.fn.keyboard) {
-        $('#u_name, #u_address, #u_resident_address, #u_phone, #u_id_number')
+        $('#u_name, #u_address, #u_resident_address, #u_phone, #u_id_number, #u_email')
           .keyboard({ layout: 'qwerty' });
       }
     })(jQuery);

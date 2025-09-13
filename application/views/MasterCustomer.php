@@ -155,6 +155,7 @@
                 <th>Address</th>
                 <th>Resident Address</th>
                 <th>Phone</th>
+                <th>Email</th>
                 <th>Created At</th>
                 <th>Created By</th>
               </tr>
@@ -195,7 +196,7 @@
       { data: 0, orderable: false },
       { data: 1, orderable: false, searchable: false },
       { data: 2 },{ data: 3 }, { data: 4 }, { data: 5 },
-      { data: 6 }, { data: 7 }, { data: 8 }, { data: 9 }
+      { data: 6 }, { data: 7 }, { data: 8 }, { data: 9 },{ data: 10 }
     ],
     scrollX: true,
     language: {

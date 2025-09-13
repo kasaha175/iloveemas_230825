@@ -130,6 +130,9 @@ $route['report/zip/(:any)'] = 'ReportController/downloadZip/$1';
 $route['maintenance/truncate']['get']  = 'MaintenanceController/truncate';
 $route['maintenance/truncate']['post'] = 'MaintenanceController/truncateRun';
 
+$route['health/ping'] = 'HealthController/ping';
+
+
 /* =============================== DEFAULT =============================== */
 $route['default_controller'] = 'HomeController';
 $route['404_override']       = 'HomeController/error';

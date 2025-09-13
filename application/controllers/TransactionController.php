@@ -636,45 +636,123 @@ class TransactionController extends CI_Controller
     }
     return $returnValue;
 }
-	function newCustomerProcess(){
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		if ($authUser == true) {
-			$month = $this->numberToRomanRepresentation(date('m', strtotime($this->dateToday)));
-			$noUrut = $this->MasterModel->lastCustomer()->row("c_id");
-			if($noUrut>0){
-				$noUrut = $noUrut+1;
-			}else{
-				$noUrut = 1;
-			}
-			$year = date('Y', strtotime($this->dateToday));
-			$year = $year[2].$year[3];
-			echo $noOrder = "ILE/".$noUrut."/".$month."/".$year;
-			$data = array(
-				'c_name' => strtoupper($this->input->post("name")),
-				'c_id_number' => strtoupper($this->input->post("idNumber")),
-				'c_address' => strtoupper($this->input->post("address")),
-				'c_resident_address' => strtoupper($this->input->post("resident_address")),
-				'c_phone' => $this->input->post("phone"),
-				'c_u_id' => $idUser,
-				'c_no_order' => $noOrder,
-				'c_date_created' => $this->dateToday,
-			);
-			$this->MasterModel->customerAdd($data);
-			$data_session = array(
-				'status' => 'success',
-				'message' => "Add customer is success!",
-			);
-			$this->session->set_userdata($data_session);
-			$key = $this->input->post('key');
-			if($key!='add'){
-				redirect(base_url()."transaction");
-			}else{
-				redirect(base_url()."master/customer");
-			}
-		}
-		else {
+	
+	public function newCustomerProcess()
+	{
+		if ($this->session->userdata("authUser") !== true) {
 			redirect(base_url());
+			return;
+		}
+
+		$idUser = (int)$this->session->userdata("idUser");
+		$key    = (string)$this->input->post("key");
+
+		// Ambil & normalisasi input
+		$name            = trim((string)$this->input->post("name"));
+		$idNumberRaw     = trim((string)$this->input->post("idNumber"));
+		$address         = trim((string)$this->input->post("address"));
+		$residentAddress = trim((string)$this->input->post("resident_address"));
+		$phoneRaw        = trim((string)$this->input->post("phone"));
+
+		$idNumber = preg_replace('/\D+/', '', $idNumberRaw);
+		$phone    = preg_replace('/\D+/', '', $phoneRaw);
+
+		// Validasi mandatory
+		if ($name === '' || $idNumber === '' || $address === '' || $residentAddress === '' || $phone === '') {
+			$this->session->set_userdata([
+				'status'  => 'error',
+				'message' => 'All fields are mandatory!'
+			]);
+			redirect(base_url("transaction/new-customer?key=".$key));
+			return;
+		}
+
+		// Validasi format angka
+		if (!ctype_digit($idNumber)) {
+			$this->session->set_userdata([
+				'status'  => 'error',
+				'message' => 'ID Number (KTP) must be numeric!'
+			]);
+			redirect(base_url("transaction/new-customer?key=".$key));
+			return;
+		}
+		if (!ctype_digit($phone)) {
+			$this->session->set_userdata([
+				'status'  => 'error',
+				'message' => 'Phone must be numeric!'
+			]);
+			redirect(base_url("transaction/new-customer?key=".$key));
+			return;
+		}
+
+		// Validasi duplikat berdasarkan c_id_number
+		$dup = $this->db->select('c_id')
+						->from('tb_customer')
+						->where('c_id_number', $idNumber)
+						->limit(1)
+						->get()
+						->num_rows() > 0;
+
+		if ($dup) {
+			$this->session->set_userdata([
+				'status'  => 'error',
+				'message' => 'Customer with this ID Number already exists!'
+			]);
+			redirect(base_url("transaction/new-customer?key=".$key));
+			return;
+		}
+
+		// Tanggal sekarang
+		$now = isset($this->dateToday) && $this->dateToday ? $this->dateToday : date('Y-m-d H:i:s');
+
+		// Generate nomor order
+		$lastRow = $this->MasterModel->lastCustomer(); // harus ambil dari tb_customer
+		$lastId  = 0;
+		if ($lastRow && method_exists($lastRow, 'row')) {
+			$tmp = $lastRow->row('c_id');
+			if (is_numeric($tmp)) $lastId = (int)$tmp;
+		}
+
+		$noUrut     = $lastId > 0 ? $lastId + 1 : 1;
+		$monthRoman = $this->numberToRomanRepresentation((int)date('m', strtotime($now)));
+		$year2      = date('y', strtotime($now));
+		$noOrder    = "ILE/{$noUrut}/{$monthRoman}/{$year2}";
+
+		// Data simpan
+		$data = [
+			'c_name'             => strtoupper($name),
+			'c_id_number'        => $idNumber,
+			'c_address'          => strtoupper($address),
+			'c_resident_address' => strtoupper($residentAddress),
+			'c_phone'            => $phone,
+			'c_u_id'             => $idUser,
+			'c_no_order'         => $noOrder,
+			'c_date_created'     => $now,
+		];
+
+		$this->db->insert('tb_customer', $data);
+
+		$err = $this->db->error();
+		if (!empty($err['code'])) {
+			log_message('error', 'tb_customer insert failed: '.$err['code'].' '.$err['message']);
+			$this->session->set_userdata([
+				'status'  => 'error',
+				'message' => 'Internal error. Please try again.'
+			]);
+			redirect(base_url("transaction/new-customer?key=".$key));
+			return;
+		}
+
+		// Sukses
+		$this->session->set_userdata([
+			'status'  => 'success',
+			'message' => 'Add customer is success!'
+		]);
+
+		if ($key !== 'add') {
+			redirect(base_url("transaction"));
+		} else {
+			redirect(base_url("master/customer"));
 		}
 	}
 

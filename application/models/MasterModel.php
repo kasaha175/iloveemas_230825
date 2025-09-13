@@ -1,140 +1,197 @@
 <?php
- if (!defined('BASEPATH'))
- 	exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MasterModel extends CI_Model {
 
-    function yearData(){
-        $query = $this->db->query("SELECT *
-        FROM tb_year");
-        return $query;
-    }
-    function customerDetail($id){
-        $query = $this->db->query("SELECT * FROM tb_customer WHERE c_id='$id'");
-        return $query;
-    }
-    function editCustomerProces($data,$idCustomer){
-        $this->db->where('c_id', $idCustomer);
-        $this->db->update('tb_customer', $data);
-    }
-    function deleteCustomerProcess($id){
-        $query = $this->db->query("DELETE FROM tb_customer WHERE c_id='$id'");
-        return $query;
-    }
-    function lastCustomer(){
-        $query = $this->db->query("SELECT *
-        FROM tb_customer c
-        ORDER BY c.c_id DESC
-        LIMIT 1");
-        return $query;
-    }
-    function formulasData($type){
-        $query = $this->db->query("SELECT *
-        FROM tb_formulas a
-        WHERE a.f_name = '$type'");
-        return $query;
-    }
-    function formulasUpdate($key,$data){
-        $this->db->where('f_name', $key);
-        $this->db->update('tb_formulas', $data);
-    }
-    function customerData(){
-        $query = $this->db->query("SELECT *
-        FROM tb_customer a
-        WHERE a.c_id_number!='999999999999999'
-        ORDER BY a.c_name ASC");
-        return $query;
-    }
-    function customerAdd($data){
-        $this->db->insert('tb_customer', $data);
-    }
-    function customerDatas($idCustomer){
-        $query = $this->db->query("SELECT *
-        FROM tb_customer a
-        WHERE a.c_id = '$idCustomer'");
-        return $query;
+    /* ==================== GENERIC ==================== */
+    public function yearData(){
+        return $this->db->get('tb_year');
     }
 
+    public function lastCustomer(){
+        return $this->db->select('*')
+                        ->from('tb_customer c')
+                        ->order_by('c.c_id','DESC')
+                        ->limit(1)
+                        ->get();
+    }
+
+    /* ==================== FORMULAS ==================== */
+    public function formulasData($type){
+        return $this->db->get_where('tb_formulas', ['f_name' => $type]);
+    }
+
+    public function formulasUpdate($key,$data){
+        return $this->db->where('f_name', $key)->update('tb_formulas', $data);
+    }
+
+    /* ==================== CUSTOMER CRUD ==================== */
+    public function customerDetail($id){
+        return $this->db->get_where('tb_customer', ['c_id' => (int)$id]);
+    }
+
+    public function customerDatas($idCustomer){
+        return $this->db->get_where('tb_customer', ['c_id' => (int)$idCustomer]);
+    }
+
+    public function customerData(){
+        return $this->db->from('tb_customer a')
+                        ->where('a.c_id_number !=', '999999999999999')
+                        ->order_by('a.c_name', 'ASC')
+                        ->get();
+    }
+
+    public function customerAdd(array $data){
+        $this->db->insert('tb_customer', $data);
+        return $this->db->affected_rows() > 0;
+    }
+
+    // dipertahankan ejaan fungsi lama agar kompatibel dengan controller
+    public function editCustomerProces(array $data, $idCustomer){
+        return $this->db->where('c_id', (int)$idCustomer)->update('tb_customer', $data);
+    }
+
+    public function deleteCustomerProcess($id){
+        return $this->db->delete('tb_customer', ['c_id' => (int)$id]);
+    }
+
+    /** Cek duplikat nomor KTP */
+    public function customerExistsByIdNumber(string $idNumber, $excludeId = null): bool
+    {
+        $this->db->from('tb_customer')->where('c_id_number', $idNumber);
+        if (!empty($excludeId)) {
+            $this->db->where('c_id <>', (int)$excludeId);
+        }
+        return $this->db->count_all_results() > 0;
+    }
+
+    /* ==================== DATATABLES: CUSTOMER ==================== */
     public function dtCustomers($start, $length, $search, $orderBy, $dir)
     {
+        // kolom yang diijinkan untuk orderBy
+        $allowedOrder = [
+            'c_id','c_no_order','c_id_number','c_name','c_address','c_resident_address',
+            'c_phone','c_email','c_date_created','u_name'
+        ];
+        if (!in_array($orderBy, $allowedOrder, true)) {
+            $orderBy = 'c_no_order';
+        }
+        $dir = (strtoupper($dir)==='DESC') ? 'DESC' : 'ASC';
+
         // total
         $total = $this->db->from('tb_customer c')
-                        ->where('c.c_id_number !=', '999999999999999')
-                        ->count_all_results();
+                          ->where('c.c_id_number !=','999999999999999')
+                          ->count_all_results();
 
         // filtered count
         $qb = $this->db->from('tb_customer c')
-                    ->join('tb_user u','u.u_id=c.c_u_id','left')
-                    ->where('c.c_id_number !=', '999999999999999');
+                       ->join('tb_user u','u.u_id=c.c_u_id','left')
+                       ->where('c.c_id_number !=','999999999999999');
 
         if ($search !== '') {
             $qb->group_start()
-            ->like('c.c_name', $search)
-            ->or_like('c.c_no_order', $search)
-            ->or_like('c.c_phone', $search)
+                ->like('c.c_name', $search)
+                ->or_like('c.c_no_order', $search)
+                ->or_like('c.c_phone', $search)
+                ->or_like('c.c_email', $search)
+                ->or_like('c.c_id_number', $search)
             ->group_end();
         }
         $filtered = $qb->count_all_results();
 
-        // data
-        $rows = $this->db->from('tb_customer c')
-                        ->join('tb_user u','u.u_id=c.c_u_id','left')
-                        ->where('c.c_id_number !=', '999999999999999')
-                        ->order_by($orderBy, $dir)
-                        ->limit($length, $start)
-                        ->get()->result();
+        // data page
+        $rows = $this->db->select('c.*, u.u_name')
+                         ->from('tb_customer c')
+                         ->join('tb_user u','u.u_id=c.c_u_id','left')
+                         ->where('c.c_id_number !=','999999999999999')
+                         ->order_by($orderBy, $dir)
+                         ->limit((int)$length, (int)$start)
+                         ->get()->result();
 
         return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
     }
 
+    /* ==================== EXPORT: CUSTOMER ==================== */
+    /**
+     * Data untuk Export Excel (lengkap + join created_by)
+     * $filters opsional: ['created_from' => 'YYYY-mm-dd', 'created_to' => 'YYYY-mm-dd']
+     */
+    public function customersForExport(array $filters = []): array
+    {
+        $this->db->select("
+            c.c_id,
+            c.c_no_order,
+            c.c_id_number,
+            c.c_name,
+            c.c_address,
+            c.c_resident_address,
+            c.c_phone,
+            c.c_email,
+            c.c_date_created,
+            u.u_name
+        ");
+        $this->db->from('tb_customer c');
+        $this->db->join('tb_user u', 'u.u_id = c.c_u_id', 'left');
+        $this->db->where('c.c_id_number !=', '999999999999999');
+
+        if (!empty($filters['created_from'])) {
+            $this->db->where('c.c_date_created >=', $filters['created_from']);
+        }
+        if (!empty($filters['created_to'])) {
+            $this->db->where('c.c_date_created <', $filters['created_to']);
+        }
+
+        $this->db->order_by('c.c_id', 'ASC');
+        return $this->db->get()->result_array();
+    }
+
+    /** Alias agar kompatibel dengan pemanggilan lama */
+    public function getAllCustomers(): array
+    {
+        return $this->customersForExport();
+    }
+
+    /* ==================== CABANG & MEMO (apa adanya) ==================== */
     public function dtMemos($start, $length, $search, $orderBy, $dir)
     {
-        // total baris
         $total = $this->db->from('tb_memo')->count_all_results();
 
-        // filter count
         $qb = $this->db->from('tb_memo');
         if ($search !== '') {
             $qb->group_start()
-            ->like('tm_value', $search)
-            ->or_like('tm_priority', $search)
-            ->group_end();
+               ->like('tm_value', $search)
+               ->or_like('tm_priority', $search)
+               ->group_end();
         }
         $filtered = $qb->count_all_results();
 
-        // ambil data page ini
         $rows = $this->db->from('tb_memo')
-                        ->order_by($orderBy, $dir)
-                        ->limit($length, $start)
-                        ->get()->result();
+                         ->order_by($orderBy, $dir)
+                         ->limit((int)$length, (int)$start)
+                         ->get()->result();
 
         return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
     }
 
     public function dtCabang($start, $length, $search, $orderBy, $dir)
     {
-        // total ENABLE
         $total = $this->db->from('tb_cabang')->where('status','ENABLE')->count_all_results();
 
-        // filtered
         $qb = $this->db->from('tb_cabang')->where('status','ENABLE');
         if ($search !== '') {
             $qb->group_start()
-                ->like('nama_cabang', $search)
-                ->or_like('alamat_cabang', $search)
-            ->group_end();
+               ->like('nama_cabang', $search)
+               ->or_like('alamat_cabang', $search)
+               ->group_end();
         }
         $filtered = $qb->count_all_results();
 
-        // rows
         $rows = $this->db->from('tb_cabang')
-                ->where('status','ENABLE')
-                ->order_by($orderBy, $dir)
-                ->limit($length, $start)
-                ->get()->result();
+                         ->where('status','ENABLE')
+                         ->order_by($orderBy, $dir)
+                         ->limit((int)$length, (int)$start)
+                         ->get()->result();
 
         return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
     }
-
 }
-?>

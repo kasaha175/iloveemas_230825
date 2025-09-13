@@ -142,6 +142,15 @@
             </div>
           </div>
 
+          <div class="row row-1">
+            <div class="cd-field">
+              <label for="u_email">Email</label>
+              <input type="email" id="u_email" name="email" required class="cd-input" 
+                    value="<?= html_escape($d->c_email ?? '') ?>">
+              <div class="cd-note">Masukkan alamat email yang valid</div>
+            </div>
+          </div>
+
           <div class="cd-actions">
             <button type="submit" class="btn-primary-soft">
               <i class="fas fa-save"></i> Simpan Perubahan

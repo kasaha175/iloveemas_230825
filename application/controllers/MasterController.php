@@ -1,6 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
 class MasterController extends CI_Controller
 {
     /** payload umum ke view */
@@ -141,22 +146,84 @@ class MasterController extends CI_Controller
 
     public function editCustomerProcess()
     {
-        if ($this->session->userdata('authUser') !== true) return redirect(base_url());
-        $idUser = $this->session->userdata('idUser');
+        if ($this->session->userdata('authUser') !== true) {
+            return redirect(base_url());
+        }
 
-        $idCustomer = $this->input->post('idCustomer');
+        $idUser      = (int)$this->session->userdata('idUser');
+        $idCustomer  = (int)$this->input->post('idCustomer', true);
+
+        // Ambil input (XSS filter = true), lalu normalisasi
+        $name            = trim((string)$this->input->post('name', true));
+        $idNumberRaw     = trim((string)$this->input->post('idNumber', true));
+        $address         = trim((string)$this->input->post('address', true));
+        $residentAddress = trim((string)$this->input->post('resident_address', true));
+        $phoneRaw        = trim((string)$this->input->post('phone', true));
+        $emailRaw        = trim((string)$this->input->post('email', true));
+        $noOrder         = trim((string)$this->input->post('noOrder', true));
+
+        // Normalisasi angka
+        $idNumber = preg_replace('/\D+/', '', $idNumberRaw);
+        $phone    = preg_replace('/\D+/', '', $phoneRaw);
+        $email    = strtolower($emailRaw);
+
+        // ===== Validasi dasar
+        if ($name === '' || $idNumber === '' || $address === '' || $residentAddress === '' || $phone === '' || $email === '') {
+            $this->session->set_userdata(['status'=>'error','message'=>'All fields are mandatory!']);
+            return redirect(base_url("master/customer/{$idCustomer}/"));
+        }
+        if (!ctype_digit($idNumber)) {
+            $this->session->set_userdata(['status'=>'error','message'=>'ID Number (KTP) must be numeric!']);
+            return redirect(base_url("master/customer/{$idCustomer}/"));
+        }
+        if (!ctype_digit($phone)) {
+            $this->session->set_userdata(['status'=>'error','message'=>'Phone must be numeric!']);
+            return redirect(base_url("master/customer/{$idCustomer}/"));
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->session->set_userdata(['status'=>'error','message'=>'Email format is invalid!']);
+            return redirect(base_url("master/customer/{$idCustomer}/"));
+        }
+
+        // ===== Cek duplikat KTP (pastikan bukan dirinya sendiri)
+        $dup = $this->db->select('c_id')
+            ->from('tb_customer')
+            ->where('c_id_number', $idNumber)
+            ->where('c_id !=', $idCustomer)
+            ->limit(1)
+            ->get()->num_rows() > 0;
+
+        if ($dup) {
+            $this->session->set_userdata(['status'=>'error','message'=>'Another customer with this ID Number already exists!']);
+            return redirect(base_url("master/customer/{$idCustomer}/"));
+        }
+
+        // ===== Build payload update
         $data = [
-            'c_name'            => strtoupper($this->input->post('name')),
-            'c_id_number'       => strtoupper($this->input->post('idNumber')),
-            'c_address'         => strtoupper($this->input->post('address')),
-            'c_resident_address'=> strtoupper($this->input->post('resident_address')),
-            'c_phone'           => $this->input->post('phone'),
-            'c_u_id'            => $idUser,
-            'c_no_order'        => $this->input->post('noOrder'),
+            'c_name'             => strtoupper($name),
+            'c_id_number'        => $idNumber,
+            'c_address'          => strtoupper($address),
+            'c_resident_address' => strtoupper($residentAddress),
+            'c_phone'            => $phone,
+            'c_email'            => $email,           // <— tambahan email
+            'c_u_id'             => $idUser,
+            'c_no_order'         => $noOrder,
         ];
+
+        // Eksekusi update via model
         $this->MasterModel->editCustomerProces($data, $idCustomer);
+
+        // Cek error DB (optional tapi bagus)
+        $err = $this->db->error();
+        if (!empty($err['code'])) {
+            log_message('error', 'tb_customer update failed: '.$err['code'].' '.$err['message']);
+            $this->session->set_userdata(['status'=>'error','message'=>'Internal error. Please try again.']);
+            return redirect(base_url("master/customer/{$idCustomer}/"));
+        }
+
+        // Sukses
         $this->session->set_userdata(['status'=>'success','message'=>'Edit customer is success!']);
-        redirect(base_url("master/customer/$idCustomer/"));
+        return redirect(base_url("master/customer/{$idCustomer}/"));
     }
 
     public function deleteCustomerProcess()
@@ -699,5 +766,206 @@ class MasterController extends CI_Controller
             'data'            => $data,
             $this->security->get_csrf_token_name() => $this->security->get_csrf_hash(),
         ]);
+    }
+
+    /* ===================== EXPORT ===================== */
+    public function exportCustomerExcel()
+    {
+        if ($this->session->userdata('authUser') !== true) { show_404(); return; }
+
+        $this->load->model('MasterModel');
+        $rows = $this->MasterModel->customersForExport(); // result_array()
+
+        // Guard: pastikan iterable
+        if (!is_array($rows)) $rows = (array)$rows;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+
+        // Header
+        $sheet->setCellValue('A1','No');
+        $sheet->setCellValue('B1','No Order');
+        $sheet->setCellValue('C1','ID Number');
+        $sheet->setCellValue('D1','Name');
+        $sheet->setCellValue('E1','Address');
+        $sheet->setCellValue('F1','Resident Address');
+        $sheet->setCellValue('G1','Phone');
+        $sheet->setCellValue('H1','Email');
+
+        // Helper ambil nilai baik dari array maupun object
+        $get = function($row, $key) {
+            if (is_array($row))  return $row[$key] ?? '';
+            if (is_object($row)) return $row->$key ?? '';
+            return '';
+        };
+
+        // Rows
+        $r = 2; $no = 1;
+        foreach ($rows as $row) {
+            $sheet->setCellValue('A'.$r, $no++);
+
+            // Keep-as-string untuk mencegah 0 leading hilang / scientific notation
+            $sheet->setCellValueExplicit('B'.$r, (string)$get($row,'c_no_order'),      \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('C'.$r, (string)$get($row,'c_id_number'),     \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue(       'D'.$r, (string)$get($row,'c_name'));
+            $sheet->setCellValue(       'E'.$r, (string)$get($row,'c_address'));
+            $sheet->setCellValue(       'F'.$r, (string)$get($row,'c_resident_address'));
+            $sheet->setCellValueExplicit('G'.$r, (string)$get($row,'c_phone'),         \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue(       'H'.$r, (string)$get($row,'c_email'));
+            $r++;
+        }
+
+        // Auto width
+        foreach (range('A','H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Bersihkan buffer agar file tidak korup
+        if (ob_get_length()) { @ob_end_clean(); }
+        if (method_exists($this->output,'enable_profiler')) { $this->output->enable_profiler(false); }
+
+        // Output
+        $writer   = new Xlsx($spreadsheet);
+        $filename = 'customer_export_'.date('Ymd_His').'.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+        exit;
+    }
+
+    /* ===================== IMPORT ===================== */
+    public function importCustomerExcel()
+    {
+        if ($this->session->userdata('authUser') !== true) { show_404(); return; }
+
+        if (empty($_FILES['file']['name'])) {
+            $this->_flashBack('File tidak dipilih.');
+            return;
+        }
+
+        // Upload sementara
+        $dir = FCPATH.'uploads/tmp/';
+        if (!is_dir($dir)) @mkdir($dir, 0755, true);
+
+        $cfg = [
+            'upload_path'   => $dir,
+            'allowed_types' => 'xlsx|xls',
+            'max_size'      => 4096, // KB
+            'file_name'     => 'import_customer_'.date('Ymd_His'),
+            'overwrite'     => true
+        ];
+        $this->load->library('upload', $cfg);
+
+        if (!$this->upload->do_upload('file')) {
+            $this->_flashBack('Upload gagal: '.$this->upload->display_errors('',''));
+            return;
+        }
+
+        $path = $this->upload->data('full_path');
+
+        // Baca spreadsheet
+        try {
+            $spreadsheet = IOFactory::load($path);
+        } catch (\Throwable $e) {
+            @unlink($path);
+            $this->_flashBack('File tidak dapat dibaca: '.$e->getMessage());
+            return;
+        }
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows  = $sheet->toArray(null, true, true, true);
+
+        // Ekspektasi header baris-1: A No, B No Order, C ID Number, D Name, E Address,
+        // F Resident Address, G Phone, H Email (opsional)
+        $ok = 0; $skip = 0; $errDet = [];
+
+        $this->db->trans_begin();
+
+        $uId = (int)$this->session->userdata('idUser');
+
+        for ($i = 2; $i <= count($rows); $i++) {
+            $r = $rows[$i] ?? null;
+            if (!$r) continue;
+
+            $noOrder   = trim((string)($r['B'] ?? ''));
+            $idNumber  = preg_replace('/\D+/', '', (string)($r['C'] ?? ''));
+            $name      = strtoupper(trim((string)($r['D'] ?? '')));
+            $addr      = strtoupper(trim((string)($r['E'] ?? '')));
+            $resAddr   = strtoupper(trim((string)($r['F'] ?? '')));
+            $phone     = preg_replace('/\D+/', '', (string)($r['G'] ?? ''));
+            $email     = trim((string)($r['H'] ?? '')); // opsional
+
+            // lewati baris benar-benar kosong
+            if ($noOrder==='' && $idNumber==='' && $name==='' && $addr==='' && $resAddr==='' && $phone==='') {
+                continue;
+            }
+
+            // Validasi wajib
+            if ($noOrder==='' || $idNumber==='' || $name==='' || $addr==='' || $resAddr==='' || $phone==='') {
+                $skip++; $errDet[] = "Baris {$i}: kolom wajib kosong"; continue;
+            }
+            // Validasi email kalau ada
+            if ($email!=='' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $skip++; $errDet[] = "Baris {$i}: format email tidak valid"; continue;
+            }
+
+            // Upsert berdasar c_id_number
+            $exists = $this->db->select('c_id')->from('tb_customer')->where('c_id_number', $idNumber)->limit(1)->get()->row();
+
+            $data = [
+                'c_no_order'         => $noOrder,
+                'c_id_number'        => $idNumber,
+                'c_name'             => $name,
+                'c_address'          => $addr,
+                'c_resident_address' => $resAddr,
+                'c_phone'            => $phone,
+                'c_email'            => ($email !== '' ? $email : null),
+                'c_u_id'             => $uId,
+            ];
+
+            if ($exists) {
+                $this->db->where('c_id', (int)$exists->c_id)->update('tb_customer', $data);
+            } else {
+                $data['c_date_created'] = date('Y-m-d H:i:s');
+                $this->db->insert('tb_customer', $data);
+            }
+
+            $dberr = $this->db->error();
+            if (!empty($dberr['code'])) {
+                $skip++; $errDet[] = "Baris {$i}: DB error ".$dberr['message'];
+            } else {
+                $ok++;
+            }
+        }
+
+        // commit/rollback
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            @unlink($path);
+            $this->_flashBack('Import gagal (transaksi DB).');
+            return;
+        }
+        $this->db->trans_commit();
+        @unlink($path);
+
+        // Ringkas error
+        $errMsg = '';
+        if ($skip > 0) {
+            $errMsg = ' | Skip: '.$skip.(count($errDet) ? ' (contoh: '.html_escape($errDet[0]).')' : '');
+        }
+
+        $this->session->set_userdata([
+            'status'  => 'success',
+            'message' => "Import selesai. OK: {$ok}{$errMsg}"
+        ]);
+        redirect(base_url('master/customer'));
+    }
+
+    /* Helper flash+redirect */
+    private function _flashBack($msg)
+    {
+        $this->session->set_userdata(['status'=>'error','message'=>$msg]);
+        redirect(base_url('master/customer'));
     }
 }

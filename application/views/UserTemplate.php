@@ -243,22 +243,25 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
   if(!el) return;
   const label = el.querySelector('.label');
 
-  // Endpoint publik ringan untuk cek internet (latency-only)
+  // Endpoint gambar ringan (tidak butuh CORS utk <img>)
   const PROBES = [
-    'https://www.gstatic.com/generate_204', // Google
-    'https://cloudflare.com/cdn-cgi/trace', // Cloudflare (fallback)
+    'https://www.google.com/favicon.ico',
+    'https://www.cloudflare.com/favicon.ico'
   ];
 
   // Konfigurasi
   const INTERVAL = 5000;   // cek tiap 5 dtk
   const TIMEOUT  = 4000;   // timeout 4 dtk
   const WINDOW_N = 3;      // moving average
-  // Ambang kualitas untuk "Internet latency" (lebih longgar & realistis)
-  const LTH = [1200, 800, 400, 150]; 
-  // <=150ms: 4 (Sangat Baik), <=400:3 (Baik), <=800:2 (Cukup), <=1200:1 (Buruk), >1200:0
+
+  // Ambang kualitas (ms)
+  // <=150: 4 (Sangat Baik), <=400:3 (Baik), <=800:2 (Cukup), <=1200:1 (Buruk), >1200:0
+  const LTH = [1200, 800, 400, 150];
 
   let samples = [];
+  let ticker = null;
 
+  // Network Information API (opsional)
   function getConn(){
     return (navigator.connection || navigator.mozConnection || navigator.webkitConnection) || null;
   }
@@ -270,6 +273,7 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
     const c = getConn();
     return c && typeof c.downlink === 'number' ? c.downlink : null; // Mbps (approx)
   }
+
   function qualityFromLatency(ms){
     if (ms <= LTH[3]) return 4;
     if (ms <= LTH[2]) return 3;
@@ -302,29 +306,45 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
     el.title = `Internet • Latency: ${latTxt}${effTxt}${dlTxt}`;
   }
 
-  function fetchWithTimeout(url){
-    const ctrl = new AbortController();
-    const to = setTimeout(()=>ctrl.abort(), TIMEOUT);
-    const t0 = performance.now();
+  // ---- Image ping (tanpa CORS) ----
+  function pingImage(url, timeoutMs = TIMEOUT){
+    return new Promise((resolve, reject) => {
+      const start = performance.now();
+      const img = new Image();
+      let done = false;
 
-    // pakai mode default; kalau CORS blok, tetap bisa hitung waktu selesai (opaque) pada banyak CDN
-    return fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(), {
-      cache: 'no-store',
-      signal: ctrl.signal
-    }).then(res=>{
-      clearTimeout(to);
-      const t1 = performance.now();
-      if (!res.ok && res.type !== 'opaque') throw new Error('HTTP '+res.status);
-      return t1 - t0;
+      const finish = (ok) => {
+        if (done) return;
+        done = true;
+        clearTimeout(tmr);
+        img.onload = img.onerror = null;
+        if (ok) resolve(Math.round(performance.now() - start));
+        else reject(new Error('img-error'));
+      };
+
+      // timeout
+      const tmr = setTimeout(() => finish(false), timeoutMs);
+
+      img.onload  = () => finish(true);
+      img.onerror = () => finish(false);
+
+      // cache buster
+      img.src = url + (url.includes('?') ? '&' : '?') + 'cb=' + Date.now();
     });
   }
 
+  // Ambil hasil tercepat dari beberapa host (first success)
   function probeLatency(){
-    // pilih endpoint yang merespon lebih dulu
-    return Promise.any(PROBES.map(url => fetchWithTimeout(url)));
+    const tasks = PROBES.map(u => pingImage(u));
+    if (Promise.any) return Promise.any(tasks);
+    // fallback bila browser lama: first-resolve
+    return new Promise((resolve, reject) => {
+      let rejects = 0;
+      tasks.forEach(p => p.then(resolve).catch(()=>{ if(++rejects===tasks.length) reject(new Error('all-failed')); }));
+    });
   }
 
-  function tick(){
+  function runProbe(){
     if(!navigator.onLine){
       samples = [];
       setState({online:false});
@@ -339,7 +359,6 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
         const effType = getEff();
         const down    = getDownlink();
 
-        // Naik/turunkan kualitas sedikit berdasar effectiveType
         let q = qualityFromLatency(latency);
         if (effType && /^(2g|slow-2g)$/i.test(effType)) q = Math.min(q, 1);
         if (effType && /^3g$/i.test(effType))           q = Math.min(q, 2);
@@ -353,14 +372,24 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
   }
 
   // listeners
-  window.addEventListener('online',  tick);
+  window.addEventListener('online',  runProbe);
   window.addEventListener('offline', ()=>setState({online:false}));
   const c = getConn();
-  if (c && c.addEventListener) c.addEventListener('change', tick);
+  if (c && c.addEventListener) c.addEventListener('change', runProbe);
+
+  // batasi polling saat tab tidak aktif (hemat & stabil)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (ticker) { clearInterval(ticker); ticker = null; }
+    } else {
+      runProbe();
+      if (!ticker) ticker = setInterval(runProbe, INTERVAL);
+    }
+  });
 
   // start
-  tick();
-  setInterval(tick, INTERVAL);
+  runProbe();
+  ticker = setInterval(runProbe, INTERVAL);
 })();
   </script>
 </body>

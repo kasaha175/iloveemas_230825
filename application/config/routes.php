@@ -77,14 +77,22 @@ $route['archive/buy/save']       = 'MasterController/buySave';
 $route['archive/sell']           = 'MasterController/sell';
 $route['archive/sell/save']      = 'MasterController/sellSave';
 
-/* ================================ MASTER =============================== */
-$route['master']                                 = 'MasterController/master';
-$route['master/customer']                        = 'MasterController/customer';
-$route['transaction/customers']                  = 'TransactionController/getCustomers';
-$route['master/customer-dt']                     = 'MasterController/customer_dt';
-$route['master/delete-customer-process/(:any)']  = 'MasterController/deleteCustomerProcess/$1';
-$route['master/edit-customer-process']           = 'MasterController/editCustomerProcess';
-$route['master/customer/(:any)']                 = 'MasterController/detailCustomer/$1';
+/* ================= MASTER: Customer ================= */
+$route['master']                         = 'MasterController/master';
+$route['master/customer']                = 'MasterController/customer';
+$route['master/customer-dt']             = 'MasterController/customer_dt';
+$route['master/delete-customer-process/(:any)'] = 'MasterController/deleteCustomerProcess/$1';
+$route['master/edit-customer-process']   = 'MasterController/editCustomerProcess';
+
+/* --- TEMPATKAN YANG SPESIFIK DI ATAS --- */
+$route['master/customer/export-excel']['GET']  = 'MasterController/exportCustomerExcel';
+$route['master/customer/import-excel']['POST'] = 'MasterController/importCustomerExcel';
+$route['master/customer/template-excel']['GET']= 'MasterController/templateCustomerExcel';
+/* --------------------------------------- */
+
+/* ini paling terakhir agar tidak “menangkap” export-excel */
+$route['master/customer/(:any)']         = 'MasterController/detailCustomer/$1';
+
 
 $route['master/memo']                            = 'MasterController/memo';
 $route['master/memo-dt']                         = 'MasterController/memo_dt';

@@ -1,121 +1,143 @@
-<!-- Dashboard — modern, responsive, aesthetic (I Love Emas) -->
+<!-- Dashboard — iPadOS Inspired + Dynamic Background (I Love Emas) -->
 <style>
   :root{
-    --blue-light:#074799;
-    --blue-dark:#001A6E;
-    --blue-pastel:#B1F0F7;
+    --blue-light:#2970f5;
+    --blue-dark:#0a1a3f;
+    --blue-pastel:#bcdcff;
     --text:#0B0F1A;
-    --muted:#6b7a99;
-    --card-bg:#ffffff;
-    --card-br:#e6eefc;
-    --shadow:0 18px 30px rgba(0,0,0,.10);
-    --radius:18px;
+    --muted:#5c6b85;
+    --card-bg:rgba(255,255,255,.72);
+    --card-br:rgba(255,255,255,.28);
+    --shadow:0 8px 32px rgba(0,0,0,.14);
+    --radius:22px;
     --topbar-h:72px;
   }
 
-  /* scope ke dashboard */
-  .ilv-dash{ padding:clamp(16px,2.2vw,28px); margin-top:var(--topbar-h); }
-  .ilv-container{ max-width:1200px; margin-inline:auto; }
-
-  .ilv-hero{
-    position:relative; overflow:hidden; border-radius:var(--radius);
-    background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));
-    color:#fff; padding:clamp(20px,3.5vw,32px);
-    box-shadow: var(--shadow);
+  /* ===== Sistem font ala Apple (SF Pro) ===== */
+  html, body, .ilv-dash, .kpi-card, .ilv-card, .ilv-hero {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+                 "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-  .ilv-hero h1{ margin:0 0 6px; font-weight:700; letter-spacing:.3px; font-size:clamp(20px,3.2vw,30px); }
-  .ilv-hero p{ margin:0; opacity:.95; font-size:clamp(13px,1.3vw,15px); }
 
-  .ilv-hero .blob{position:absolute; border-radius:50%; filter:blur(44px); opacity:.25; pointer-events:none;}
-  .ilv-hero .b1{ width:380px;height:380px;background:var(--blue-pastel);right:-120px;top:-120px;}
-  .ilv-hero .b2{ width:240px;height:240px;background:#8fd2ff;left:-80px;bottom:-100px;opacity:.2;}
+  /* ===== Dynamic background image layer (DO NOT REMOVE) ===== */
+  .page-bg{
+    position:fixed; inset:0; z-index:-2;
+    background: center / cover no-repeat var(--bg, transparent);
+  }
+  .page-bg::after{
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:
+      radial-gradient(1200px 600px at 50% 0%, rgba(10,26,63,.45), transparent 60%),
+      linear-gradient(180deg, rgba(10,26,63,.38), rgba(10,26,63,.10) 40%, rgba(10,26,63,.55));
+    pointer-events:none;
+  }
 
-  /* KPI row */
-  .kpi-row{ margin-top:14px; display:grid; grid-template-columns:1fr; gap:12px; }
-  @media (min-width:760px){ .kpi-row{ grid-template-columns:repeat(2,1fr); } }
+  /* ===== Dashboard wrapper (PERBAIKAN SPACING) ===== */
+  .ilv-dash{
+    padding: clamp(16px, 2.5vw, 28px);
+    /* Hapus margin-top & top padding ganda. Cukup satu padding-top yang menghormati topbar + sedikit ruang */
+    padding-top: calc(var(--topbar-h) + 16px + env(safe-area-inset-top, 0px));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  .ilv-container{ max-width:1100px; margin-inline:auto; }
+
+  /* ===== Hero (glass / iPadOS) ===== */
+  .ilv-hero{
+    position:relative; overflow:hidden;
+    border-radius:var(--radius);
+    background:linear-gradient(160deg, rgba(10,26,63,.85), rgba(41,112,245,.70));
+    color:#fff; padding:clamp(24px,4vw,36px);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+  }
+  .ilv-hero h1{ margin:0 0 8px; font-weight:800; font-size:clamp(22px,3vw,32px); letter-spacing:.2px; }
+  .ilv-hero p{ margin:0; opacity:.96; font-size:clamp(14px,1.4vw,16px); }
+
+  /* ===== KPI ===== */
+  .kpi-row{ margin-top:20px; display:grid; gap:16px; grid-template-columns:1fr; }
+  @media(min-width:640px){ .kpi-row{ grid-template-columns:repeat(2,1fr); } }
 
   .kpi-card{
-    background:#fff; border:1px solid var(--card-br); border-radius:16px;
-    padding:14px 16px; display:flex; align-items:center; gap:14px;
-    box-shadow:0 10px 20px rgba(0,0,0,.06);
+    background:var(--card-bg); border:1px solid var(--card-br);
+    border-radius:var(--radius); padding:18px;
+    display:flex; align-items:center; gap:16px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
   }
   .kpi-ico{
-    width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
-    background:linear-gradient(135deg, var(--blue-pastel), #e9faff);
-    border:1px solid #d7f4ff;
+    width:54px; height:54px; border-radius:16px; display:grid; place-items:center;
+    background:linear-gradient(135deg, var(--blue-pastel), #eef6ff);
+    border:1px solid #d7e5ff;
   }
-  .kpi-title{ margin:0; font-size:12px; color:#6b7a99; }
-  .kpi-value{ margin:2px 0 0; font-size:26px; line-height:1; font-weight:800; color:#001A6E; }
-  .kpi-empty{ font-size:13px; color:#6b7a99; }
+  .kpi-ico svg{ width:26px; height:26px; stroke:#074799; }
+  .kpi-title{ margin:0; font-size:14px; color:#0a1a3f; }
+  .kpi-value{ margin:4px 0 0; font-size:28px; font-weight:900; color:#ffffff; }
+  .kpi-empty{ font-size:14px; color:#0a1a3f; }
 
-  /* Skeleton / shimmer loader */
-  .kpi-card .skeleton{ display:none; }
-  .kpi-card.loading .skeleton{ display:block; }
-  .kpi-card.loading .kpi-value,
-  .kpi-card.loading .kpi-empty{ display:none !important; }
+  /* Skeleton */
+  .kpi-card .skeleton{display:none;}
+  .kpi-card.loading .skeleton{display:block;}
+  .kpi-card.loading .kpi-value,.kpi-card.loading .kpi-empty{display:none!important;}
   .skeleton{
-    height:24px; width:120px; border-radius:8px;
-    background: linear-gradient(90deg,#edf3ff 25%,#f7fbff 37%,#edf3ff 63%);
-    background-size:400% 100%;
-    animation: shimmer 1.2s ease-in-out infinite;
+    height:24px;width:120px;border-radius:8px;
+    background:linear-gradient(90deg,#cfe0ff 25%,#eaf2ff 37%,#cfe0ff 63%);
+    background-size:400% 100%; animation:shimmer 1.2s infinite;
   }
-  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:0 0;} }
+  @keyframes shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
 
-  /* Menu grid */
-  .ilv-grid{
-    margin-top: clamp(18px, 2.5vw, 24px);
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;
-  }
+  /* ===== Menu grid ===== */
+  .ilv-grid{ margin-top:24px; display:grid; gap:18px; grid-template-columns:1fr; }
+  @media(min-width:540px){ .ilv-grid{ grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); } }
+
   .ilv-card{
     display:flex; align-items:flex-start; gap:14px; text-decoration:none;
-    background:var(--card-bg); border:1px solid var(--card-br); color:var(--text);
-    border-radius:var(--radius); padding:16px; box-shadow:0 6px 14px rgba(0,0,0,.06);
-    transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    background:var(--card-bg); border:1px solid var(--card-br); color:#fff;
+    border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    transition:transform .12s ease, box-shadow .2s ease;
   }
-  .ilv-card:hover{ transform: translateY(-2px); box-shadow:0 14px 32px rgba(0,0,0,.12); border-color:#d7e5ff; background:#fff; }
-  .ilv-ico{ flex:0 0 48px; height:48px; display:grid; place-items:center; border-radius:14px;
-    background:linear-gradient(135deg, var(--blue-pastel), #e9faff); border:1px solid #d7f4ff; }
-  .ilv-ico svg{width:22px;height:22px;}
-  .ilv-tit{font-weight:600; margin:0; font-size:15px;}
-  .ilv-sub{margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.35;}
+  @media(hover:hover){ .ilv-card:hover{ transform:translateY(-3px); box-shadow:0 14px 34px rgba(0,0,0,.18); } }
+  .ilv-card:focus-visible{ outline:3px solid #8fd2ff; outline-offset:2px; }
+
+  .ilv-ico{ flex:0 0 52px; height:52px; display:grid; place-items:center; border-radius:16px;
+    background:linear-gradient(135deg,var(--blue-pastel),#f0f8ff); border:1px solid #d7e5ff; }
+  .ilv-ico svg{ width:26px; height:26px; stroke:#074799; }
+  .ilv-tit{ font-weight:700; margin:0; font-size:16px; color:#0a1a3f; }
+  .ilv-sub{ margin:4px 0 0; font-size:14px; color:#0a1a3f; line-height:1.4; } /* lebih kontras di atas glass */
 
   .ilv-meta{
-    margin-top:16px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
-    font-size:12px; color:#26406e;
+    margin-top:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between;
+    font-size:13px; color:#d3e1ff;
   }
-  .ilv-badge{ background:#ffffff; color:#0e2b68; border:1px solid #dfeaff; padding:6px 10px; border-radius:999px; }
-
-  @media (max-width:480px){
-    .ilv-hero{ padding:16px; }
-    .ilv-card{ padding:14px; }
+  .ilv-badge{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.28);
+    padding:6px 12px; border-radius:999px; color:#eaf2ff;
   }
 
-  /* ===== Global overlay while fetching KPI ===== */
-  .app-overlay{
-    position:fixed; inset:0; z-index:3000;
-    background: rgba(255,255,255,.35);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    display:flex; align-items:center; justify-content:center;
-    transition: opacity .25s ease, visibility .25s ease;
-  }
+  /* Overlay loader */
+  .app-overlay{ position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,.2);
+    backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center;
+    transition:opacity .25s ease; }
   .app-overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
-
-  .loader{
-    display:flex; flex-direction:column; align-items:center; gap:12px;
-    padding:18px 22px; border-radius:16px; background:rgba(255,255,255,.8); border:1px solid #e6eefc;
-    box-shadow:0 8px 24px rgba(0,0,0,.10);
-  }
-  .ring{
-    width:44px; height:44px; border-radius:50%;
-    border:3px solid rgba(0,26,110,.25); border-top-color: var(--blue-dark);
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin{ to { transform: rotate(360deg); } }
-  .loader-label{ font-size:13px; color:#0b1f4f; font-weight:600; }
+  .loader{ display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:20px 24px; border-radius:18px; background:rgba(255,255,255,.9); }
+  .ring{ width:48px; height:48px; border-radius:50%;
+    border:3px solid rgba(0,26,110,.25); border-top-color:var(--blue-dark);
+    animation:spin 1s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .loader-label{ font-size:14px; color:#0b1f4f; font-weight:700; }
 </style>
 
-<div class="ilv-dash">
+<!-- Dynamic background image (ambil dari config/variabel, fallback ke aset lokal) -->
+<div class="page-bg"
+     style="--bg:url('<?= !empty($config['dashboard_bg']) ? $config['dashboard_bg'] : base_url('assets/images/bg-dashboard.jpg') ?>')">
+</div>
+
+<main class="ilv-dash" role="main">
   <div class="ilv-container">
     <section class="ilv-hero" aria-label="Ringkasan Dashboard">
       <div>
@@ -126,13 +148,13 @@
         </p>
       </div>
 
-      <!-- KPI row (async) -->
+      <!-- KPI -->
       <div class="kpi-row">
-        <!-- Transaksi Hari Ini -->
         <div class="kpi-card loading" id="kpiTx">
           <span class="kpi-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M8 2h8l2 2v16l-2 2H8l-2-2V4l2-2z"/><path d="M9 7h6M9 11h6M9 15h6"/>
+            <!-- ikon transaksi -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 2h8l2 2v16l-2 2H8l-2-2V4z"/><path d="M9 7h6M9 11h6M9 15h6"/>
             </svg>
           </span>
           <div>
@@ -143,11 +165,13 @@
           </div>
         </div>
 
-        <!-- Total Customer -->
         <div class="kpi-card loading" id="kpiCust">
           <span class="kpi-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            <!-- ikon customer -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>
             </svg>
           </span>
           <div>
@@ -163,8 +187,9 @@
       <nav class="ilv-grid" aria-label="Menu utama">
         <a class="ilv-card" href="<?= base_url('transaction-list') ?>">
           <span class="ilv-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 7h14l-4-4"/><path d="M17 17H3l4 4"/><path d="M21 7v6" opacity=".4"/><path d="M3 11v6" opacity=".4"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7h14l-4-4"/><path d="M17 17H3l4 4"/>
+              <path d="M21 7v6" opacity=".4"/><path d="M3 11v6" opacity=".4"/>
             </svg>
           </span>
           <span><h3 class="ilv-tit">Transaction</h3><p class="ilv-sub">Kelola transaksi harian & proses operasional.</p></span>
@@ -172,8 +197,9 @@
 
         <a class="ilv-card" href="<?= base_url('archive') ?>">
           <span class="ilv-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v3" opacity=".4"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v3" opacity=".4"/>
             </svg>
           </span>
           <span><h3 class="ilv-tit">Archive</h3><p class="ilv-sub">Akses arsip dokumen & histori transaksi.</p></span>
@@ -181,8 +207,10 @@
 
         <a class="ilv-card" href="<?= base_url('master') ?>">
           <span class="ilv-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6" opacity=".4"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5"/>
+              <path d="M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6" opacity=".4"/>
             </svg>
           </span>
           <span><h3 class="ilv-tit">Master Data</h3><p class="ilv-sub">Atur data master (user, cabang, dsb.).</p></span>
@@ -190,8 +218,9 @@
 
         <a class="ilv-card" href="<?= base_url('report') ?>">
           <span class="ilv-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3v18h18"/><rect x="6" y="13" width="3" height="5"/><rect x="11" y="9" width="3" height="9"/><rect x="16" y="5" width="3" height="13"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><rect x="6" y="13" width="3" height="5"/>
+              <rect x="11" y="9" width="3" height="9"/><rect x="16" y="5" width="3" height="13"/>
             </svg>
           </span>
           <span><h3 class="ilv-tit">Report</h3><p class="ilv-sub">Lihat ringkasan & analitik performa.</p></span>
@@ -200,33 +229,26 @@
         <?php if (!empty($userData) && strtolower($userData[0]->u_rule ?? '') === 'administrator'): ?>
         <a class="ilv-card" href="<?= base_url('config') ?>">
           <span class="ilv-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09c-.18 0-.35.04-.51.1-.6.25-.99.85-.99 1.51z"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83"/>
             </svg>
           </span>
           <span><h3 class="ilv-tit">Konfigurasi</h3><p class="ilv-sub">Kelola logo, warna, nama & versi aplikasi.</p></span>
         </a>
-        <?php endif; ?>
 
-        <?php if (!empty($userData) && strtolower($userData[0]->u_rule ?? '') === 'administrator'): ?>
-          <a class="ilv-card" href="<?= base_url('maintenance/truncate') ?>">
-            <span class="ilv-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#074799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
-            </span>
-            <span>
-              <h3 class="ilv-tit">Data Maintenance</h3>
-              <p class="ilv-sub">Truncate data transaksi & customer.</p>
-            </span>
-          </a>
+        <a class="ilv-card" href="<?= base_url('maintenance/truncate') ?>">
+          <span class="ilv-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+          </span>
+          <span><h3 class="ilv-tit">Data Maintenance</h3><p class="ilv-sub">Truncate data transaksi & customer.</p></span>
+        </a>
         <?php endif; ?>
       </nav>
-
-      <!-- decorative blobs -->
-      <span class="blob b1"></span>
-      <span class="blob b2"></span>
     </section>
 
     <div class="ilv-meta">
@@ -234,7 +256,7 @@
       <span>© <?= date('Y') ?> • I Love Emas</span>
     </div>
   </div>
-</div>
+</main>
 
 <!-- Overlay while loading KPI -->
 <div id="dashLoading" class="app-overlay" aria-live="polite" aria-busy="true">
@@ -250,54 +272,35 @@
   const elTx   = document.getElementById('kpiTx');
   const elCust = document.getElementById('kpiCust');
   const overlay = document.getElementById('dashLoading');
+  const nf = new Intl.NumberFormat('id-ID');
 
   function finishLoading(node){
     node.classList.remove('loading');
-    const sk = node.querySelector('.skeleton');
-    if (sk) sk.style.display = 'none';
+    const sk = node.querySelector('.skeleton'); if (sk) sk.style.display='none';
   }
   function setKPI(node, value){
     finishLoading(node);
     const v = node.querySelector('.kpi-value');
     const e = node.querySelector('.kpi-empty');
-    if (typeof value === 'number' && value > 0){
-      v.textContent = value;
-      v.style.display = 'block';
-      e.style.display = 'none';
-    } else {
-      v.style.display = 'none';
-      e.textContent = 'Data belum tersedia';
-      e.style.display = 'block';
-    }
+    const num = Number.isFinite(value) ? value : 0;
+    v.textContent = nf.format(num);
+    v.style.display = 'block';
+    e.style.display = (num > 0) ? 'none' : 'block';
   }
   function setError(node){
     finishLoading(node);
-    const v = node.querySelector('.kpi-value');
-    const e = node.querySelector('.kpi-empty');
-    v.style.display = 'none';
-    e.textContent = 'Gagal memuat';
-    e.style.display = 'block';
+    node.querySelector('.kpi-value').style.display='none';
+    const e = node.querySelector('.kpi-empty'); e.textContent='Gagal memuat'; e.style.display='block';
   }
-  function hideOverlay(){
-    if (!overlay) return;
-    // beri sedikit delay agar transisi halus
-    setTimeout(()=> {
-      overlay.classList.add('hidden');
-      overlay.setAttribute('aria-busy','false');
-    }, 100);
-  }
+  function hideOverlay(){ overlay.classList.add('hidden'); overlay.setAttribute('aria-busy','false'); }
 
-  // TAMPILKAN overlay sejak halaman dimuat (default), sembunyikan setelah fetch selesai
   fetch(endpoint, { headers:{ 'X-Requested-With':'XMLHttpRequest' } })
     .then(r => r.ok ? r.json() : Promise.reject(r))
     .then(d => {
       setKPI(elTx,   Number(d.tx_today || 0));
       setKPI(elCust, Number(d.customer_total || 0));
     })
-    .catch(() => {
-      setError(elTx);
-      setError(elCust);
-    })
+    .catch(() => { setError(elTx); setError(elCust); })
     .finally(hideOverlay);
 })();
 </script>

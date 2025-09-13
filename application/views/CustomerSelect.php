@@ -174,11 +174,7 @@ function init(){ (function ($) {
       $overlay.addClass('show');
     }
   }
-  function hideOverlay(){
-    if ($overlay && $overlay.length){
-      $overlay.removeClass('show');
-    }
-  }
+  function hideOverlay(){ $overlay && $overlay.removeClass('show'); }
 
   function toggleActions(){
     var has = !!$sel.val();
@@ -188,84 +184,80 @@ function init(){ (function ($) {
 
   console.log('%c[BOOT] jQuery & Select2 siap', 'color:#16a34a');
 
-  // ============== DEBUG PING (sanity check) =================
-  $.get(ENDPOINT, {search:'ab', page:1})
-    .done(function(d){ console.log('[PING] GET', ENDPOINT, '-> OK:', d); })
-    .fail(function(xhr){ console.warn('[PING] GET', ENDPOINT, '-> FAIL', xhr.status, xhr.responseText); });
-
   // ====================== SELECT2 ==========================
   $sel.select2({
     width: '100%',
     placeholder: 'Please select customer...',
     allowClear: true,
     minimumInputLength: 2,
+    dropdownParent: $sel.closest('.card, .card-body, body'),
     ajax: {
       url: ENDPOINT,
       dataType: 'json',
       delay: 250,
       data: function (params) {
-        console.log('[S2->data] term="%s" page=%s', params.term, params.page || 1);
         return { search: params.term || '', page: params.page || 1 };
       },
       processResults: function (data, params) {
-        console.log('[S2<-resp] raw:', data);
         params.page = params.page || 1;
-        var list = Array.isArray(data && data.results)
-          ? data.results
-          : (data && data.results ? Object.values(data.results) : []);
+
+        // Normalisasi berbagai bentuk respons:
+        var list = Array.isArray(data) ? data
+                 : (data && Array.isArray(data.results)) ? data.results
+                 : (data && Array.isArray(data.data)) ? data.data
+                 : [];
+
         var items = list.map(function (r) {
-          return {
-            id: String(r.c_id),
-            text: (r.c_id ?? '') + ' - ' + (r.c_name ?? '') + ' - ' + (r.c_id_number ?? '')
-          };
+          var id   = (r && (r.id != null))   ? r.id   : (r && r.c_id != null ? r.c_id : '');
+          var text = (r && (r.text != null)) ? r.text :
+                     [r.c_id, r.c_name, r.c_id_number].filter(Boolean).join(' - ');
+          return { id: String(id), text: String(text || '') };
         });
-        return { results: items, pagination: { more: !!(data && data.pagination && data.pagination.more) } };
+
+        return {
+          results: items,
+          pagination: { more: !!(data && data.pagination && data.pagination.more) }
+        };
       },
       cache: true
-    }
+    },
+    // biarkan teks tampil apa adanya
+    escapeMarkup: function (m) { return m; }
   });
 
-  // log ketika dropdown dibuka + apa yang diketik user
+  // debug ketikan user (opsional)
   $sel.on('select2:open', function(){
-    console.log('[S2] open');
     setTimeout(function(){
       var $input = $('.select2-container--open .select2-search__field');
       $input.off('input.__dbg').on('input.__dbg', function(){
-        console.log('[S2] typing:', this.value);
+        // console.log('[S2] typing:', this.value);
       });
     }, 0);
   });
 
-  // saat user memilih satu baris → simpan ke session via updateLive (POST + CSRF)
+  // saat pilih/clear → simpan & toggle tombol
   $sel.on('select2:select', function(e){
     var id = e.params.data.id;
-    console.log('[S2] selected:', e.params.data);
-
     showOverlay('Menyimpan pilihan…');
 
     $.post(baseUrl + "transaction/updateLive", { id: id })
       .done(function(resp){
-        console.log('[updateLive] OK:', resp);
-        // update CSRF kalau server regenerate
         try {
-          if (resp && typeof resp === 'object') {
-            if (resp[CSRF.name]) { CSRF.value = resp[CSRF.name]; }
-            if (resp.ok === false) {
-              alert(resp.msg || 'Gagal menyimpan customer.');
-            } else if (resp.idCustomer) {
-              // sukses
-              toggleActions();
-            }
+          if (resp && typeof resp === 'object' && resp[CSRF.name]) {
+            CSRF.value = resp[CSRF.name];
           }
-        } catch(err){ console.warn('CSRF/update parse warn:', err); }
+        } catch(_) {}
+        toggleActions();
       })
       .fail(function(xhr){
         console.warn('[updateLive] FAIL', xhr.status, xhr.responseText);
         alert('Gagal menyimpan pilihan customer (' + xhr.status + ').');
       })
-      .always(function(){
-        hideOverlay();
-      });
+      .always(hideOverlay);
+  });
+
+  $sel.on('select2:clear', function(){
+    toggleActions();
   });
 
   // enable/disable awal
@@ -276,12 +268,12 @@ function init(){ (function ($) {
     if (!$sel.val()) { alert('Please select customer!'); return true; }
     return false;
   }
-  $('#sell').on('click', function(e){
+  $sell.on('click', function(e){
     e.preventDefault();
     if (mustPick()) return;
     window.location.href = baseUrl + "transaction/sell";
   });
-  $('#buy').on('click', function(e){
+  $buy.on('click', function(e){
     e.preventDefault();
     if (mustPick()) return;
     window.location.href = baseUrl + "transaction/buy";
@@ -289,4 +281,5 @@ function init(){ (function ($) {
 
 })(jQuery); }
 </script>
+
 

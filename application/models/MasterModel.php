@@ -194,4 +194,39 @@ class MasterModel extends CI_Model {
 
         return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$rows];
     }
+
+    public function searchCustomers($search = '', $limit = 10, $offset = 0)
+    {
+        $this->db->select('c_id, c_name, c_id_number');
+        $this->db->from('tb_customer');
+
+        if (!empty($search)) {
+            $this->db->group_start()
+                ->like('c_name', $search)
+                ->or_like('c_id_number', $search)
+                ->or_like('c_id', $search)
+            ->group_end();
+        }
+
+        $this->db->order_by('c_name', 'ASC');
+        $this->db->limit($limit, $offset);
+
+        return $this->db->get()->result();
+    }
+
+    // Hitung total hasil pencarian
+    public function countCustomers($search = '')
+    {
+        $this->db->from('tb_customer');
+
+        if (!empty($search)) {
+            $this->db->group_start()
+                ->like('c_name', $search)
+                ->or_like('c_id_number', $search)
+                ->or_like('c_id', $search)
+            ->group_end();
+        }
+
+        return $this->db->count_all_results();
+    }
 }

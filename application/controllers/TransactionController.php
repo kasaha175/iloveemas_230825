@@ -2196,5 +2196,30 @@ public function getCustomers()
 		return [$relDir, $absDir, $noOrder];
 	}
 
+	public function customers()
+	{
+		$search = $this->input->get('search') ?? '';
+		$page   = (int)($this->input->get('page') ?? 1);
 
+		$this->load->model('MasterModel');
+		$limit  = 10;
+		$offset = ($page - 1) * $limit;
+
+		$rows = $this->MasterModel->searchCustomers($search, $limit, $offset); 
+		$count = $this->MasterModel->countCustomers($search);
+
+		$results = array_map(function($r){
+			return [
+				'id'   => $r->c_id,
+				'text' => $r->c_id . ' - ' . $r->c_name . ' - ' . $r->c_id_number,
+			];
+		}, $rows);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode([
+				'results' => $results,
+				'pagination' => ['more' => ($count > $offset + $limit)]
+			]));
+	}
 }

@@ -59,6 +59,7 @@ $route['transaction/updateAllStatus']                = 'TransactionController/up
 $route['transaction/select-customer/(:any)']         = 'TransactionController/selectCustomer/$1';
 $route['transaction/new-customer']                   = 'TransactionController/newCustomer';
 $route['transaction/new-customer-process']           = 'TransactionController/newCustomerProcess';
+$route['transaction/customers']['GET'] = 'TransactionController/customers';
 
 // === Simpan metadata print + generate & simpan PDF ===
 $route['transaction/savePrint/(:any)/(:num)']['POST'] = 'TransactionController/savePrint/$1/$2';

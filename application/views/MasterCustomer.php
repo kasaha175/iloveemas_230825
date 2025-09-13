@@ -141,7 +141,28 @@
       <div class="mc-card-hd">
         <h2>Customer Data</h2>
         <span class="mc-badge" id="badgeTotal">Total: —</span>
+
+         <!-- Dropdown Import/Export -->
+        <div class="dropdown ml-auto">
+          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="custDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-file-export"></i> Excel
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="custDropdown">
+            <h6 class="dropdown-header">Export</h6>
+            <a class="dropdown-item" href="<?= base_url('master/customer/export-excel') ?>">
+              <i class="fas fa-file-excel text-success"></i> Export Excel (.xlsx)
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <!-- <h6 class="dropdown-header">Import</h6>
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#importModal">
+              <i class="fas fa-file-upload text-primary"></i> Import Excel (.xlsx)
+            </a> -->
+          </div>
+        </div>
       </div>
+
       <div class="mc-table-wrap">
         <div class="table-responsive">
           <table class="table table-borderless mc-table" id="custTable">
@@ -165,6 +186,40 @@
         </div>
       </div>
     </section>
+
+     <!-- Modal Import (Excel only) -->
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <form action="<?= base_url('master/customer/import-excel') ?>" method="post" enctype="multipart/form-data">
+            <!-- CSRF -->
+            <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+            <div class="modal-header">
+              <h5 class="modal-title" id="importModalLabel">Import Customer (Excel)</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Pilih file Excel (.xlsx / .xls) sesuai template untuk diimport.</p>
+              <div class="custom-file">
+                <input type="file" name="file" class="custom-file-input" id="importFile" accept=".xlsx,.xls" required>
+                <label class="custom-file-label" for="importFile">Pilih file…</label>
+              </div>
+              <small class="form-text text-muted mt-2">
+                Disarankan format <strong>.xlsx</strong>. Pastikan kolom mengikuti template.
+                <?php /* opsional: link template */ ?>
+                <a href="<?= base_url('master/customer/template-excel') ?>" class="ml-1"><i class="fas fa-download"></i> Unduh Template</a>
+              </small>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-soft" data-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-file-upload"></i> Import</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>

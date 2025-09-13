@@ -11,8 +11,16 @@ $route['logout-process']['GET']    = 'AuthController/logoutProcess';
 
 $route['dashboard']['GET']         = 'HomeController/dashboard';
 
-$route['config']['GET']            = 'ConfigController/index';
-$route['config']['POST']           = 'ConfigController/save';
+// ================== CONFIG (APP) ==================
+$route['config']['GET']  = 'ConfigController/index';
+$route['config']['POST'] = 'ConfigController/save';
+
+// ================== CONFIG (SMTP) ==================
+$route['config/smtp']['GET']      = 'ConfigController/smtp';
+$route['config/save-smtp']['POST'] = 'ConfigController/save_smtp';
+$route['smtp/test-send']['POST']     = 'ConfigController/smtp_test_send';
+// Cek jaringan sebelum kirim SMTP test (AJAX)
+$route['config/smtp/check-net']['POST'] = 'ConfigController/smtp_check_net';
 
 $route['api/kpi-dashboard']['GET'] = 'HomeController/kpiDashboard';
 
@@ -131,7 +139,7 @@ $route['maintenance/truncate']['get']  = 'MaintenanceController/truncate';
 $route['maintenance/truncate']['post'] = 'MaintenanceController/truncateRun';
 
 $route['health/ping'] = 'HealthController/ping';
-
+$route['health/ping']['GET'] = 'HealthController/ping';
 
 /* =============================== DEFAULT =============================== */
 $route['default_controller'] = 'HomeController';

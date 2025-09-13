@@ -101,6 +101,25 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
 
     /* opsional: turunkan topbar sedikit saat modal terbuka (biar pasti di bawah backdrop) */
     body.modal-open .navbar.topbar { z-index: 1000 !important; }
+
+    /* Internet Indicator */
+    .net-indicator{display:inline-flex;align-items:center;gap:6px;font-size:12px;user-select:none}
+    .net-indicator .bars{display:inline-flex;align-items:flex-end;gap:2px;width:18px;height:12px}
+    .net-indicator .bar{width:3px;background:#d0d7e2;border-radius:1px;transition:height .2s,background .2s}
+    .net-indicator .bar:nth-child(1){height:20%}
+    .net-indicator .bar:nth-child(2){height:45%}
+    .net-indicator .bar:nth-child(3){height:70%}
+    .net-indicator .bar:nth-child(4){height:100%}
+    .net-indicator[data-quality="0"] .bar{background:#d0d7e2}
+    .net-indicator[data-quality="1"] .bar:nth-child(-n+1){background:#f59e0b}
+    .net-indicator[data-quality="2"] .bar:nth-child(-n+2){background:#f59e0b}
+    .net-indicator[data-quality="3"] .bar:nth-child(-n+3){background:#10b981}
+    .net-indicator[data-quality="4"] .bar:nth-child(-n+4){background:#10b981}
+    .net-indicator.offline .bar{background:#ef4444!important}
+    .net-indicator .dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 2px rgba(0,0,0,.04) inset}
+    .net-indicator.online .dot{background:#10b981}
+    .net-indicator.degraded .dot{background:#f59e0b}
+    .net-indicator .label{opacity:.75}
   </style>
 </head>
 <body>
@@ -118,6 +137,17 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
     <ul class="navbar-nav ml-auto">
       <li class="nav-item d-none d-sm-flex align-items-center pr-2" style="color:#000;">
         <small class="font-weight-600"><?= html_escape($appName) ?> — v<?= html_escape($appVersion) ?></small>
+      </li>
+
+      <!-- Internet indicator (global, bukan backend) -->
+      <li class="nav-item d-flex align-items-center px-2">
+        <span id="internetIndicator" class="net-indicator offline" data-quality="0" title="Offline">
+          <span class="bars" aria-hidden="true">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          </span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="label d-none d-md-inline">Internet • Offline</span>
+        </span>
       </li>
 
       <li class="nav-item dropdown no-arrow">
@@ -207,6 +237,131 @@ $bgDashboardUrl = !empty($cfg['bg_dashboard'])
         document.getElementById('logoutForm').submit();
       }
     });
+
+  (function(){
+  const el = document.getElementById('internetIndicator');
+  if(!el) return;
+  const label = el.querySelector('.label');
+
+  // Endpoint publik ringan untuk cek internet (latency-only)
+  const PROBES = [
+    'https://www.gstatic.com/generate_204', // Google
+    'https://cloudflare.com/cdn-cgi/trace', // Cloudflare (fallback)
+  ];
+
+  // Konfigurasi
+  const INTERVAL = 5000;   // cek tiap 5 dtk
+  const TIMEOUT  = 4000;   // timeout 4 dtk
+  const WINDOW_N = 3;      // moving average
+  // Ambang kualitas untuk "Internet latency" (lebih longgar & realistis)
+  const LTH = [1200, 800, 400, 150]; 
+  // <=150ms: 4 (Sangat Baik), <=400:3 (Baik), <=800:2 (Cukup), <=1200:1 (Buruk), >1200:0
+
+  let samples = [];
+
+  function getConn(){
+    return (navigator.connection || navigator.mozConnection || navigator.webkitConnection) || null;
+  }
+  function getEff(){
+    const c = getConn();
+    return c && c.effectiveType ? c.effectiveType : null; // '4g','3g',...
+  }
+  function getDownlink(){
+    const c = getConn();
+    return c && typeof c.downlink === 'number' ? c.downlink : null; // Mbps (approx)
+  }
+  function qualityFromLatency(ms){
+    if (ms <= LTH[3]) return 4;
+    if (ms <= LTH[2]) return 3;
+    if (ms <= LTH[1]) return 2;
+    if (ms <= LTH[0]) return 1;
+    return 0;
+  }
+  const avg = () => samples.length ? Math.round(samples.reduce((a,b)=>a+b,0)/samples.length) : null;
+
+  function setState({online, quality, latency, effType, downlink}){
+    el.classList.toggle('offline', !online);
+    el.classList.toggle('online',  online && quality >= 3);
+    el.classList.toggle('degraded', online && quality < 3);
+    el.setAttribute('data-quality', String(online ? quality : 0));
+
+    if (!online){
+      if(label) label.textContent = 'Internet • Offline';
+      el.title = 'Internet tidak terhubung';
+      return;
+    }
+
+    const grades = ['Sangat Buruk','Buruk','Cukup','Baik','Sangat Baik'];
+    const grade  = grades[quality] || grades[0];
+
+    const latTxt = latency != null ? `${latency} ms` : 'n/a';
+    const effTxt = effType ? ` • ${effType.toUpperCase()}` : '';
+    const dlTxt  = (typeof downlink === 'number') ? ` • ~${downlink.toFixed(1)} Mbps` : '';
+
+    if(label) label.textContent = `Internet • ${grade}`;
+    el.title = `Internet • Latency: ${latTxt}${effTxt}${dlTxt}`;
+  }
+
+  function fetchWithTimeout(url){
+    const ctrl = new AbortController();
+    const to = setTimeout(()=>ctrl.abort(), TIMEOUT);
+    const t0 = performance.now();
+
+    // pakai mode default; kalau CORS blok, tetap bisa hitung waktu selesai (opaque) pada banyak CDN
+    return fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(), {
+      cache: 'no-store',
+      signal: ctrl.signal
+    }).then(res=>{
+      clearTimeout(to);
+      const t1 = performance.now();
+      if (!res.ok && res.type !== 'opaque') throw new Error('HTTP '+res.status);
+      return t1 - t0;
+    });
+  }
+
+  function probeLatency(){
+    // pilih endpoint yang merespon lebih dulu
+    return Promise.any(PROBES.map(url => fetchWithTimeout(url)));
+  }
+
+  function tick(){
+    if(!navigator.onLine){
+      samples = [];
+      setState({online:false});
+      return;
+    }
+
+    probeLatency()
+      .then(ms=>{
+        samples.push(ms);
+        if(samples.length > WINDOW_N) samples.shift();
+        const latency = avg();
+        const effType = getEff();
+        const down    = getDownlink();
+
+        // Naik/turunkan kualitas sedikit berdasar effectiveType
+        let q = qualityFromLatency(latency);
+        if (effType && /^(2g|slow-2g)$/i.test(effType)) q = Math.min(q, 1);
+        if (effType && /^3g$/i.test(effType))           q = Math.min(q, 2);
+
+        setState({online:true, quality:q, latency, effType, downlink:down});
+      })
+      .catch(()=>{
+        samples = [];
+        setState({online:false});
+      });
+  }
+
+  // listeners
+  window.addEventListener('online',  tick);
+  window.addEventListener('offline', ()=>setState({online:false}));
+  const c = getConn();
+  if (c && c.addEventListener) c.addEventListener('change', tick);
+
+  // start
+  tick();
+  setInterval(tick, INTERVAL);
+})();
   </script>
 </body>
 </html>

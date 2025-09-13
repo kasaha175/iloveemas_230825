@@ -150,12 +150,13 @@
                 <th class="mc-col-no">No</th>
                 <th class="mc-col-action">Aksi</th>
                 <th>No Order</th>
-                <th>Nama</th>
-                <th>Alamat</th>
-                <th>Domisili</th>
-                <th>Telepon</th>
-                <th>Tanggal Buat</th>
-                <th>Dibuat Oleh</th>
+                <th>ID Number (KTP)</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Resident Address</th>
+                <th>Phone</th>
+                <th>Created At</th>
+                <th>Created By</th>
               </tr>
             </thead>
             <tbody></tbody> <!-- server-side -->
@@ -193,8 +194,8 @@
     columns: [
       { data: 0, orderable: false },
       { data: 1, orderable: false, searchable: false },
-      { data: 2 }, { data: 3 }, { data: 4 },
-      { data: 5 }, { data: 6 }, { data: 7 }, { data: 8 }
+      { data: 2 },{ data: 3 }, { data: 4 }, { data: 5 },
+      { data: 6 }, { data: 7 }, { data: 8 }, { data: 9 }
     ],
     scrollX: true,
     language: {

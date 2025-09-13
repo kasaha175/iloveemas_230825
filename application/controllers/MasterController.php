@@ -88,7 +88,7 @@ class MasterController extends CI_Controller
         $postOrder = $this->input->post('order');
         $order0    = (is_array($postOrder) && isset($postOrder[0])) ? $postOrder[0] : ['column'=>2,'dir'=>'asc'];
 
-        $cols    = ['c_id', null, 'c_no_order','c_name','c_address','c_resident_address','c_phone','c_date_created','u_name'];
+        $cols    = ['c_id', null, 'c_no_order','c_id_number','c_name','c_address','c_resident_address','c_phone','c_date_created','u_name'];
         $orderBy = isset($cols[$order0['column']]) ? $cols[$order0['column']] : 'c_no_order';
         $dir     = (isset($order0['dir']) && strtolower($order0['dir'])==='desc') ? 'DESC' : 'ASC';
 
@@ -103,7 +103,7 @@ class MasterController extends CI_Controller
 
             $data[] = [
                 $no, $aksi,
-                $r->c_no_order, $r->c_name, $r->c_address, $r->c_resident_address,
+                $r->c_no_order, $r->c_id_number,$r->c_name, $r->c_address, $r->c_resident_address,
                 $r->c_phone, $r->c_date_created, $r->u_name
             ];
         }

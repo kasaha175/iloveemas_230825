@@ -64,6 +64,13 @@
     display:inline-block; padding:8px 12px; border-radius:999px;
     border:1px solid #c9f6d1; background:#ecffef; color:#155724; font-weight:700; font-size:12px;
   }
+
+  /* badge sukses sudah ada (.nc-badge). Tambahkan varian error: */
+  .nc-badge--error{
+    border:1px solid #fecaca;
+    background:#fff1f2;
+    color:#991b1b;
+  }
 </style>
 
 <div class="nc-wrap">
@@ -84,11 +91,20 @@
       <p>Input data pelanggan baru untuk transaksi di <strong>I Love Emas</strong>.</p>
     </header>
 
-    <?php if($this->session->userdata('status')==='success'): ?>
+    <?php
+      $status  = $this->session->userdata('status');   // 'success' atau 'error'
+      $message = $this->session->userdata('message');  // teks pesan
+      if ($status && $message):
+    ?>
       <div style="margin:10px 0 0;">
-        <span class="nc-badge"><?= html_escape($this->session->userdata('message')) ?></span>
+        <span class="nc-badge <?= ($status === 'success') ? '' : 'nc-badge--error' ?>">
+          <?= html_escape($message) ?>
+        </span>
       </div>
-      <?php $this->session->set_userdata(['status'=>'','message'=>'']); ?>
+      <?php
+        // bersihkan setelah ditampilkan
+        $this->session->set_userdata(['status'=>'','message'=>'']);
+      ?>
     <?php endif; ?>
 
     <!-- Card -->
@@ -164,5 +180,28 @@
       }
     })(jQuery);
   }
+
+  (function(){
+  const form = document.getElementById('myForm');
+  if(!form) return;
+
+  form.addEventListener('submit', function(e){
+    let firstInvalid = null;
+    form.querySelectorAll('input[required], textarea[required]').forEach(el=>{
+      if (!el.value.trim()){
+        el.classList.add('is-invalid');
+        if (!firstInvalid) firstInvalid = el;
+      } else {
+        el.classList.remove('is-invalid');
+      }
+    });
+
+    if (firstInvalid){
+      e.preventDefault();
+      firstInvalid.scrollIntoView({behavior:'smooth', block:'center'});
+      setTimeout(()=>firstInvalid.focus(), 150);
+    }
+  });
+})();
 </script>
 

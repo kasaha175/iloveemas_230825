@@ -229,4 +229,9 @@ class MasterModel extends CI_Model {
 
         return $this->db->count_all_results();
     }
+
+    public function getCustomerById($id)
+    {
+        return $this->db->where('c_id', $id)->get('tb_customer');
+    }
 }

@@ -15,6 +15,28 @@ $materials = [
   ["url" => "buy/21",               "img" => "tantalum.png",   "name" => "Tantalum"],
 ];
 
+$customerObj = isset($customer) ? $customer : null;
+
+if (is_object($customerObj)) {
+  $customerData = [
+    'id'         => $customerObj->c_id        ?? null,
+    'name'       => $customerObj->c_name      ?? null,
+    'id_number'  => $customerObj->c_id_number ?? null,
+    'phone'      => $customerObj->c_phone     ?? null,
+    'email'      => $customerObj->c_email     ?? null,
+  ];
+} elseif (is_array($customerObj)) {
+  $customerData = [
+    'id'         => $customerObj['c_id']        ?? null,
+    'name'       => $customerObj['c_name']      ?? null,
+    'id_number'  => $customerObj['c_id_number'] ?? null,
+    'phone'      => $customerObj['c_phone']     ?? null,
+    'email'      => $customerObj['c_email']     ?? null,
+  ];
+} else {
+  $customerData = ['id'=>null,'name'=>null,'id_number'=>null,'phone'=>null,'email'=>null];
+}
+
 // Ikon back dari config (fallback)
 $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
 ?>
@@ -145,9 +167,30 @@ $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
         <div>
           <h1>Buy — Choose Material</h1>
           <p>Pilih jenis material untuk memulai transaksi pembelian.</p>
+
+          <?php if (!empty($customerData['id'])): ?>
+            <!-- Chip info customer aktif -->
+            <div style="display:inline-flex;align-items:center;gap:10px;margin-top:8px;
+                        background:#ffffff;color:#0b1f4f;border:1px solid #e6eefc;border-radius:999px;
+                        padding:7px 12px;box-shadow:0 8px 18px rgba(0,0,0,.08)">
+              <i class="fas fa-user-circle" aria-hidden="true"></i>
+              <span style="font-weight:700;">
+                <?= htmlspecialchars($customerData['name'] ?? 'Customer', ENT_QUOTES) ?>
+              </span>
+              <span style="color:#6b7a99;">
+                (ID: <?= htmlspecialchars($customerData['id'], ENT_QUOTES) ?>
+                <?= $customerData['id_number'] ? ' • '.htmlspecialchars($customerData['id_number'], ENT_QUOTES) : '' ?>)
+              </span>
+            </div>
+          <?php else: ?>
+            <!-- Peringatan ringan jika belum ada customer -->
+            <div style="margin-top:8px;background:#fff4f4;border:1px solid #ffd7d7;color:#9a1a1a;
+                        border-radius:10px;padding:8px 10px;">
+              Customer belum dipilih. <a href="<?= base_url('transaction') ?>" style="font-weight:700;">Pilih customer</a> terlebih dahulu.
+            </div>
+          <?php endif; ?>
         </div>
 
-        <!-- Tombol back: jika ingin 100% dari config, ganti class ke <?= htmlspecialchars($btnPrimary, ENT_QUOTES) ?> -->
         <a href="<?= base_url('transaction') ?>" class="ilv-back" aria-label="Kembali ke Transaction">
           <i class="<?= htmlspecialchars($iconBack, ENT_QUOTES) ?>"></i> Kembali
         </a>

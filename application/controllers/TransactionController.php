@@ -599,11 +599,14 @@ class TransactionController extends CI_Controller
 		$idUser   = $this->session->userdata("idUser");
 		$this->data["title"] = "TRANSACTION BUY";
 
-		if ($authUser == true) {
-			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+		if ($authUser === true) {
+			// ARRAY asosiatif
+			$this->data['userData'] = $this->UserModel->userDataById($idUser)->row_array();
 
-			// muat view utama ke dalam template
-			$this->data['content'] = $this->load->view('Buy', $this->data, true); // <-- pakai 'Buy', bukan 'transaction/buy'
+			// customer tetap object (nggak masalah untuk Buy view yg sudah di-normalisasi)
+			$this->data['customer'] = $this->MasterModel->getCustomerById($idUser)->row();
+
+			$this->data['content'] = $this->load->view('Buy', $this->data, true);
 			$this->load->view("UserTemplate", $this->data);
 		} else {
 			redirect(base_url());

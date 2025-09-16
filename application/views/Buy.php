@@ -1,112 +1,155 @@
-<?php
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
-// Data material
+<?php
+// ====== DATA MATERIAL ======
 $materials = [
-  ["url" => "buy/1",                "img" => "diamond.png",    "name" => "Diamond"],
-  ["url" => "buy/2",                "img" => "gold.png",       "name" => "Gold"],
-  ["url" => "buy/lm/select",        "img" => "ubs.png",        "name" => "LM & UBS"],
-  ["url" => "buy/silver/select",    "img" => "silver.png",     "name" => "Silver"],
-  ["url" => "buy/platinum/select",  "img" => "platinum.png",   "name" => "Platinum"],
-  ["url" => "buy/paladium/select",  "img" => "paladium.png",   "name" => "Paladium"],
-  ["url" => "buy/iridium/select",   "img" => "iridium.png",    "name" => "Iridium"],
-  ["url" => "buy/rhodium/select",   "img" => "rhodium.png",    "name" => "Rhodium"],
-  ["url" => "buy/10",               "img" => "material-au.png","name" => "C. Profesional"],
-  ["url" => "buy/ruthenium/select", "img" => "ruthenium.png",  "name" => "Ruthenium"],
-  ["url" => "buy/21",               "img" => "tantalum.png",   "name" => "Tantalum"],
+  ["url" => "buy/1",                "img" => "diamond.png",     "name" => "Diamond"],
+  ["url" => "buy/2",                "img" => "gold.png",        "name" => "Gold"],
+  ["url" => "buy/lm/select",        "img" => "ubs.png",         "name" => "LM & UBS"],
+  ["url" => "buy/silver/select",    "img" => "silver.png",      "name" => "Silver"],
+  ["url" => "buy/platinum/select",  "img" => "platinum.png",    "name" => "Platinum"],
+  ["url" => "buy/paladium/select",  "img" => "paladium.png",    "name" => "Paladium"],
+  ["url" => "buy/iridium/select",   "img" => "iridium.png",     "name" => "Iridium"],
+  ["url" => "buy/rhodium/select",   "img" => "rhodium.png",     "name" => "Rhodium"],
+  ["url" => "buy/10",               "img" => "material-au.png", "name" => "C. Profesional"],
+  ["url" => "buy/ruthenium/select", "img" => "ruthenium.png",   "name" => "Ruthenium"],
+  ["url" => "buy/21",               "img" => "tantalum.png",    "name" => "Tantalum"],
 ];
 
+// ====== CUSTOMER DATA (obj/array/null) ======
 $customerObj = isset($customer) ? $customer : null;
+$customerData = [
+  'id'               => null,
+  'name'             => null,
+  'id_number'        => null,
+  'phone'            => null,
+  'email'            => null,
+  'address'          => null,
+  'resident_address' => null,
+  'no_order'         => null,
+  'date_created'     => null,
+];
 
-if (is_object($customerObj)) {
-  $customerData = [
-    'id'         => $customerObj->c_id        ?? null,
-    'name'       => $customerObj->c_name      ?? null,
-    'id_number'  => $customerObj->c_id_number ?? null,
-    'phone'      => $customerObj->c_phone     ?? null,
-    'email'      => $customerObj->c_email     ?? null,
-  ];
-} elseif (is_array($customerObj)) {
-  $customerData = [
-    'id'         => $customerObj['c_id']        ?? null,
-    'name'       => $customerObj['c_name']      ?? null,
-    'id_number'  => $customerObj['c_id_number'] ?? null,
-    'phone'      => $customerObj['c_phone']     ?? null,
-    'email'      => $customerObj['c_email']     ?? null,
-  ];
-} else {
-  $customerData = ['id'=>null,'name'=>null,'id_number'=>null,'phone'=>null,'email'=>null];
+if (is_object($customerObj) || is_array($customerObj)) {
+  $src = (array)$customerObj;
+  $customerData['id']               = $src['c_id']               ?? null;
+  $customerData['name']             = $src['c_name']             ?? null;
+  $customerData['id_number']        = $src['c_id_number']        ?? null;
+  $customerData['phone']            = $src['c_phone']            ?? null;
+  $customerData['email']            = $src['c_email']            ?? null;
+  $customerData['address']          = $src['c_address']          ?? null;
+  $customerData['resident_address'] = $src['c_resident_address'] ?? null;
+  $customerData['no_order']         = $src['c_no_order']         ?? null;
+  $customerData['date_created']     = $src['c_date_created']     ?? null;
 }
 
-// Ikon back dari config (fallback)
-$iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
+// Fallback dari session / query kalau controller belum inject
+if (empty($customerData['id'])) {
+  $cidSess = (int) $this->session->userdata('idCustomer');
+  $cidGet  = (int) $this->input->get('cid');
+  $customerData['id'] = $cidSess ?: ($cidGet ?: null);
+}
+
+$hasCust   = !empty($customerData['id']) && (int)$customerData['id'] > 0;
+// Perlu AJAX bila hanya punya ID tanpa detail lain
+$needsAjax = $hasCust && empty($customerData['name']) && empty($customerData['phone']) && empty($customerData['email']);
+
+$iconBack  = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
+$custInfoUrl = site_url('transaction/customer-info'); // gunakan underscore (pasti JSON)
+
+// Helper URL + persist cid
+$buildTxUrl = function(string $rel) use ($hasCust, $customerData) {
+  $u = base_url('transaction/'.$rel);
+  if ($hasCust) {
+    $u .= (strpos($u,'?')===false ? '?' : '&').'cid='.(int)$customerData['id'];
+  }
+  return $u;
+};
+
+// Normalisasi item (pakai folder gambar yang kamu pakai saat ini)
+$materialItems = array_map(function($m) use ($buildTxUrl){
+  return [
+    'href' => $buildTxUrl($m['url']),
+    'img'  => base_url('assets/offline/'.$m['img']),
+    'name' => $m['name'],
+  ];
+}, $materials);
+
+// Debug ringan
+if (ENVIRONMENT !== 'production') {
+  echo "<script>console.log('[Buy-Choose] idCustomer=', ".json_encode((int)($customerData['id'] ?: 0)).", 'needAjax=', ".json_encode($needsAjax).");</script>";
+}
 ?>
 
 <style>
   :root{
-    --blue-light:#074799;
-    --blue-dark:#001A6E;
-    --blue-pastel:#B1F0F7;
-    --text:#0B0F1A;
-    --muted:#6b7a99;
-    --card-bg:#ffffff;
-    --card-br:#e6eefc;
+    --blue-light:#074799; --blue-dark:#001A6E; --blue-pastel:#B1F0F7;
+    --text:#0B0F1A; --muted:#6b7a99;
+    --card-bg:#fff; --card-br:#e6eefc;
     --shadow:0 18px 30px rgba(0,0,0,.10);
-    --radius:18px;
-    --topbar-h:72px;
-
-    /* ukuran minimum kolom supaya grid bisa merapat */
+    --radius:18px; --topbar-h:72px;
     --grid-min: clamp(140px, 16vw, 170px);
   }
 
   .ilv-buy{ padding:clamp(14px,2vw,24px); margin-top:var(--topbar-h); }
   .ilv-container{ max-width:1200px; margin-inline:auto; }
 
+  /* HERO */
   .ilv-hero{
     position:relative; overflow:hidden; border-radius:var(--radius);
     background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));
     color:#fff; padding:clamp(16px,3vw,28px);
-    box-shadow: var(--shadow);
+    box-shadow:var(--shadow);
   }
-  .ilv-hero h1{ margin:0 0 4px; font-weight:800; letter-spacing:.2px; font-size:clamp(18px,3vw,28px); }
-  .ilv-hero p{ margin:0; opacity:.96; font-size:clamp(12px,1.2vw,14px); }
-
-  .ilv-hero .blob{position:absolute; border-radius:50%; filter:blur(44px); opacity:.25; pointer-events:none;}
-  .ilv-hero .b1{ width:320px;height:320px;background:var(--blue-pastel);right:-120px;top:-120px;}
-  .ilv-hero .b2{ width:200px;height:200px;background:#8fd2ff;left:-80px;bottom:-100px;opacity:.2;}
-
-  /* Breadcrumb pills */
   .ilv-crumbs{
     display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    background: rgba(255,255,255,.10);
-    border:1px solid rgba(255,255,255,.20);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    border-radius:999px; padding:8px 12px; width:max-content;
+    background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.20);
+    border-radius:999px; padding:8px 12px; width:max-content; backdrop-filter:blur(6px);
   }
   .ilv-crumbs a{ color:#e8f2ff; text-decoration:none; font-weight:600; }
   .ilv-crumbs .sep{ color:#c9defe; opacity:.7; }
 
-  /* Header actions */
-  .ilv-head{
-    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-    margin-top:12px;
-  }
+  .ilv-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:12px; }
   .ilv-back{
     display:inline-flex; align-items:center; gap:8px;
-    background:#ffffff; color:#0b1f4f; border:1px solid #e6eefc;
+    background:#fff; color:#0b1f4f; border:1px solid #e6eefc;
     border-radius:999px; padding:7px 12px; text-decoration:none; font-weight:700;
     box-shadow:0 8px 18px rgba(0,0,0,.08);
     transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
   }
-  .ilv-back:hover{ transform: translateY(-1px); box-shadow:0 14px 26px rgba(0,0,0,.12); border-color:#d7e5ff; }
+  .ilv-back:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(0,0,0,.12); border-color:#d7e5ff; }
 
-  /* ====== COMPACT GRID ====== */
-  .ilv-grid{
-    margin-top: clamp(14px, 2vw, 20px);
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--grid-min), 1fr));
-    gap:10px;
+  /* CUSTOMER CARD */
+  .cust-card{
+    margin-top:12px; background:#fff; color:#0b1f4f; border:1px solid #e6eefc;
+    border-radius:16px; padding:12px 14px; box-shadow:0 10px 24px rgba(0,0,0,.08); max-width:820px;
+  }
+  .cust-title{ display:flex; align-items:center; gap:10px; margin:0 0 8px; }
+  .cust-title .avatar{
+    width:36px; height:36px; border-radius:50%;
+    background:linear-gradient(135deg,#e6f1ff,#f6fbff);
+    border:1px solid #dfeaff; display:grid; place-items:center; color:#2454a6;
+  }
+  .cust-title h6{ margin:0; font-weight:800; color:#0e204a; font-size:15px; }
+  .cust-title small{ color:#6b7a99; font-weight:600; }
+
+  .cust-grid{ display:grid; grid-template-columns:1fr; gap:6px 14px; }
+  @media (min-width: 680px){ .cust-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+
+  .cust-row{ font-size:13.5px; color:#2a3d6b; display:flex; gap:8px; align-items:center; min-height:24px; }
+  .cust-row b{ color:#0e204a; white-space:nowrap; }
+  .cust-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .btn-chip{
+    display:inline-flex; align-items:center; gap:8px; border:1px solid #dfeaff; background:#fff;
+    color:#0e204a; padding:6px 10px; border-radius:999px; font-weight:700; text-decoration:none;
   }
 
+  /* GRID MATERIAL */
+  .ilv-grid{
+    margin-top: clamp(14px, 2vw, 20px);
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(var(--grid-min), 1fr));
+    gap:10px;
+  }
   .ilv-item{
     text-decoration:none; color:var(--text);
     background:var(--card-bg); border:1px solid var(--card-br);
@@ -116,36 +159,20 @@ $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
     display:flex; flex-direction:column; min-height:150px;
   }
   .ilv-item:hover{ transform: translateY(-2px); box-shadow:0 14px 28px rgba(0,0,0,.12); border-color:#d7e5ff; background:#fff; }
+  .ilv-item.disabled{ opacity:.6; filter:saturate(.5) grayscale(.1); cursor:not-allowed; }
 
-  .ilv-thumb{
-    display:grid; place-items:center; min-height:96px; padding:10px 10px 6px;
-    background:linear-gradient(180deg,rgba(241,248,255,.6),rgba(255,255,255,1));
-  }
+  .ilv-thumb{ display:grid; place-items:center; min-height:96px; padding:10px 10px 6px;
+    background:linear-gradient(180deg,rgba(241,248,255,.6),rgba(255,255,255,1)); }
   .ilv-thumb img{ width:82%; max-height:86px; object-fit:contain; border-radius:10px; }
+  .ilv-caption{ text-align:center; padding:8px 10px; font-weight:800; color:#001A6E; border-top:1px solid var(--card-br); font-size:14px; }
 
-  .ilv-caption{
-    text-align:center; padding:8px 10px; font-weight:800; color:#001A6E;
-    border-top:1px solid var(--card-br); font-size:14px;
-  }
+  .ilv-meta{ margin-top:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; font-size:12px; color:#26406e; }
+  .ilv-badge{ background:#fff; color:#0e2b68; border:1px solid #dfeaff; padding:6px 10px; border-radius:999px; }
 
-  /* Meta footer */
-  .ilv-meta{
-    margin-top:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
-    font-size:12px; color:#26406e;
-  }
-  .ilv-badge{ background:#ffffff; color:#0e2b68; border:1px solid #dfeaff; padding:6px 10px; border-radius:999px; }
-
-  /* Sedikit lebih rapat di layar besar */
-  @media (min-width:1200px){
-    :root{ --grid-min: 180px; } /* tetap harmonis di monitor besar */
-    .ilv-grid{ gap:12px; }
-  }
-
-  @media (max-width:480px){
-    .ilv-hero{ padding:14px; }
+  @media (prefers-reduced-motion: reduce){
+    .ilv-item, .ilv-back{ transition:none; }
   }
 </style>
-
 
 <div class="ilv-buy">
   <div class="ilv-container">
@@ -165,27 +192,57 @@ $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
 
       <div class="ilv-head">
         <div>
-          <h1>Buy — Choose Material</h1>
-          <p>Pilih jenis material untuk memulai transaksi pembelian.</p>
+          <h1 style="margin:8px 0 6px; font-weight:800; letter-spacing:.2px; font-size:clamp(20px,3.2vw,28px);">Buy — Choose Material</h1>
+          <p style="margin:0; color:#dbe8ff; font-size:13px;">Pilih jenis material untuk memulai transaksi pembelian.</p>
 
-          <?php if (!empty($customerData['id'])): ?>
-            <!-- Chip info customer aktif -->
-            <div style="display:inline-flex;align-items:center;gap:10px;margin-top:8px;
-                        background:#ffffff;color:#0b1f4f;border:1px solid #e6eefc;border-radius:999px;
-                        padding:7px 12px;box-shadow:0 8px 18px rgba(0,0,0,.08)">
-              <i class="fas fa-user-circle" aria-hidden="true"></i>
-              <span style="font-weight:700;">
-                <?= htmlspecialchars($customerData['name'] ?? 'Customer', ENT_QUOTES) ?>
-              </span>
-              <span style="color:#6b7a99;">
-                (ID: <?= htmlspecialchars($customerData['id'], ENT_QUOTES) ?>
-                <?= $customerData['id_number'] ? ' • '.htmlspecialchars($customerData['id_number'], ENT_QUOTES) : '' ?>)
-              </span>
+          <?php if ($hasCust): ?>
+            <div id="custCard" class="cust-card"
+                 data-cid="<?= (int)$customerData['id'] ?>"
+                 data-needs="<?= $needsAjax ? '1':'0' ?>">
+
+              <?php if (!$needsAjax): ?>
+                <div class="cust-title">
+                  <div class="avatar"><i class="fas fa-user"></i></div>
+                  <h6><?= htmlspecialchars($customerData['name'] ?? 'Customer', ENT_QUOTES) ?></h6>
+                  <small>(ID: <?= (int)$customerData['id'] ?>)</small>
+                </div>
+
+                <div class="cust-grid">
+                  <div class="cust-row"><b>No. Identitas:</b> <?= htmlspecialchars($customerData['id_number'] ?? '-', ENT_QUOTES) ?></div>
+                  <div class="cust-row"><b>No. Order:</b>     <?= htmlspecialchars($customerData['no_order']   ?? '-', ENT_QUOTES) ?></div>
+                  <div class="cust-row"><b>Phone:</b>         <?= htmlspecialchars($customerData['phone']     ?? '-', ENT_QUOTES) ?></div>
+                  <div class="cust-row"><b>Email:</b>         <?= htmlspecialchars($customerData['email']     ?? '-', ENT_QUOTES) ?></div>
+                  <div class="cust-row"><b>Alamat KTP:</b>    <?= htmlspecialchars($customerData['address']   ?? '-', ENT_QUOTES) ?></div>
+                  <div class="cust-row"><b>Domisili:</b>      <?= htmlspecialchars($customerData['resident_address'] ?? '-', ENT_QUOTES) ?></div>
+                </div>
+
+                <div class="cust-actions">
+                  <?php if (!empty($customerData['phone'])): ?>
+                    <a class="btn-chip" href="tel:<?= htmlspecialchars($customerData['phone'], ENT_QUOTES) ?>">
+                      <i class="fas fa-phone"></i> Telp
+                    </a>
+                  <?php endif; ?>
+                  <?php if (!empty($customerData['email'])): ?>
+                    <a class="btn-chip" href="mailto:<?= htmlspecialchars($customerData['email'], ENT_QUOTES) ?>">
+                      <i class="fas fa-envelope"></i> Email
+                    </a>
+                  <?php endif; ?>
+                  <a class="btn-chip" href="<?= base_url('transaction') ?>">
+                    <i class="fas fa-sync-alt"></i> Ganti Customer
+                  </a>
+                </div>
+
+              <?php else: ?>
+                <div class="cust-title">
+                  <div class="avatar"><i class="fas fa-user"></i></div>
+                  <h6>Memuat data customer…</h6>
+                  <small>(ID: <?= (int)$customerData['id'] ?>)</small>
+                </div>
+                <div class="cust-grid"><div class="cust-row">Mohon tunggu sebentar.</div></div>
+              <?php endif; ?>
             </div>
           <?php else: ?>
-            <!-- Peringatan ringan jika belum ada customer -->
-            <div style="margin-top:8px;background:#fff4f4;border:1px solid #ffd7d7;color:#9a1a1a;
-                        border-radius:10px;padding:8px 10px;">
+            <div style="margin-top:8px;background:#fff4f4;border:1px solid #ffd7d7;color:#9a1a1a;border-radius:10px;padding:8px 10px;">
               Customer belum dipilih. <a href="<?= base_url('transaction') ?>" style="font-weight:700;">Pilih customer</a> terlebih dahulu.
             </div>
           <?php endif; ?>
@@ -199,20 +256,21 @@ $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
 
     <!-- Grid Material -->
     <section class="ilv-grid" aria-label="Pilihan Material">
-      <?php foreach ($materials as $m): ?>
-        <a class="ilv-item" href="<?= base_url('transaction/'.$m['url'].'/') ?>" aria-label="Pilih <?= htmlspecialchars($m['name']) ?>">
+      <?php foreach ($materialItems as $it): ?>
+        <?php
+          $href  = $hasCust ? $it['href'] : 'javascript:void(0)';
+          $class = 'ilv-item'.($hasCust ? '' : ' disabled');
+          $attr  = $hasCust ? '' : 'onclick="alert(\'Pilih customer dulu ya.\');" aria-disabled="true"';
+        ?>
+        <a class="<?= $class ?>" href="<?= $href ?>" <?= $attr ?> aria-label="Pilih <?= htmlspecialchars($it['name']) ?>">
           <div class="ilv-thumb">
-            <img
-              src="<?= base_url('assets/offline/'.$m['img']) ?>"
-              alt="<?= htmlspecialchars($m['name']) ?>"
-              loading="lazy" decoding="async">
+            <img src="<?= $it['img'] ?>" alt="<?= htmlspecialchars($it['name']) ?>" loading="lazy" decoding="async">
           </div>
-          <div class="ilv-caption"><?= htmlspecialchars($m['name']) ?></div>
+          <div class="ilv-caption"><?= htmlspecialchars($it['name']) ?></div>
         </a>
       <?php endforeach; ?>
     </section>
 
-    <!-- Footer Meta (versi/brand) -->
     <div class="ilv-meta">
       <span class="ilv-badge">Mode Transaksi — Buy</span>
       <span>© <?= date('Y') ?> • I Love Emas</span>
@@ -220,3 +278,49 @@ $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
 
   </div>
 </div>
+
+<?php if ($hasCust): ?>
+<script>
+(function(){
+  var card = document.getElementById('custCard');
+  if (!card) return;
+  if (card.getAttribute('data-needs') !== '1') return;
+
+  var cid = card.getAttribute('data-cid');
+  fetch("<?= $custInfoUrl ?>?id=" + encodeURIComponent(cid), {
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(function(r){
+    var ct = r.headers.get('content-type') || '';
+    if (ct.indexOf('application/json') !== -1) return r.json();
+    return r.text().then(function(t){ throw new Error('Not JSON:\n' + t.slice(0,250)); });
+  })
+  .then(function(j){
+    if (!j || !j.ok || !j.data) return;
+    var c = j.data;
+    card.innerHTML =
+      '<div class="cust-title">'
+      +   '<div class="avatar"><i class="fas fa-user"></i></div>'
+      +   '<h6>' + esc(c.c_name || 'Customer') + '</h6>'
+      +   '<small>(ID: ' + esc(c.c_id || cid) + ')</small>'
+      + '</div>'
+      + '<div class="cust-grid">'
+      +   row('No. Identitas:', c.c_id_number)
+      +   row('No. Order:',     c.c_no_order)
+      +   row('Phone:',         c.c_phone)
+      +   row('Email:',         c.c_email)
+      +   row('Alamat KTP:',    c.c_address)
+      +   row('Domisili:',      c.c_resident_address)
+      + '</div>'
+      + '<div class="cust-actions">'
+      +   (c.c_phone ? '<a class="btn-chip" href="tel:'+esc(c.c_phone)+'"><i class="fas fa-phone"></i> Telp</a>' : '')
+      +   (c.c_email ? '<a class="btn-chip" href="mailto:'+esc(c.c_email)+'"><i class="fas fa-envelope"></i> Email</a>' : '')
+      +   '<a class="btn-chip" href="<?= base_url('transaction') ?>"><i class="fas fa-sync-alt"></i> Ganti Customer</a>'
+      + '</div>';
+    function row(label,val){ return '<div class="cust-row"><b>'+esc(label)+'</b> '+esc(val||'-')+'</div>'; }
+    function esc(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  })
+  .catch(function(e){ console.warn('customer-info error', e); });
+})();
+</script>
+<?php endif; ?>

@@ -305,80 +305,106 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-    <!-- Tambahan: variabel global untuk AJAX simpan PDF -->
-    <script>
-      window.__TRANS_TYPE = 'buy';  /* view ini untuk BUY */
-      window.__TRANS_ID   = <?= (int)($a->t_id ?? 0) ?>;
-      window.__BASE_URL   = "<?= base_url() ?>";
-      window.__CSRF_NAME  = "<?= $this->security->get_csrf_token_name(); ?>";
-      window.__CSRF_HASH  = "<?= $this->security->get_csrf_hash(); ?>";
-    </script>
+<!-- Variabel global -->
+<script>
+  // variabel global dari view
+  window.__TRANS_TYPE = 'buy';                          // view ini untuk BUY
+  window.__TRANS_ID   = <?= (int)($a->t_id ?? 0) ?>;
+  window.__BASE_URL   = "<?= base_url() ?>";
+  window.__CSRF_NAME  = "<?= $this->security->get_csrf_token_name(); ?>";
+  window.__CSRF_HASH  = "<?= $this->security->get_csrf_hash(); ?>";
 
-    <script>
-      // Handler baru: simpan meta & generate PDF di server, lalu (opsional) print + destroy
-      (function($){
-        function collectCabang(){
-          var out = [];
-          $('.cb-cabang:checked').each(function(){
-            out.push({ id: $(this).val(), label: $(this).data('label') });
-          });
-          return out;
+  // (opsional) kalau kamu sudah bawa flag ini dari checkout:
+  // window.__NOTIFY_EMAIL = "<?= (string)($this->session->flashdata('notifyEmail') ?? '0') ?>";
+  // window.__EMAIL_TO     = "<?= (string)($this->session->flashdata('emailTo') ?? '') ?>";
+</script>
+
+<script>
+(function($){
+  function collectCabang(){
+    var out=[]; $('.cb-cabang:checked').each(function(){
+      out.push({ id: $(this).val(), label: $(this).data('label') });
+    }); return out;
+  }
+  function collectPayments(){
+    var out=[]; $('.cb-pay:checked').each(function(){ out.push($(this).val()); });
+    return out;
+  }
+
+  function finishFlow(){
+    // (opsional) kirim email sesuai pilihan checkout—biarkan non-blocking
+    if (window.__NOTIFY_EMAIL === '1' && window.__EMAIL_TO) {
+      $.post(
+        window.__BASE_URL + 'transaction/send-invoice/'+window.__TRANS_TYPE+'/'+window.__TRANS_ID,
+        (function(){
+          var p={ email: window.__EMAIL_TO }; p[window.__CSRF_NAME]=window.__CSRF_HASH; return p;
+        })()
+      ).done(function(r){ if (r && r[window.__CSRF_NAME]) window.__CSRF_HASH=r[window.__CSRF_NAME]; });
+    }
+    // destroy cart lalu redirect
+    ajaxdestroy();
+  }
+
+  function savePrintThenNext(){
+    var url = window.__BASE_URL + 'transaction/savePrint/' + window.__TRANS_TYPE + '/' + window.__TRANS_ID;
+    var payload = {
+      cabang: collectCabang(),
+      payments: collectPayments(),
+      paper: 'A4',
+      orientation: 'portrait',
+      rawHtml: document.getElementById('printNow').outerHTML
+    };
+    payload[window.__CSRF_NAME] = window.__CSRF_HASH;
+
+    var $btn = $('#doPrint').prop('disabled',true).addClass('disabled').css('opacity',.6);
+
+    $.ajax({ url:url, type:'POST', dataType:'json', data:payload })
+      .done(function(r){
+        if (r && r[window.__CSRF_NAME]) window.__CSRF_HASH = r[window.__CSRF_NAME];
+        if (!r || !r.ok){
+          alert((r && r.msg) ? r.msg : 'Gagal menyimpan arsip print.');
+          $btn.prop('disabled',false).removeClass('disabled').css('opacity',1);
+          return;
         }
-        function collectPayments(){
-          var out = [];
-          $('.cb-pay:checked').each(function(){ out.push($(this).val()); });
-          return out;
+
+        // === BUKA DIALOG PRINT BROWSER PADA HALAMAN INI ===
+        var ended = false;
+        function afterPrint(){
+          if (ended) return; ended = true;
+          window.removeEventListener('afterprint', afterPrint);
+          finishFlow();
         }
-        function savePrintThenNext(opts){
-          var url = window.__BASE_URL + 'transaction/savePrint/' + window.__TRANS_TYPE + '/' + window.__TRANS_ID;
-          var payload = {
-            cabang: collectCabang(),
-            payments: collectPayments(),
-            paper: 'A4',
-            orientation: 'portrait',
-            rawHtml: document.getElementById('printNow').outerHTML // simpan juga HTML final (sesuai instruksi)
-          };
-          payload[window.__CSRF_NAME] = window.__CSRF_HASH;
+        window.addEventListener('afterprint', afterPrint);
 
-          $('#doPrint').css('opacity',.6).css('pointer-events','none');
+        // guard jika afterprint tidak terpanggil (beberapa browser)
+        setTimeout(function(){ if (!ended){ afterPrint(); } }, 8000);
 
-          $.ajax({ url:url, type:'POST', dataType:'json', data:payload })
-          .done(function(r){
-            // refresh token jika ada
-            if (r && r[window.__CSRF_NAME]) { window.__CSRF_HASH = r[window.__CSRF_NAME]; }
-            if (r && r.ok){
-              if (opts && opts.browserPrint === true) { setTimeout(function(){ window.print(); }, 120); }
-              if (opts && opts.finish === true) { ajaxdestroy(); }
-              else { $('#doPrint').css('opacity',1).css('pointer-events','auto'); }
-            } else {
-              alert((r && r.msg) ? r.msg : 'Gagal menyimpan PDF');
-              $('#doPrint').css('opacity',1).css('pointer-events','auto');
-            }
-          })
-          .fail(function(){
-            alert('Gagal terhubung ke server.');
-            $('#doPrint').css('opacity',1).css('pointer-events','auto');
-          });
-        }
+        try { window.print(); } catch(e){ afterPrint(); }
+      })
+      .fail(function(xhr){
+        alert('Gagal terhubung ke server ('+xhr.status+').');
+        $btn.prop('disabled',false).removeClass('disabled').css('opacity',1);
+      });
+  }
 
-        // Gantikan handler lama: sekarang simpan dulu, lalu print+destroy (tetap mempertahankan flow kamu)
-        $('#doPrint').on('click', function(e){
-          e.preventDefault();
-          savePrintThenNext({ browserPrint:true, finish:true });
-        });
-      })(jQuery);
+  // klik ikon/btn print → simpan arsip, lalu buka dialog print, lalu finish
+  $('#doPrint').off('click.print').on('click.print', function(e){
+    e.preventDefault();
+    savePrintThenNext();
+  });
 
-      // Fungsi existing: dipertahankan
-      function ajaxdestroy() {
-        jQuery.ajax({
-          url: '<?= base_url('transaction/chart-destroy') ?>',
-          success: function(){ window.location.href = "<?= base_url('dashboard') ?>"; },
-        });
-      }
-      function clickBack() {
-        window.location.href = "<?= base_url('dashboard') ?>";
-      }
-    </script>
+})(jQuery);
+
+// fungsi existing (tetap)
+function ajaxdestroy(){
+  jQuery.ajax({
+    url: '<?= base_url('transaction/chart-destroy') ?>'
+  }).always(function(){
+    window.location.href = "<?= base_url('dashboard') ?>";
+  });
+}
+function clickBack(){ window.location.href = "<?= base_url('dashboard') ?>"; }
+</script>
   </div>
 </body>
 </html>

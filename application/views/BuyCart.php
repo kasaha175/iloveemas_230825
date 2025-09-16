@@ -127,6 +127,21 @@ $mSeg     = (string)$this->uri->segment(3);
   /* Buttons */
   .btn-soft{ border:1px solid #e6eefc; background:#fff; color:#0e204a; }
   .btn-soft:hover{ border-color:#d7e5ff; background:#fff; box-shadow:0 8px 18px rgba(0,0,0,.08); }
+
+  /* wrapper & spinner untuk input email (dibuat via JS) */
+  .input-loading { position: relative; }
+  .input-loading .spinner-border {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    width: 1rem; height: 1rem; border-width: .15rem;
+    display: none;
+  }
+  .input-loading.loading .spinner-border { display: inline-block; }
+
+  /* feedback invalid bootstrap look */
+  #emailToInput.is-invalid { border-color: #dc3545; }
+  #emailError { display:none; color:#dc3545; font-size: .8125rem; margin-top: .25rem; }
+  #emailError.show { display:block; }
 </style>
 
 <!-- Overlay boot -->
@@ -304,6 +319,9 @@ $mSeg     = (string)$this->uri->segment(3);
             </div>
 
             <form action="<?= base_url('transaction/buy-checkout/') ?>" class="mt-3">
+              <input type="hidden" name="user_id" id="user_id" value="<?= htmlspecialchars($userId ?? $customer_id ?? '', ENT_QUOTES) ?>">
+              <input type="hidden" name="notifyEmail" id="notifyEmail" value="0">
+              <input type="hidden" name="emailTo" id="emailToHidden" value="">
               <div class="form-row">
                 <div class="form-group col-md-4">
                   <label class="form-label">PLUS / MINUS BIAYA ADMIN</label>
@@ -338,10 +356,36 @@ $mSeg     = (string)$this->uri->segment(3);
                         <span aria-hidden="true">×</span>
                       </button>
                     </div>
-                    <div class="modal-body">Pilih "Checkout" untuk menyelesaikan sesi cart.</div>
+                    <div class="modal-body">
+                      <p>Pilih "Checkout" untuk menyelesaikan sesi cart.</p>
+
+                      <!-- Tambahkan opsi email langsung di sini -->
+                      <div class="custom-control custom-radio mb-2">
+                        <input type="radio" name="optEmail" id="optYes" class="custom-control-input" value="yes">
+                        <label class="custom-control-label" for="optYes">Ya, kirim invoice via email</label>
+                      </div>
+                      <div class="custom-control custom-radio mb-2">
+                        <input type="radio" name="optEmail" id="optNo" class="custom-control-input" value="no" checked>
+                        <label class="custom-control-label" for="optNo">Tidak, lanjutkan saja</label>
+                      </div>
+
+                      <div id="emailFieldWrap" class="mt-2" style="display:none">
+                        <label for="emailToInput" class="mb-1">Email tujuan</label>
+                        <div class="input-loading">
+                          <input type="email" id="emailToInput"
+                                class="form-control form-control-sm"
+                                placeholder="nama@email.com"
+                                autocomplete="email">
+                          <div class="spinner-border" role="status" aria-hidden="true"></div>
+                        </div>
+                        <small class="text-muted d-block mt-1" id="emailHint" style="display:none">
+                          Diisi otomatis dari data customer.
+                        </small>
+                      </div>
+                    </div>
                     <div class="modal-footer">
                       <button class="btn btn-soft" type="button" data-dismiss="modal">Cancel</button>
-                      <button type="submit" class="btn btn-success">Checkout</button>
+                      <button type="button" id="btnModalProceed" class="btn btn-success">Checkout</button>
                     </div>
                   </div>
                 </div>
@@ -416,7 +460,240 @@ function init($){
     });
   }
 
+  (function checkoutEmailFlow(){
+  var CHECK_EMAIL = '<?= base_url('transaction/check-email') ?>';
+  var SAVE_EMAIL  = '<?= base_url('transaction/save-email') ?>';
+  var HEALTH_URL  = '<?= base_url('health/ping') ?>';
+
+  // ====== toggle debug ======
+  var DEBUG_EMAIL_SAVE = true; // set false jika sudah OK
+
+  function pingOnline(){
+    return $.ajax({ url: HEALTH_URL, type:'GET', dataType:'json', timeout:3000 });
+  }
+
+  var $checkoutForm = $('form[action*="transaction/buy-checkout/"]').last();
+  if (!$checkoutForm.length) return;
+
+  var $btnProceed = $('#btnModalProceed');
+
+  if (!$('#emailError').length){
+    $('<div id="emailError">Email wajib diisi dan format harus valid.</div>').insertAfter('#emailHint');
+  }
+
+  function setProceedDisabled(dis){
+    $btnProceed.prop('disabled', !!dis)
+               .toggleClass('disabled', !!dis)
+               .attr('aria-disabled', !!dis);
+  }
+
+  function ensureSpinner(){
+    var $inp = $('#emailToInput');
+    if (!$inp.parent().hasClass('input-loading')){
+      $inp.wrap('<div class="input-loading"></div>');
+      $inp.after('<div class="spinner-border" role="status" aria-hidden="true"></div>');
+    }
+    return $inp.closest('.input-loading');
+  }
+
+  function emailLoading(on){
+    var $wrap = ensureSpinner();
+    var $inp  = $('#emailToInput');
+    if (on){
+      $wrap.addClass('loading');
+      $inp.prop('disabled', true).attr('placeholder','Mengambil email…');
+      $('#emailHint').hide();
+    } else {
+      $wrap.removeClass('loading');
+      $inp.prop('disabled', false).attr('placeholder','nama@email.com');
+    }
+  }
+
+  function validateEmailField(){
+    var choiceYes = $('input[name="optEmail"]:checked').val() === 'yes';
+    if (!choiceYes){
+      $('#emailToInput').removeClass('is-invalid');
+      $('#emailError').removeClass('show');
+      setProceedDisabled(false);
+      return true;
+    }
+    var email = $.trim($('#emailToInput').val() || '');
+    var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!email || !ok){
+      $('#emailToInput').addClass('is-invalid');
+      $('#emailError').addClass('show');
+      setProceedDisabled(true);
+      return false;
+    } else {
+      $('#emailToInput').removeClass('is-invalid');
+      $('#emailError').removeClass('show');
+      setProceedDisabled(false);
+      return true;
+    }
+  }
+
+  // reset saat modal dibuka
+  $('#checkoutModal').off('shown.bs.modal.checkout').on('shown.bs.modal.checkout', function(){
+    $('#optNo').prop('checked', true);
+    $('#emailFieldWrap').hide();
+    $('#emailToInput').val('');
+    $('#emailHint').hide();
+    $('#emailError').removeClass('show');
+    setProceedDisabled(false);
+  });
+
+  // pilih Ya/Tidak
+  $('input[name="optEmail"]').off('change.checkout').on('change.checkout', function(){
+    if (this.value !== 'yes'){
+      $('#emailFieldWrap').hide();
+      $('#emailError').removeClass('show');
+      setProceedDisabled(false);
+      return;
+    }
+
+    emailLoading(true);
+    var jq = pingOnline();
+    if (!jq || typeof jq.done !== 'function'){
+      $('#emailFieldWrap').hide();
+      setProceedDisabled(true);
+      emailLoading(false);
+      return;
+    }
+
+    jq.done(function(){
+        if (DEBUG_EMAIL_SAVE) console.log('[PING] online OK');
+        $('#emailFieldWrap').show();
+        prefillEmail();
+      })
+      .fail(function(){
+        if (DEBUG_EMAIL_SAVE) console.warn('[PING] offline/timeout');
+        $('#emailFieldWrap').hide();
+        setProceedDisabled(true);
+      })
+      .always(function(){ emailLoading(false); });
+  });
+
+  // Ambil email dari server (prefill)
+  function prefillEmail(){
+    emailLoading(true);
+    $.ajax({ url: CHECK_EMAIL, type:'POST', dataType:'json' })
+      .done(function(res, text, xhr){
+        if (DEBUG_EMAIL_SAVE) console.log('[CHECK_EMAIL] success:', res);
+        if (res && res.ok && res.email){
+          $('#emailToInput').val(res.email);
+          $('#emailHint').show();
+        } else {
+          $('#emailToInput').val('');
+          $('#emailHint').hide();
+        }
+      })
+      .fail(function(xhr, text, err){
+        if (DEBUG_EMAIL_SAVE) console.warn('[CHECK_EMAIL] fail:', {status:xhr.status, text:xhr.responseText});
+        $('#emailToInput').val('');
+        $('#emailHint').hide();
+      })
+      .always(function(){
+        emailLoading(false);
+        validateEmailField();
+      });
+  }
+
+  // live validate
+  $(document).off('input.checkout keyup.checkout blur.checkout', '#emailToInput')
+             .on('input.checkout keyup.checkout blur.checkout', '#emailToInput', validateEmailField);
+
+  // helper submit akhir
+  function proceedSubmit(email){
+    $('#notifyEmail', $checkoutForm).val('1');
+    $('#emailToHidden', $checkoutForm).val(email);
+    $('#checkoutModal').modal('hide');
+    $checkoutForm.trigger('submit');
+  }
+
+  // Klik Checkout
+  $btnProceed.off('click.checkout').on('click.checkout', function(){
+    if ($btnProceed.is(':disabled')) return;
+
+    var choice = $('input[name="optEmail"]:checked').val();
+    var uid    = $.trim($('#user_id', $checkoutForm).val() || '');
+    var email  = $.trim($('#emailToInput').val() || '');
+
+    if (choice === 'no'){
+      $('#notifyEmail', $checkoutForm).val('0');
+      $('#emailToHidden', $checkoutForm).val('');
+      $('#checkoutModal').modal('hide');
+      $checkoutForm.trigger('submit');
+      return;
+    }
+
+    // wajib valid + online
+    if (!validateEmailField()) return;
+
+    emailLoading(true);
+    var jq = pingOnline();
+    if (!jq || typeof jq.done !== 'function'){
+      setProceedDisabled(true);
+      emailLoading(false);
+      return;
+    }
+
+    jq.done(function(){
+        if (DEBUG_EMAIL_SAVE) console.log('[PING] online before SAVE');
+
+        // === SELALU update email customer (tanpa cek sebelumnya) ===
+        var payload = { user_id: uid, email: email };
+        if (DEBUG_EMAIL_SAVE){
+          console.log('[SAVE_EMAIL] payload →', payload);
+          if (!uid) console.warn('[SAVE_EMAIL] WARNING: user_id kosong!');
+        }
+
+        $.ajax({
+          url: SAVE_EMAIL,
+          type: 'POST',
+          dataType: 'json',
+          data: payload
+        })
+        .done(function(res, text, xhr){
+          if (DEBUG_EMAIL_SAVE) console.log('[SAVE_EMAIL] success:', res, 'http', xhr.status);
+        })
+        .fail(function(xhr, text, err){
+          if (DEBUG_EMAIL_SAVE) console.error('[SAVE_EMAIL] fail:', {status:xhr.status, text:xhr.responseText, err:err});
+        })
+        .always(function(){
+          // === VERIFIKASI: ambil ulang email dari server utk memastikan tersimpan ===
+          if (DEBUG_EMAIL_SAVE) console.log('[VERIFY_EMAIL] fetching latest…');
+          $.ajax({ url: CHECK_EMAIL, type:'POST', dataType:'json' })
+            .done(function(check){
+              var match = !!(check && check.ok && (String(check.email||'').toLowerCase() === String(email).toLowerCase()));
+              if (DEBUG_EMAIL_SAVE){
+                console.log('[VERIFY_EMAIL] server:', check);
+                console.log('[VERIFY_EMAIL] match?', match, 'uid:', uid, 'email:', email);
+              }
+            })
+            .fail(function(xhr){
+              if (DEBUG_EMAIL_SAVE) console.warn('[VERIFY_EMAIL] fail:', xhr.status, xhr.responseText);
+            })
+            .always(function(){
+              // apapun hasil verifikasi, lanjut submit
+              proceedSubmit(email);
+              emailLoading(false);
+            });
+        });
+
+      })
+      .fail(function(){
+        if (DEBUG_EMAIL_SAVE) console.warn('[PING] offline saat Checkout');
+        setProceedDisabled(true);
+        emailLoading(false);
+      });
+  });
+})();
+
   // Semua siap → tampilkan halaman & tutup overlay
   reveal();
 }
 </script>
+
+
+
+

@@ -60,6 +60,7 @@ $route['transaction/select-customer/(:any)']         = 'TransactionController/se
 $route['transaction/new-customer']                   = 'TransactionController/newCustomer';
 $route['transaction/new-customer-process']           = 'TransactionController/newCustomerProcess';
 $route['transaction/customers']['GET'] = 'TransactionController/customers';
+$route['transaction/customer-info'] = 'TransactionController/customer_info';
 
 // === Simpan metadata print + generate & simpan PDF ===
 $route['transaction/savePrint/(:any)/(:num)']['POST'] = 'TransactionController/savePrint/$1/$2';
@@ -70,6 +71,15 @@ $route['transaction/savePrint/(:any)/(:num)']['GET']  = 'TransactionController/s
 $route['transaction/print-file/(:any)/(:num)']['GET'] = 'TransactionController/print_file/$1/$2';
 
 $route['diagnose/test-chrome'] = 'TransactionController/testChromePing';
+
+// ==================== TRANSACTION: EMAIL UTILITY ====================
+$route['transaction/check-email']['POST'] = 'TransactionController/check_email';
+// opsional fallback GET biar kalau diakses manual tidak 405
+$route['transaction/check-email']['GET']  = 'TransactionController/check_email';
+
+$route['transaction/save-email']['POST']  = 'TransactionController/save_email';
+// opsional GET
+$route['transaction/save-email']['GET']   = 'TransactionController/save_email';
 
 /* =============================== ARCHIVE =============================== */
 $route['archive']                = 'MasterController/archive';

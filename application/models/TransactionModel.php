@@ -548,4 +548,69 @@ if (!defined('BASEPATH'))
 		return ['total'=>$total, 'filtered'=>$filtered, 'rows'=>$outRows];
 	}
 
+	public function getEmailByUserId($idUser)
+	{
+		$this->db->select("c_email");
+		$this->db->from("tb_customer");
+		$this->db->where("c_u_id", $idUser);
+		$row = $this->db->get()->row();
+
+		return $row ? $row->c_email : null;
+	}
+
+	public function saveCustomerEmailById($customerId, $email)
+    {
+        return $this->db->where('c_id', (int)$customerId)
+                        ->update('tb_customer', ['c_email' => $email]);
+    }
+
+	public function getCustomerEmailById($c_id){
+	return $this->db->select('c_email')
+					->from('tb_customer')
+					->where('c_id', (int)$c_id)
+					->get()->row('c_email');
+	}
+
+	public function updateCustomerEmail($c_id, $email){
+	$this->db->where('c_id', (int)$c_id)
+			->update('tb_customer', ['c_email' => $email]);
+	return $this->db->affected_rows(); // 1 bila berubah, 0 bila sama/tidak ada
+	}
+
+	public function getBuyNoOrder($t_id)
+    {
+        return $this->db->select('t_no_order')
+                        ->from('tb_transaction')
+                        ->where('t_id', (int)$t_id)
+                        ->get()->row('t_no_order');
+    }
+
+    // (opsional) jika nanti ada tabel SELL berbeda, sesuaikan di sini
+    public function getSellNoOrder($t_id)
+    {
+        // contoh: return $this->db->select('s_no_order')->from('tb_sell')->where('s_id',(int)$t_id)->get()->row('s_no_order');
+        return null; // sementara kosong bila belum ada
+    }
+
+    /* ===== PRINT LOG ===== */
+    public function getPrintByTransaction($type, $t_id)
+    {
+        return $this->db->get_where('tb_transaction_prints', [
+            't_type' => strtolower($type),
+            't_id'   => (int)$t_id
+        ])->row();
+    }
+
+    public function insertPrintMeta(array $data)
+    {
+        $this->db->insert('tb_transaction_prints', $data);
+        return $this->db->insert_id();
+    }
+
+    public function updatePrintMeta($id, array $data)
+    {
+        return $this->db->where('id', (int)$id)
+                        ->update('tb_transaction_prints', $data);
+    }
+
 }

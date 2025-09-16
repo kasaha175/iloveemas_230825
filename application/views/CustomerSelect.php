@@ -140,12 +140,15 @@
 function init(){ (function ($) {
   'use strict';
 
-  // ====== CONFIG ======
-  var ENDPOINT = "<?= site_url('transaction/customers') ?>";
-  var baseUrl  = "<?= base_url() ?>";
-  var CSRF     = {
-    name: "<?= $this->security->get_csrf_token_name() ?>",
-    value:"<?= $this->security->get_csrf_hash() ?>",
+  var ENDPOINT   = "<?= site_url('transaction/customers') ?>";
+  var baseUrl    = "<?= base_url() ?>";
+  var UPDATE_URL = baseUrl + "transaction/updateLive";
+  // endpoint sederhana untuk verifikasi session (tambahkan di controller; contoh di bawah)
+  var WHOAMI_URL = baseUrl + "transaction/whoami";
+
+  var CSRF = {
+    name : "<?= $this->security->get_csrf_token_name() ?>",
+    value: "<?= $this->security->get_csrf_hash() ?>",
   };
 
   var $sel     = $('#u_name');
@@ -154,37 +157,32 @@ function init(){ (function ($) {
   var $overlay = $('#txOverlay');
   var $txt     = $('#txOverlayTxt');
 
-  // set CSRF untuk semua POST
+  var savedCustId = null;      // id yang sudah disimpan ke session
+  var saving      = false;     // guard agar tidak dobel klik
+
+  function showOverlay(msg){ if (msg) $txt.text(msg); $overlay.addClass('show'); }
+  function hideOverlay(){ $overlay.removeClass('show'); }
+
+  function setBtns(dis){
+    $sell.prop('disabled', dis);
+    $buy .prop('disabled', dis);
+  }
+
+  // sisipkan CSRF ke semua POST
   $.ajaxSetup({
-    beforeSend: function(xhr, settings){
-      if (settings.type && settings.type.toUpperCase() === 'POST') {
-        if (typeof settings.data === 'string') {
+    beforeSend: function(xhr, s){
+      if ((s.type||'').toUpperCase() === 'POST') {
+        if (typeof s.data === 'string') {
           var pair = encodeURIComponent(CSRF.name) + '=' + encodeURIComponent(CSRF.value);
-          settings.data = settings.data ? settings.data + '&' + pair : pair;
-        } else if ($.isPlainObject(settings.data)) {
-          settings.data[CSRF.name] = CSRF.value;
+          s.data = s.data ? (s.data + '&' + pair) : pair;
+        } else if ($.isPlainObject(s.data)) {
+          s.data[CSRF.name] = CSRF.value;
         }
       }
     }
   });
 
-  function showOverlay(msg){
-    if ($overlay && $overlay.length){
-      if ($txt && $txt.length && msg) { $txt.text(msg); }
-      $overlay.addClass('show');
-    }
-  }
-  function hideOverlay(){ $overlay && $overlay.removeClass('show'); }
-
-  function toggleActions(){
-    var has = !!$sel.val();
-    $sell.prop('disabled', !has);
-    $buy.prop('disabled', !has);
-  }
-
-  console.log('%c[BOOT] jQuery & Select2 siap', 'color:#16a34a');
-
-  // ====================== SELECT2 ==========================
+  // ========== SELECT2 ==========
   $sel.select2({
     width: '100%',
     placeholder: 'Please select customer...',
@@ -195,89 +193,100 @@ function init(){ (function ($) {
       url: ENDPOINT,
       dataType: 'json',
       delay: 250,
-      data: function (params) {
-        return { search: params.term || '', page: params.page || 1 };
-      },
+      data: function (params) { return { search: params.term || '', page: params.page || 1 }; },
       processResults: function (data, params) {
         params.page = params.page || 1;
-
-        // Normalisasi berbagai bentuk respons:
         var list = Array.isArray(data) ? data
                  : (data && Array.isArray(data.results)) ? data.results
                  : (data && Array.isArray(data.data)) ? data.data
                  : [];
-
-        var items = list.map(function (r) {
-          var id   = (r && (r.id != null))   ? r.id   : (r && r.c_id != null ? r.c_id : '');
-          var text = (r && (r.text != null)) ? r.text :
-                     [r.c_id, r.c_name, r.c_id_number].filter(Boolean).join(' - ');
-          return { id: String(id), text: String(text || '') };
+        var items = list.map(function(r){
+          var id   = (r && r.id!=null) ? r.id : (r && r.c_id!=null ? r.c_id : '');
+          var text = (r && r.text!=null) ? r.text : [r.c_id, r.c_name, r.c_id_number].filter(Boolean).join(' - ');
+          return { id:String(id), text:String(text||'') };
         });
-
-        return {
-          results: items,
-          pagination: { more: !!(data && data.pagination && data.pagination.more) }
-        };
+        return { results: items, pagination: { more: !!(data && data.pagination && data.pagination.more) } };
       },
       cache: true
     },
-    // biarkan teks tampil apa adanya
-    escapeMarkup: function (m) { return m; }
+    escapeMarkup: function(m){ return m; }
   });
 
-  // debug ketikan user (opsional)
-  $sel.on('select2:open', function(){
-    setTimeout(function(){
-      var $input = $('.select2-container--open .select2-search__field');
-      $input.off('input.__dbg').on('input.__dbg', function(){
-        // console.log('[S2] typing:', this.value);
-      });
-    }, 0);
-  });
-
-  // saat pilih/clear → simpan & toggle tombol
-  $sel.on('select2:select', function(e){
-    var id = e.params.data.id;
+  function savePick(id){
+    if (!id) return $.Deferred().reject('no-id').promise();
+    saving = true;
+    setBtns(true);
     showOverlay('Menyimpan pilihan…');
 
-    $.post(baseUrl + "transaction/updateLive", { id: id })
+    console.log('[updateLive] POST', {id:id});
+    return $.post(UPDATE_URL, { id:id })
       .done(function(resp){
-        try {
-          if (resp && typeof resp === 'object' && resp[CSRF.name]) {
-            CSRF.value = resp[CSRF.name];
-          }
-        } catch(_) {}
-        toggleActions();
+        console.log('[updateLive] RESP', resp);
+        // refresh CSRF bila dikirim balik
+        if (resp && typeof resp === 'object' && resp[CSRF.name]) {
+          CSRF.value = resp[CSRF.name];
+          console.log('[csrf] refreshed:', CSRF);
+        }
+        if (resp && resp.ok) {
+          savedCustId = String(id);
+        } else {
+          alert('Gagal menyimpan pilihan customer.\n' + (resp && resp.msg ? resp.msg : ''));
+          savedCustId = null;
+        }
       })
       .fail(function(xhr){
         console.warn('[updateLive] FAIL', xhr.status, xhr.responseText);
-        alert('Gagal menyimpan pilihan customer (' + xhr.status + ').');
+        alert('Gagal menyimpan pilihan customer ('+xhr.status+').');
+        savedCustId = null;
       })
-      .always(hideOverlay);
-  });
-
-  $sel.on('select2:clear', function(){
-    toggleActions();
-  });
-
-  // enable/disable awal
-  toggleActions();
-
-  // tombol
-  function mustPick(){
-    if (!$sel.val()) { alert('Please select customer!'); return true; }
-    return false;
+      .always(function(){
+        saving = false;
+        setBtns(!savedCustId);   // enable tombol hanya kalau sudah tersimpan
+        hideOverlay();
+      });
   }
-  $sell.on('click', function(e){
-    e.preventDefault();
-    if (mustPick()) return;
-    window.location.href = baseUrl + "transaction/sell";
+
+  // ketika dipilih → simpan ke session lebih dulu
+  $sel.on('select2:select', function(e){
+    var id = e.params.data.id;
+    savePick(id);
   });
-  $buy.on('click', function(e){
-    e.preventDefault();
-    if (mustPick()) return;
-    window.location.href = baseUrl + "transaction/buy";
+
+  // kosongkan pilihan → disable tombol
+  $sel.on('select2:clear', function(){
+    savedCustId = null; setBtns(true);
   });
+
+  // state awal
+  setBtns(true);
+
+  // pastikan session benar2 ter-set sebelum redirect
+  function ensureSessionThenGo(to){
+    if (saving) return;              // lagi proses, biarkan overlay
+    if (!savedCustId) { alert('Please select customer!'); return; }
+
+    showOverlay('Memverifikasi sesi…');
+    $.getJSON(WHOAMI_URL)
+      .done(function(r){
+        console.log('[whoami] RESP', r);
+        if (r && String(r.idCustomer||'') === String(savedCustId)) {
+          // OK → lanjut. (opsional: bawa cid untuk jaga2)
+          window.location.href = to + (to.indexOf('?')>-1?'&':'?') + 'cid=' + encodeURIComponent(savedCustId);
+        } else {
+          // belum nyantol? coba simpan ulang lalu lanjut
+          savePick(savedCustId).always(function(){
+            window.location.href = to + (to.indexOf('?')>-1?'&':'?') + 'cid=' + encodeURIComponent(savedCustId);
+          });
+        }
+      })
+      .fail(function(){ 
+        // server whoami tidak tersedia → tetap lanjut (karena updateLive sudah OK)
+        window.location.href = to + (to.indexOf('?')>-1?'&':'?') + 'cid=' + encodeURIComponent(savedCustId);
+      });
+  }
+
+  $('#sell').on('click', function(e){ e.preventDefault(); ensureSessionThenGo(baseUrl + 'transaction/sell'); });
+  $('#buy').on('click',  function(e){ e.preventDefault(); ensureSessionThenGo(baseUrl + 'transaction/buy');  });
 
 })(jQuery); }
 </script>

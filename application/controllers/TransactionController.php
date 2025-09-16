@@ -595,22 +595,29 @@ class TransactionController extends CI_Controller
 
 	public function buy()
 	{
-		$authUser = $this->session->userdata("authUser");
-		$idUser   = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION BUY";
+		if ($this->session->userdata('authUser') !== true) return redirect('login');
 
-		if ($authUser === true) {
-			// ARRAY asosiatif
-			$this->data['userData'] = $this->UserModel->userDataById($idUser)->row_array();
+		// Fallback: kalau ada ?cid=… set juga ke session
+		$cidGet = (int) $this->input->get('cid');
+		if ($cidGet > 0) { $this->session->set_userdata('idCustomer', $cidGet); }
 
-			// customer tetap object (nggak masalah untuk Buy view yg sudah di-normalisasi)
-			$this->data['customer'] = $this->MasterModel->getCustomerById($idUser)->row();
+		$cid = (int) $this->session->userdata('idCustomer');
 
-			$this->data['content'] = $this->load->view('Buy', $this->data, true);
-			$this->load->view("UserTemplate", $this->data);
-		} else {
-			redirect(base_url());
+		// DEBUG log biar kelihatan nilai real di server
+		@log_message('error', '[BUY] cid_get='.$cidGet.' | idCustomer_session='.$cid.' | sid='.session_id());
+
+		if ($cid <= 0) {
+			$this->session->set_flashdata('error', 'Customer belum dipilih.');
+			return redirect('transaction'); // balik ke halaman pilih customer
 		}
+
+		// siapkan data buat view
+		$this->data['customer_id']  = $cid;
+		$this->data['nameCustomer'] = (string) $this->MasterModel->customerDatas($cid)->row('c_name');
+		$this->data['title']        = 'TRANSACTION BUY';
+
+		$this->data['content'] = $this->load->view('Buy', $this->data, true);
+		$this->load->view('UserTemplate', $this->data);
 	}
 
 	function newCustomer(){
@@ -774,70 +781,138 @@ class TransactionController extends CI_Controller
 
 	public function updateLive()
 	{
-		// Wajib POST + CSRF valid
-		if (strtoupper($this->input->method()) !== 'POST') {
+		// Wajib POST
+		if ($this->input->method(TRUE) !== 'POST') {
 			return $this->output->set_status_header(405)
 				->set_content_type('application/json','utf-8')
 				->set_output(json_encode(['ok'=>false,'msg'=>'Method Not Allowed']));
 		}
 
-		$id = trim((string)$this->input->post('id', true));
-		if ($id === '') {
+		// Ambil & validasi id
+		$idRaw = $this->input->post('id', true);
+		$id    = is_numeric($idRaw) ? (int)$idRaw : 0;
+		if ($id <= 0) {
 			return $this->output->set_status_header(400)
 				->set_content_type('application/json','utf-8')
 				->set_output(json_encode([
-					'ok'=>false,
-					'msg'=>'Missing id',
-					$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
+					'ok'  => false,
+					'msg' => 'Missing/invalid id',
+					$this->security->get_csrf_token_name() => $this->config->item('csrf_protection')
+						? $this->security->get_csrf_hash()
+						: null,
 				]));
 		}
 
-		// jangan di-explode; id kita sudah numeric murni dari Select2
+		// Bersihkan state transaksi lama
 		$this->session->unset_userdata('idTransaction');
-		$this->session->set_userdata(['idCustomer' => $id]);
-		$this->cart->destroy();
+		// Hapus cart lebih dulu agar tidak mengganggu write session berikutnya
+		if (isset($this->cart)) {
+			$this->cart->destroy();
+		}
 
-		// kirim balik status + token baru
+		// Set session customer yang dipilih
+		$this->session->set_userdata('idCustomer', $id);
+
+		// (opsional) log ringkas untuk debug
+		log_message('info', sprintf('[updateLive] id=%s, sess.idCustomer=%s, ip=%s',
+			$id,
+			(string)$this->session->userdata('idCustomer'),
+			$this->input->ip_address()
+		));
+
+		// Siapkan payload balasan
+		$resp = [
+			'ok'           => true,
+			'idCustomer'   => $id,
+			// kirim balik echo dari session untuk verifikasi cepat di console/network
+			'sessionEcho'  => (string)$this->session->userdata('idCustomer'),
+		];
+		// Token baru hanya bila CSRF aktif
+		$resp[$this->security->get_csrf_token_name()] = $this->config->item('csrf_protection')
+			? $this->security->get_csrf_hash()
+			: null;
+
 		return $this->output->set_content_type('application/json','utf-8')
-			->set_output(json_encode([
-				'ok' => true,
-				'idCustomer' => $id,
-				$this->security->get_csrf_token_name() => $this->security->get_csrf_hash()
-			]));
+			->set_output(json_encode($resp));
 	}
 
-	function buyCart()
+	// function buyCart()
+	// {
+	// 	$authUser = $this->session->userdata("authUser");
+	// 	$idUser = $this->session->userdata("idUser");
+	// 	$this->data["title"] = "TRANSACTION BUY";
+	// 	if ($authUser == true) {
+    //         $idMaterial = $this->uri->segment(3);
+	// 		$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial,'Buy')->row("m_name");
+    //         // echo "<pre>";
+    //         // print_r ($materialName);
+    //         // echo "</pre>";
+	// 		if (!empty($materialName)) {
+	// 			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+	// 			$idCustomer = $this->session->userdata("idCustomer");
+	// 			if(empty($idCustomer)){
+	// 				$idCustomer = 7;
+	// 			}
+	// 			$this->data['nameCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
+	// 			$this->data['materianName'] = $materialName;
+	// 			$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
+	// 			$this->data['carat'] = $this->MaterialModel->caratData($idMaterial)->result();
+	// 			$this->data['potongan'] = $this->MaterialModel->potonganData($idMaterial)->result();
+	// 			$this->data['content'] = $this->load->view('BuyCart', $this->data, true);
+	// 			$this->load->view("UserTemplate", $this->data);
+	// 		}
+	// 		else {
+	// 			redirect(base_url() . "transaction/buy/");
+	// 		}
+	// 	}
+	// 	else {
+	// 		redirect(base_url());
+	// 	}
+	// }
+
+	public function buyCart()
 	{
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION BUY";
-		if ($authUser == true) {
-            $idMaterial = $this->uri->segment(3);
-			$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial,'Buy')->row("m_name");
-            // echo "<pre>";
-            // print_r ($materialName);
-            // echo "</pre>";
-			if (!empty($materialName)) {
-				$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-				$idCustomer = $this->session->userdata("idCustomer");
-				if(empty($idCustomer)){
-					$idCustomer = 7;
-				}
-				$this->data['nameCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
-				$this->data['materianName'] = $materialName;
-				$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
-				$this->data['carat'] = $this->MaterialModel->caratData($idMaterial)->result();
-				$this->data['potongan'] = $this->MaterialModel->potonganData($idMaterial)->result();
-				$this->data['content'] = $this->load->view('BuyCart', $this->data, true);
-				$this->load->view("UserTemplate", $this->data);
-			}
-			else {
-				redirect(base_url() . "transaction/buy/");
-			}
-		}
-		else {
+		// pastikan yang login (admin/staff)
+		$authUser = $this->session->userdata('authUser');
+		if (!$authUser) {
 			redirect(base_url());
+			return;
 		}
+
+		$this->data['title'] = 'TRANSACTION BUY';
+
+		// id material dari URL
+		$idMaterial = (int) $this->uri->segment(3);
+		$material   = $this->MaterialModel->materialDataBy('m_id', $idMaterial, 'Buy')->row();
+
+		if (!$material) {
+			redirect(base_url('transaction/buy'));
+			return;
+		}
+
+		// IMPORTANT: di app ini idUser = ID CUSTOMER
+		$customerId = (int) $this->session->userdata('idUser');
+		if (empty($customerId)) {
+			$customerId = 7; // fallback sesuai implementasi lama
+		}
+
+		// siapkan data untuk view
+		$this->data['customer_id']  = $customerId;          // dipakai hidden input di BuyCart
+		$this->data['userId']       = $customerId;          // kompatibel dgn kode view lama
+		$this->data['nameCustomer'] = $this->MasterModel->customerDatas($customerId)->row('c_name') ?? '-';
+
+		$this->data['materianName'] = $material->m_name;
+		$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
+		$this->data['carat']        = $this->MaterialModel->caratData($idMaterial)->result();
+		$this->data['potongan']     = $this->MaterialModel->potonganData($idMaterial)->result();
+
+		// (opsional) kalau memang UserTemplate butuh info admin/staff:
+		// $this->data['adminUser'] = $authUser;
+		// atau jika perlu detail dari DB admin:
+		// $this->data['adminData'] = $this->UserModel->userDataById($authUser['id'])->row();
+
+		$this->data['content'] = $this->load->view('BuyCart', $this->data, true);
+		$this->load->view('UserTemplate', $this->data);
 	}
 	
 	public function buyAddToCart()
@@ -1268,20 +1343,46 @@ class TransactionController extends CI_Controller
 
 	public function sell()
 	{
-		$authUser = $this->session->userdata("authUser");
-		$idUser   = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION SELL";
-
-		if ($authUser == true) {
-			$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-			$this->data['data']     = $this->MaterialModel->materialData('Sell')->result();
-
-			// muat view utama ke dalam template
-			$this->data['content'] = $this->load->view('Sell', $this->data, true); // <-- pakai 'Sell'
-			$this->load->view("UserTemplate", $this->data);
-		} else {
-			redirect(base_url());
+		// wajib login
+		if ($this->session->userdata('authUser') !== true) {
+			return redirect(base_url());
 		}
+
+		$idUser = (int)$this->session->userdata('idUser');
+
+		$this->load->model('UserModel');
+		$this->load->model('MasterModel');    // untuk data customer
+		$this->load->model('MaterialModel');  // MODEL yang kamu kirim
+
+		// ===== header/template data
+		$this->data['title']    = 'TRANSACTION SELL';
+		$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+
+		// ===== customer aktif (untuk chip info di hero)
+		$cidSession = (int) $this->session->userdata('idCustomer');
+		$cidQuery   = (int) $this->input->get('cid');
+		$cid        = $cidSession ?: $cidQuery;
+
+		if ($cid > 0) {
+			// row_array supaya mudah dipakai di view
+			$this->data['customer'] = $this->MasterModel->customerDatas($cid)->row_array();
+		}
+
+		// ===== AMBIL MATERIAL UNTUK SELL
+		// sesuai MaterialModel::materialData($type) -> WHERE m_type LIKE '%$type%'
+		$materials = $this->MaterialModel->materialData('Sell')->result();
+
+		// simpan ke variabel yang dipakai view Sell (view kita iterasi $data)
+		$this->data['data'] = $materials;
+
+		// (opsional) log untuk debug bila kosong
+		if (empty($materials)) {
+			log_message('error', '[SELL] materialData("Sell") mengembalikan 0 baris.');
+		}
+
+		// ===== render
+		$this->data['content'] = $this->load->view('Sell', $this->data, true);
+		return $this->load->view('UserTemplate', $this->data);
 	}
 
 	function sellCart()
@@ -1845,169 +1946,309 @@ public function getCustomers()
 		exit;
 	}
 
-	public function savePrint($type='buy', $id=0)
+	// public function savePrint($type='buy', $id=0)
+	// {
+	// 	// ===== Auth & method =====
+	// 	if ($this->session->userdata('authUser') !== true) {
+	// 		return $this->output->set_status_header(401)->set_output('Unauthorized');
+	// 	}
+	// 	if (strtoupper($this->input->method()) !== 'POST') {
+	// 		return $this->output->set_status_header(405)->set_output('Method Not Allowed');
+	// 	}
+
+	// 	// ===== Validasi type =====
+	// 	$type = strtolower((string)$type);
+	// 	if (!in_array($type, ['buy','sell'], true)) {
+	// 		return $this->output->set_status_header(400)->set_output('Bad Request');
+	// 	}
+	// 	$id = (int)$id;
+
+	// 	// ===== Ambil header transaksi =====
+	// 	$tTable = ($type === 'sell') ? 'tb_transaction_sell' : 'tb_transaction';
+	// 	$row    = $this->db->where('t_id', $id)->get($tTable)->row();
+	// 	if (!$row) {
+	// 		return $this->output->set_status_header(404)->set_output('Transaction not found');
+	// 	}
+
+	// 	// ===== Payload dari view =====
+	// 	$cabang      = $this->input->post('cabang');                  // array of {id,label}
+	// 	$payments    = $this->input->post('payments');                // array
+	// 	$paper       = strtoupper($this->input->post('paper') ?: 'A4');
+	// 	$orientation = strtolower($this->input->post('orientation') ?: 'portrait');
+	// 	$rawHtml     = (string)$this->input->post('rawHtml', false);  // HTML mentah (tanpa filtering)
+
+	// 	if ($rawHtml === '') {
+	// 		return $this->output->set_status_header(422)
+	// 			->set_content_type('application/json','utf-8')
+	// 			->set_output(json_encode(['ok'=>false,'msg'=>'rawHtml missing']));
+	// 	}
+
+	// 	// ===== Normalisasi cabang & payments =====
+	// 	$branches  = [];
+	// 	$branchIds = [];
+	// 	if (is_array($cabang)) {
+	// 		foreach ($cabang as $r) {
+	// 			$bid   = (int)($r['id'] ?? 0);
+	// 			$label = (string)($r['label'] ?? '');
+	// 			if ($bid > 0) {
+	// 				$branches[]  = ['id'=>$bid, 'label'=>$label];
+	// 				$branchIds[] = $bid;
+	// 			}
+	// 		}
+	// 	}
+	// 	$payments = is_array($payments) ? array_values(array_unique(array_map('strtoupper', $payments))) : [];
+
+	// 	// ===== Tandai checkbox di HTML (1:1 di PDF) =====
+	// 	$htmlFinal = $this->_applyChecksToHtml($rawHtml, $branchIds, $payments);
+
+	// 	// ===== Dapatkan no_order & tanggal Transaksi =====
+	// 	$noOrder = null;
+	// 	foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no','no_invoice'] as $c) {
+	// 		if (!empty($row->{$c})) { $noOrder = (string)$row->{$c}; break; }
+	// 	}
+	// 	if (!$noOrder) { $noOrder = strtoupper($type).'-'.$id; } // fallback aman
+
+	// 	$tDate = null;
+	// 	foreach (['t_date_created','date_created','created_at','t_date'] as $c) {
+	// 		if (!empty($row->{$c})) { $tDate = (string)$row->{$c}; break; }
+	// 	}
+	// 	if (!$tDate) { $tDate = date('Y-m-d'); }
+
+	// 	// ===== Build direktori penyimpanan (RELATIVE & ABSOLUTE) =====
+	// 	$tahun   = date('Y', strtotime($tDate));
+	// 	$bulan   = date('m', strtotime($tDate));
+	// 	$relDir  = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
+	// 	$absDir  = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
+
+	// 	// Pastikan folder ada
+	// 	if (!is_dir($absDir) && !@mkdir($absDir, 0775, true)) {
+	// 		return $this->output->set_status_header(500)
+	// 			->set_content_type('application/json','utf-8')
+	// 			->set_output(json_encode(['ok'=>false,'msg'=>'Tidak bisa membuat folder penyimpanan PDF.']));
+	// 	}
+
+	// 	// ===== Hapus SEMUA file lama transaksi ini (NOORDER-*.pdf) =====
+	// 	// Jika ada file yang tidak bisa dihapus (locked), hentikan dengan 423
+	// 	$pattern  = $absDir . $noOrder . '-*.pdf';
+	// 	$oldFiles = glob($pattern) ?: [];
+	// 	foreach ($oldFiles as $old) {
+	// 		if (@is_file($old) && !@unlink($old)) {
+	// 			return $this->output->set_status_header(423) // Locked
+	// 				->set_content_type('application/json','utf-8')
+	// 				->set_output(json_encode([
+	// 					'ok'  => false,
+	// 					'msg' => 'File PDF lama sedang dibuka. Tutup halaman PDF terlebih dahulu, lalu ulangi.'
+	// 				]));
+	// 		}
+	// 	}
+
+	// 	// ===== Nama file BARU: {NOORDER}-{YYYYMMDD-HHMMSS}.pdf =====
+	// 	$stamp    = date('Ymd-His');
+	// 	$fileName = $noOrder . '-' . $stamp . '.pdf';
+	// 	$relPath  = str_replace('\\','/', $relDir . $fileName); // simpan RELATIVE
+	// 	$absPath  = $absDir . $fileName;
+
+	// 	// ===== Generate PDF: tulis ke temp lalu rename (atomic-ish) =====
+	// 	try {
+	// 		$tmpPath = $absPath . '.part';
+
+	// 		// Chrome-only generator
+	// 		$this->_generatePdf($htmlFinal, $tmpPath, $paper, $orientation);
+
+	// 		// rename -> final
+	// 		if (!@rename($tmpPath, $absPath)) {
+	// 			@unlink($tmpPath);
+	// 			return $this->output->set_status_header(500)
+	// 				->set_content_type('application/json','utf-8')
+	// 				->set_output(json_encode(['ok'=>false,'msg'=>'Gagal menyimpan PDF akhir.']));
+	// 		}
+	// 	} catch (\Throwable $e) {
+	// 		return $this->output->set_status_header(500)
+	// 			->set_content_type('application/json','utf-8')
+	// 			->set_output(json_encode(['ok'=>false,'msg'=>'PDF gagal dibuat: '.$e->getMessage()]));
+	// 	}
+
+	// 	// ===== Simpan/Update jejak ke DB — 1 baris per transaksi =====
+	// 	$this->db->trans_start();
+
+	// 	$payloadDb = [
+	// 		't_type'        => strtoupper($type),
+	// 		't_id'          => (int)$id,
+	// 		'no_order'      => $noOrder,
+	// 		'paper'         => $paper,
+	// 		'orientation'   => $orientation,
+	// 		'branches_json' => json_encode($branches, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+	// 		'payments_json' => json_encode($payments, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+	// 		'html_raw'      => $rawHtml,
+	// 		'html_final'    => $htmlFinal,
+	// 		'pdf_path'      => $relPath, // RELATIVE (aktif terbaru)
+	// 		'updated_at'    => date('Y-m-d H:i:s'),
+	// 		'updated_by'    => (int)$this->session->userdata('idUser'),
+	// 	];
+
+	// 	// Upsert manual: coba update; jika tidak ada baris, insert
+	// 	$this->db->where(['t_type'=>strtoupper($type), 't_id'=>$id])->update('tb_transaction_prints', $payloadDb);
+	// 	if ($this->db->affected_rows() === 0) {
+	// 		$payloadDb['created_at'] = $payloadDb['updated_at'];
+	// 		$payloadDb['created_by'] = $payloadDb['updated_by'];
+	// 		$this->db->insert('tb_transaction_prints', $payloadDb);
+	// 	}
+
+	// 	$this->db->trans_complete();
+	// 	if (!$this->db->trans_status()) {
+	// 		return $this->output->set_status_header(500)
+	// 			->set_content_type('application/json','utf-8')
+	// 			->set_output(json_encode(['ok'=>false,'msg'=>'DB error saat menyimpan metadata PDF.']));
+	// 	}
+
+	// 	// ===== Response =====
+	// 	return $this->output->set_content_type('application/json','utf-8')
+	// 		->set_output(json_encode([
+	// 			'ok'       => true,
+	// 			'download' => base_url('transaction/print-file/'.$type.'/'.$id),
+	// 			'path'     => $relPath, // contoh: uploads/prints/buy/2025/09/NO123-20250909-183012.pdf
+	// 			'note'     => 'PDF berhasil dibuat. 1 transaksi 1 file aktif; nama file memakai timestamp.'
+	// 		], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+	// }
+
+	public function savePrint($type = 'buy', $t_id = 0)
+{
+    if (!$this->input->is_ajax_request()) { show_error('Invalid request', 400); }
+
+    $this->output->set_content_type('application/json');
+    $csrf_name = $this->security->get_csrf_token_name();
+    $csrf_hash = $this->security->get_csrf_hash();
+
+    $type = strtolower(trim($type));
+    $t_id = (int)$t_id;
+
+    $this->load->model('TransactionModel');
+
+    // Ambil no_order sesuai jenis
+    if ($type === 'buy') {
+        $no_order = $this->TransactionModel->getBuyNoOrder($t_id);
+    } else {
+        $no_order = $this->TransactionModel->getSellNoOrder($t_id);
+    }
+    if (!$no_order) {
+        echo json_encode(['ok'=>false,'msg'=>'No. order tidak ditemukan', $csrf_name=>$csrf_hash]);
+        return;
+    }
+
+    $paper       = $this->input->post('paper', true) ?: 'A4';
+    $orientation = $this->input->post('orientation', true) ?: 'portrait';
+    $rawHtml     = $this->input->post('rawHtml');            // jangan xss_clean agar HTML utuh
+    $branches    = $this->input->post('cabang');
+    $payments    = $this->input->post('payments');
+
+    $now     = date('Y-m-d H:i:s');
+    $user_id = (int)$this->session->userdata('authUserId'); // sesuaikan nama session admin
+    $exists  = $this->TransactionModel->getPrintByTransaction($type, $t_id);
+
+    $data = [
+        't_type'        => $type,
+        't_id'          => $t_id,
+        'no_order'      => $no_order,
+        'paper'         => $paper,
+        'orientation'   => $orientation,
+        'branches_json' => json_encode($branches ?: []),
+        'payments_json' => json_encode($payments ?: []),
+        'html_raw'      => $rawHtml ?: '',
+        'updated_by'    => $user_id ?: 0,
+        'updated_at'    => $now,
+    ];
+
+    if ($exists) {
+        $this->TransactionModel->updatePrintMeta((int)$exists->id, $data);
+        $id_print = (int)$exists->id;
+    } else {
+        $data['created_by'] = $user_id ?: 0;
+        $data['created_at'] = $now;
+        $id_print = (int)$this->TransactionModel->insertPrintMeta($data);
+    }
+
+    // ==== Simpan berkas ====
+    $uploadsBase = rtrim(FCPATH, '/\\').DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'prints'.DIRECTORY_SEPARATOR;
+    if (!is_dir($uploadsBase)) { @mkdir($uploadsBase, 0775, true); }
+
+    // Nama file dasar
+    $slugNo = preg_replace('/[^A-Za-z0-9\-]/', '-', $no_order);
+    $baseName = strtolower($type).'-'.$slugNo.'-'.time();
+
+    $pdfPathRel  = ''; // relative path disimpan ke DB
+    try {
+        // === Jika DOMPDF ada, render PDF: ===
+        // $this->load->library('dompdf_gen');
+        // $this->dompdf->load_html($rawHtml);
+        // $this->dompdf->set_paper($paper, $orientation);
+        // $this->dompdf->render();
+        // $pdfFull = $uploadsBase.$baseName.'.pdf';
+        // file_put_contents($pdfFull, $this->dompdf->output());
+        // $pdfPathRel = 'uploads/prints/'.$baseName.'.pdf';
+
+        // === Fallback: simpan HTML (agar print_file bisa tampilkan) ===
+        $htmlFull = $uploadsBase.$baseName.'.html';
+        file_put_contents($htmlFull, $rawHtml ?: '');
+        $pdfPathRel = 'uploads/prints/'.$baseName.'.html'; // simpan sbg "pdf_path" tapi tipe html (akan ditangani di print_file)
+
+        // Update path
+        $this->TransactionModel->updatePrintMeta($id_print, ['pdf_path' => $pdfPathRel]);
+    } catch (\Throwable $e) {
+        log_message('error', 'savePrint: gagal simpan file: '.$e->getMessage());
+    }
+
+    echo json_encode([
+        'ok'        => true,
+        'id'        => $id_print,
+        'no_order'  => $no_order,
+        'pdf_path'  => $pdfPathRel,
+        $csrf_name  => $this->security->get_csrf_hash(),
+    ]);
+}
+
+	private function _ping_health(): bool
 	{
-		// ===== Auth & method =====
-		if ($this->session->userdata('authUser') !== true) {
-			return $this->output->set_status_header(401)->set_output('Unauthorized');
-		}
-		if (strtoupper($this->input->method()) !== 'POST') {
-			return $this->output->set_status_header(405)->set_output('Method Not Allowed');
-		}
+		// paling sederhana: curl ke /health/ping
+		$ch = curl_init();
+		curl_setopt_array($ch, [
+			CURLOPT_URL            => site_url('health/ping'),
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_TIMEOUT        => 2,
+		]);
+		curl_exec($ch);
+		$ok = curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200;
+		curl_close($ch);
+		return $ok;
+	}
 
-		// ===== Validasi type =====
-		$type = strtolower((string)$type);
-		if (!in_array($type, ['buy','sell'], true)) {
-			return $this->output->set_status_header(400)->set_output('Bad Request');
-		}
-		$id = (int)$id;
+	/** util: kirim email invoice + attachment */
+	private function _send_invoice_email(string $to, string $pdfPath, string $jenis, string $noOrder): bool
+	{
+		$this->load->library('email'); // pakai konfigurasi SMTP kamu (ConfigController/save_smtp)
 
-		// ===== Ambil header transaksi =====
-		$tTable = ($type === 'sell') ? 'tb_transaction_sell' : 'tb_transaction';
-		$row    = $this->db->where('t_id', $id)->get($tTable)->row();
-		if (!$row) {
-			return $this->output->set_status_header(404)->set_output('Transaction not found');
-		}
+		$fromAddr = $this->config->item('smtp_from') ?? 'no-reply@yourdomain.tld';
+		$fromName = $this->config->item('smtp_from_name') ?? 'I Love Emas';
 
-		// ===== Payload dari view =====
-		$cabang      = $this->input->post('cabang');                  // array of {id,label}
-		$payments    = $this->input->post('payments');                // array
-		$paper       = strtoupper($this->input->post('paper') ?: 'A4');
-		$orientation = strtolower($this->input->post('orientation') ?: 'portrait');
-		$rawHtml     = (string)$this->input->post('rawHtml', false);  // HTML mentah (tanpa filtering)
-
-		if ($rawHtml === '') {
-			return $this->output->set_status_header(422)
-				->set_content_type('application/json','utf-8')
-				->set_output(json_encode(['ok'=>false,'msg'=>'rawHtml missing']));
+		$this->email->from($fromAddr, $fromName);
+		$this->email->to($to);
+		$this->email->subject("Invoice {$jenis} #{$noOrder}");
+		$this->email->message("Halo,\n\nTerlampir invoice {$jenis} #{$noOrder}.\n\nTerima kasih.");
+		if (is_file($pdfPath)) {
+			$this->email->attach($pdfPath);
 		}
 
-		// ===== Normalisasi cabang & payments =====
-		$branches  = [];
-		$branchIds = [];
-		if (is_array($cabang)) {
-			foreach ($cabang as $r) {
-				$bid   = (int)($r['id'] ?? 0);
-				$label = (string)($r['label'] ?? '');
-				if ($bid > 0) {
-					$branches[]  = ['id'=>$bid, 'label'=>$label];
-					$branchIds[] = $bid;
-				}
-			}
+		$sent = $this->email->send(false);
+		if (!$sent) {
+			log_message('error', 'Invoice mail failed: ' . $this->email->print_debugger(['headers']));
 		}
-		$payments = is_array($payments) ? array_values(array_unique(array_map('strtoupper', $payments))) : [];
+		return $sent ? true : false;
+	}
 
-		// ===== Tandai checkbox di HTML (1:1 di PDF) =====
-		$htmlFinal = $this->_applyChecksToHtml($rawHtml, $branchIds, $payments);
-
-		// ===== Dapatkan no_order & tanggal Transaksi =====
-		$noOrder = null;
-		foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no','no_invoice'] as $c) {
-			if (!empty($row->{$c})) { $noOrder = (string)$row->{$c}; break; }
-		}
-		if (!$noOrder) { $noOrder = strtoupper($type).'-'.$id; } // fallback aman
-
-		$tDate = null;
-		foreach (['t_date_created','date_created','created_at','t_date'] as $c) {
-			if (!empty($row->{$c})) { $tDate = (string)$row->{$c}; break; }
-		}
-		if (!$tDate) { $tDate = date('Y-m-d'); }
-
-		// ===== Build direktori penyimpanan (RELATIVE & ABSOLUTE) =====
-		$tahun   = date('Y', strtotime($tDate));
-		$bulan   = date('m', strtotime($tDate));
-		$relDir  = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
-		$absDir  = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
-
-		// Pastikan folder ada
-		if (!is_dir($absDir) && !@mkdir($absDir, 0775, true)) {
-			return $this->output->set_status_header(500)
-				->set_content_type('application/json','utf-8')
-				->set_output(json_encode(['ok'=>false,'msg'=>'Tidak bisa membuat folder penyimpanan PDF.']));
-		}
-
-		// ===== Hapus SEMUA file lama transaksi ini (NOORDER-*.pdf) =====
-		// Jika ada file yang tidak bisa dihapus (locked), hentikan dengan 423
-		$pattern  = $absDir . $noOrder . '-*.pdf';
-		$oldFiles = glob($pattern) ?: [];
-		foreach ($oldFiles as $old) {
-			if (@is_file($old) && !@unlink($old)) {
-				return $this->output->set_status_header(423) // Locked
-					->set_content_type('application/json','utf-8')
-					->set_output(json_encode([
-						'ok'  => false,
-						'msg' => 'File PDF lama sedang dibuka. Tutup halaman PDF terlebih dahulu, lalu ulangi.'
-					]));
-			}
-		}
-
-		// ===== Nama file BARU: {NOORDER}-{YYYYMMDD-HHMMSS}.pdf =====
-		$stamp    = date('Ymd-His');
-		$fileName = $noOrder . '-' . $stamp . '.pdf';
-		$relPath  = str_replace('\\','/', $relDir . $fileName); // simpan RELATIVE
-		$absPath  = $absDir . $fileName;
-
-		// ===== Generate PDF: tulis ke temp lalu rename (atomic-ish) =====
-		try {
-			$tmpPath = $absPath . '.part';
-
-			// Chrome-only generator
-			$this->_generatePdf($htmlFinal, $tmpPath, $paper, $orientation);
-
-			// rename -> final
-			if (!@rename($tmpPath, $absPath)) {
-				@unlink($tmpPath);
-				return $this->output->set_status_header(500)
-					->set_content_type('application/json','utf-8')
-					->set_output(json_encode(['ok'=>false,'msg'=>'Gagal menyimpan PDF akhir.']));
-			}
-		} catch (\Throwable $e) {
-			return $this->output->set_status_header(500)
-				->set_content_type('application/json','utf-8')
-				->set_output(json_encode(['ok'=>false,'msg'=>'PDF gagal dibuat: '.$e->getMessage()]));
-		}
-
-		// ===== Simpan/Update jejak ke DB — 1 baris per transaksi =====
-		$this->db->trans_start();
-
-		$payloadDb = [
-			't_type'        => strtoupper($type),
-			't_id'          => (int)$id,
-			'no_order'      => $noOrder,
-			'paper'         => $paper,
-			'orientation'   => $orientation,
-			'branches_json' => json_encode($branches, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-			'payments_json' => json_encode($payments, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-			'html_raw'      => $rawHtml,
-			'html_final'    => $htmlFinal,
-			'pdf_path'      => $relPath, // RELATIVE (aktif terbaru)
-			'updated_at'    => date('Y-m-d H:i:s'),
-			'updated_by'    => (int)$this->session->userdata('idUser'),
-		];
-
-		// Upsert manual: coba update; jika tidak ada baris, insert
-		$this->db->where(['t_type'=>strtoupper($type), 't_id'=>$id])->update('tb_transaction_prints', $payloadDb);
-		if ($this->db->affected_rows() === 0) {
-			$payloadDb['created_at'] = $payloadDb['updated_at'];
-			$payloadDb['created_by'] = $payloadDb['updated_by'];
-			$this->db->insert('tb_transaction_prints', $payloadDb);
-		}
-
-		$this->db->trans_complete();
-		if (!$this->db->trans_status()) {
-			return $this->output->set_status_header(500)
-				->set_content_type('application/json','utf-8')
-				->set_output(json_encode(['ok'=>false,'msg'=>'DB error saat menyimpan metadata PDF.']));
-		}
-
-		// ===== Response =====
-		return $this->output->set_content_type('application/json','utf-8')
-			->set_output(json_encode([
-				'ok'       => true,
-				'download' => base_url('transaction/print-file/'.$type.'/'.$id),
-				'path'     => $relPath, // contoh: uploads/prints/buy/2025/09/NO123-20250909-183012.pdf
-				'note'     => 'PDF berhasil dibuat. 1 transaksi 1 file aktif; nama file memakai timestamp.'
-			], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+/** util: kirim JSON standar */
+	private function _json_ok(array $data)
+	{
+		$this->output->set_content_type('application/json')
+					->set_output(json_encode($data));
 	}
 
 	public function print_file($type = 'buy', $id = 0)
@@ -2224,5 +2465,63 @@ public function getCustomers()
 				'results' => $results,
 				'pagination' => ['more' => ($count > $offset + $limit)]
 			]));
+	}
+
+	public function check_email(){
+		// ambil dari session, boleh override dengan POST user_id kalau ada (tetap diverifikasi)
+		$idCustomer = $this->input->post('user_id', true);
+		if (!$idCustomer) { $idCustomer = $this->session->userdata('idUser'); }
+
+		if (!$idCustomer){
+			$this->output->set_status_header(400);
+			echo json_encode(["ok"=>false, "msg"=>"idUser (customer) kosong"]);
+			return;
+		}
+
+		$this->load->model('TransactionModel');
+		$email = $this->TransactionModel->getCustomerEmailById($idCustomer);
+
+		echo json_encode($email
+			? ["ok"=>true,  "email"=>$email, "id_used"=>(int)$idCustomer]
+			: ["ok"=>false, "msg"=>"Email tidak ditemukan", "id_used"=>(int)$idCustomer]
+		);
+	}
+
+	public function save_email(){
+		// session-first
+		$idCustomer = $this->input->post('user_id', true);
+		if (!$idCustomer) { $idCustomer = $this->session->userdata('idUser'); }
+
+		$email = trim((string)$this->input->post('email', true));
+
+		if (!$idCustomer || $email===''){
+			$this->output->set_status_header(400);
+			echo json_encode(["ok"=>false, "msg"=>"Param kurang (user_id/email)"]);
+			return;
+		}
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)){
+			$this->output->set_status_header(422);
+			echo json_encode(["ok"=>false, "msg"=>"Format email tidak valid"]);
+			return;
+		}
+
+		$this->load->model('TransactionModel');
+		$affected = $this->TransactionModel->updateCustomerEmail($idCustomer, $email);
+
+		echo json_encode([
+			"ok"       => true,            // treat OK walau affected 0 (email sama)
+			"affected" => (int)$affected,
+			"id_used"  => (int)$idCustomer,
+			"email"    => $email
+		]);
+	}
+
+	public function customer_info()
+	{
+		$id = (int)$this->input->get('id');
+		if (!$id) return $this->output->set_content_type('application/json')->set_output(json_encode(['ok'=>false]));
+		$row = $this->MasterModel->customerDatas($id)->row_array(); // atau model yang kamu pakai
+		return $this->output->set_content_type('application/json')
+			->set_output(json_encode(['ok'=> (bool)$row, 'data'=>$row]));
 	}
 }

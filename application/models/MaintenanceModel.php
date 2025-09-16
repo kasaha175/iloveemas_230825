@@ -27,22 +27,20 @@ class MaintenanceModel extends CI_Model
     {
         $result = [];
 
-        foreach ($tables as $t) {
-            $ok = false;
-            $err= null;
+        // Matikan FK agar TRUNCATE tidak mental (akan dikembalikan lagi)
+        try { $this->db->query('SET FOREIGN_KEY_CHECKS=0'); } catch (\Throwable $e) {}
 
-            // Coba TRUNCATE dulu
+        foreach ($tables as $t) {
+            $ok = false; $err = null;
+
             try {
                 $this->db->query("TRUNCATE TABLE `{$t}`");
                 $ok = true;
             } catch (\Throwable $e) {
-                // fallback: DELETE + reset auto increment
+                // Fallback: DELETE + reset AI
                 try {
                     $this->db->query("DELETE FROM `{$t}`");
-                    // reset AI (abaikan error jika table tidak punya AI)
-                    try {
-                        $this->db->query("ALTER TABLE `{$t}` AUTO_INCREMENT = 1");
-                    } catch (\Throwable $e2) { /* ignore */ }
+                    try { $this->db->query("ALTER TABLE `{$t}` AUTO_INCREMENT = 1"); } catch (\Throwable $e2) {}
                     $ok = true;
                 } catch (\Throwable $e3) {
                     $err = $e3->getMessage();
@@ -52,6 +50,8 @@ class MaintenanceModel extends CI_Model
 
             $result[$t] = ['ok' => $ok, 'error' => $err];
         }
+
+        try { $this->db->query('SET FOREIGN_KEY_CHECKS=1'); } catch (\Throwable $e) {}
 
         return $result;
     }

@@ -8,14 +8,31 @@ foreach ($this->cart->contents() as $row) {
   } elseif (isset($opt['priceTotal']) && is_numeric($opt['priceTotal'])) {
     $total += (float)$opt['priceTotal'];
   } else {
-    $total += (float)$row['subtotal'];
+    $total += (float)($row['subtotal'] ?? 0);
   }
 }
 function nominal($angka){ return number_format(floor((float)$angka), 0, ',', '.'); }
 
+// icon & param
 $iconBack = $this->config->item('iconBack') ?? 'fas fa-arrow-left';
-$tParam   = isset($_GET['t']) ? preg_replace('/[^a-z]/i','', $_GET['t']) : '';
-$mSeg     = (string)$this->uri->segment(3);
+
+// ambil dari controller (fallback aman jika belum ada)
+$mSeg   = isset($mSeg)   ? (string)$mSeg   : (string)$this->uri->segment(3);
+$tParam = isset($tParam) ? (string)$tParam : preg_replace('/[^a-z]/i','', $this->input->get('t') ?: '');
+
+// normalisasi customer (FOKUS: gunakan idCustomer)
+$customer     = isset($customer) && is_object($customer) ? $customer : null;
+$nameCustomer = $customer ? ($customer->c_name ?? '-') : '-';
+
+// c_id dari object customer → fallback ke session idCustomer → fallback ke ?cid=
+$userId = $customer ? (int)($customer->c_id ?? 0) : 0;
+if (!$userId) {
+  $userId = (int)($this->session->userdata('idCustomer') ?: $this->input->get('cid'));
+}
+
+// (opsional) jika proyek lama memakai $customer_id (kompatibilitas variabel)
+$customer_id = $userId;
+$cidQuery    = (int)$userId; // untuk appended query pada URL
 ?>
 <style>
   :root{
@@ -166,7 +183,7 @@ $mSeg     = (string)$this->uri->segment(3);
             <span class="sep">›</span>
             <a href="<?= base_url('transaction') ?>">Transaction</a>
             <span class="sep">›</span>
-            <a href="<?= base_url('transaction/buy') ?>">Buy</a>
+            <a href="<?= base_url('transaction/buy'.($cidQuery?'?cid='.$cidQuery:'')) ?>">Buy</a>
             <span class="sep">›</span>
             <span style="opacity:.9">Cart</span>
           </div>
@@ -177,7 +194,7 @@ $mSeg     = (string)$this->uri->segment(3);
             <h1>Buy — Checkout Session</h1>
             <p>Review item dan lanjutkan proses checkout. Customer: <strong><?= htmlspecialchars($nameCustomer ?? '-', ENT_QUOTES) ?></strong></p>
           </div>
-          <a href="<?= base_url('transaction/buy') ?>" class="ilv-back" aria-label="Kembali ke daftar material">
+          <a href="<?= base_url('transaction/buy'.($cidQuery?'?cid='.$cidQuery:'')) ?>" class="ilv-back" aria-label="Kembali ke daftar material">
             <i class="<?= htmlspecialchars($iconBack, ENT_QUOTES) ?>"></i> Kembali
           </a>
         </div>
@@ -304,10 +321,10 @@ $mSeg     = (string)$this->uri->segment(3);
                         echo $isDiamond ? (float)$a['price'] : nominal($a['price']);
                       ?>
                     </td>
-                    <td><?= nominal( isset($opt['priceTotal']) && is_numeric($opt['priceTotal']) ? $opt['priceTotal'] : $a['subtotal'] ) ?></td>
+                    <td><?= nominal( isset($opt['priceTotal']) && is_numeric($opt['priceTotal']) ? $opt['priceTotal'] : ($a['subtotal'] ?? 0) ) ?></td>
                     <td><?= htmlspecialchars($opt['types'] ?? ($tParam ? ucwords($tParam) : '-'), ENT_QUOTES) ?></td>
                     <td class="text-center">
-                      <a href="<?= base_url('transaction/buy-add-to-cart-reset/?idMaterial='.$mSeg.'&idRow='.$a['rowid'].'&t='.$tParam) ?>"
+                      <a href="<?= base_url('transaction/buy-add-to-cart-reset/?idMaterial='.$mSeg.'&idRow='.$a['rowid'].'&t='.$tParam.($cidQuery?'&cid='.$cidQuery:'')) ?>"
                          class="btn btn-danger btn-sm" title="Remove">
                         <i class="fas fa-trash"></i>
                       </a>
@@ -319,7 +336,8 @@ $mSeg     = (string)$this->uri->segment(3);
             </div>
 
             <form action="<?= base_url('transaction/buy-checkout/') ?>" class="mt-3">
-              <input type="hidden" name="user_id" id="user_id" value="<?= htmlspecialchars($userId ?? $customer_id ?? '', ENT_QUOTES) ?>">
+              <!-- user_id = c_id (idCustomer) -->
+              <input type="hidden" name="user_id" id="user_id" value="<?= (int)$userId ?>">
               <input type="hidden" name="notifyEmail" id="notifyEmail" value="0">
               <input type="hidden" name="emailTo" id="emailToHidden" value="">
               <div class="form-row">
@@ -359,7 +377,7 @@ $mSeg     = (string)$this->uri->segment(3);
                     <div class="modal-body">
                       <p>Pilih "Checkout" untuk menyelesaikan sesi cart.</p>
 
-                      <!-- Tambahkan opsi email langsung di sini -->
+                      <!-- Opsi email -->
                       <div class="custom-control custom-radio mb-2">
                         <input type="radio" name="optEmail" id="optYes" class="custom-control-input" value="yes">
                         <label class="custom-control-label" for="optYes">Ya, kirim invoice via email</label>
@@ -413,7 +431,7 @@ $mSeg     = (string)$this->uri->segment(3);
       <div class="modal-body">Pilih "Reset" untuk mengosongkan sesi cart.</div>
       <div class="modal-footer">
         <button class="btn btn-soft" type="button" data-dismiss="modal">Cancel</button>
-        <a class="btn btn-danger" href="<?= base_url('transaction/buy-add-to-cart-reset/?idMaterial='.$mSeg.'&t='.$tParam) ?>">Reset</a>
+        <a class="btn btn-danger" href="<?= base_url('transaction/buy-add-to-cart-reset/?idMaterial='.$mSeg.'&t='.$tParam.($cidQuery?'&cid='.$cidQuery:'')) ?>">Reset</a>
       </div>
     </div>
   </div>
@@ -429,8 +447,8 @@ $mSeg     = (string)$this->uri->segment(3);
     } else { init(window.jQuery); }
     return;
   }
-  if (n > 80) { reveal(); return; }              // fallback agar tidak blank
-  setTimeout(function(){ boot(n+1); }, 100);     // polling jQuery
+  if (n > 80) { reveal(); return; }
+  setTimeout(function(){ boot(n+1); }, 100);
 })(0);
 
 function reveal(){
@@ -441,19 +459,37 @@ function reveal(){
 }
 
 function init($){
-  // Select2
+  // === CSRF setup (CI3) ===
+  var CSRF = {
+    name : "<?= $this->security->get_csrf_token_name() ?>",
+    value: "<?= $this->security->get_csrf_hash() ?>",
+  };
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings){
+      if (settings.type && settings.type.toUpperCase() === 'POST') {
+        if (typeof settings.data === 'string') {
+          var pair = encodeURIComponent(CSRF.name)+'='+encodeURIComponent(CSRF.value);
+          settings.data = settings.data ? settings.data + '&' + pair : pair;
+        } else if ($.isPlainObject(settings.data)) {
+          settings.data[CSRF.name] = CSRF.value;
+        } else if (settings.data == null) {
+          settings.data = {}; settings.data[CSRF.name] = CSRF.value;
+        }
+      }
+    },
+    complete: function(xhr){
+      try{
+        var res = xhr.responseJSON || JSON.parse(xhr.responseText);
+        if (res && res[CSRF.name]) { CSRF.value = res[CSRF.name]; }
+      }catch(_){}
+    }
+  });
+
   if ($.fn.select2){ $('.select2').select2({ width:'100%' }); }
 
-  // Virtual Keyboard (Mottie)
   if ($.fn.keyboard){
     var $nums = $('.aang, .biayaAdmin');
-    $nums.keyboard({
-      layout: 'num',
-      restrictInput : true,
-      preventPaste : true,
-      autoAccept : true
-    });
-    // Auto-reveal saat fokus/klik
+    $nums.keyboard({ layout: 'num', restrictInput:true, preventPaste:true, autoAccept:true });
     $(document).on('focus click', '.aang, .biayaAdmin', function(){
       var kb = $(this).getkeyboard && $(this).getkeyboard();
       if (kb && kb.isOpen !== true) { kb.reveal(); }
@@ -461,124 +497,126 @@ function init($){
   }
 
   (function checkoutEmailFlow(){
-  var CHECK_EMAIL = '<?= base_url('transaction/check-email') ?>';
-  var SAVE_EMAIL  = '<?= base_url('transaction/save-email') ?>';
-  var HEALTH_URL  = '<?= base_url('health/ping') ?>';
+    var CHECK_EMAIL = '<?= base_url('transaction/check-email') ?>';
+    var SAVE_EMAIL  = '<?= base_url('transaction/save-email') ?>';
+    var HEALTH_URL  = '<?= base_url('health/ping') ?>';
 
-  // ====== toggle debug ======
-  var DEBUG_EMAIL_SAVE = true; // set false jika sudah OK
+    var DEBUG_EMAIL_SAVE = false;
 
-  function pingOnline(){
-    return $.ajax({ url: HEALTH_URL, type:'GET', dataType:'json', timeout:3000 });
-  }
-
-  var $checkoutForm = $('form[action*="transaction/buy-checkout/"]').last();
-  if (!$checkoutForm.length) return;
-
-  var $btnProceed = $('#btnModalProceed');
-
-  if (!$('#emailError').length){
-    $('<div id="emailError">Email wajib diisi dan format harus valid.</div>').insertAfter('#emailHint');
-  }
-
-  function setProceedDisabled(dis){
-    $btnProceed.prop('disabled', !!dis)
-               .toggleClass('disabled', !!dis)
-               .attr('aria-disabled', !!dis);
-  }
-
-  function ensureSpinner(){
-    var $inp = $('#emailToInput');
-    if (!$inp.parent().hasClass('input-loading')){
-      $inp.wrap('<div class="input-loading"></div>');
-      $inp.after('<div class="spinner-border" role="status" aria-hidden="true"></div>');
+    function pingOnline(){
+      return $.ajax({ url: HEALTH_URL, type:'GET', dataType:'json', timeout:3000 });
     }
-    return $inp.closest('.input-loading');
-  }
 
-  function emailLoading(on){
-    var $wrap = ensureSpinner();
-    var $inp  = $('#emailToInput');
-    if (on){
-      $wrap.addClass('loading');
-      $inp.prop('disabled', true).attr('placeholder','Mengambil email…');
+    var $checkoutForm = $('form[action*="transaction/buy-checkout/"]').last();
+    if (!$checkoutForm.length) return;
+
+    var $btnProceed = $('#btnModalProceed');
+
+    if (!$('#emailError').length){
+      $('<div id="emailError">Email wajib diisi dan format harus valid.</div>').insertAfter('#emailHint');
+    }
+
+    function setProceedDisabled(dis){
+      $btnProceed.prop('disabled', !!dis)
+                 .toggleClass('disabled', !!dis)
+                 .attr('aria-disabled', !!dis);
+    }
+
+    function ensureSpinner(){
+      var $inp = $('#emailToInput');
+      if (!$inp.parent().hasClass('input-loading')){
+        $inp.wrap('<div class="input-loading"></div>');
+        $inp.after('<div class="spinner-border" role="status" aria-hidden="true"></div>');
+      }
+      return $inp.closest('.input-loading');
+    }
+
+    function emailLoading(on){
+      var $wrap = ensureSpinner();
+      var $inp  = $('#emailToInput');
+      if (on){
+        $wrap.addClass('loading');
+        $inp.prop('disabled', true).attr('placeholder','Mengambil email…');
+        $('#emailHint').hide();
+      } else {
+        $wrap.removeClass('loading');
+        $inp.prop('disabled', false).attr('placeholder','nama@email.com');
+      }
+    }
+
+    function validateEmailField(){
+      var choiceYes = $('input[name="optEmail"]:checked').val() === 'yes';
+      if (!choiceYes){
+        $('#emailToInput').removeClass('is-invalid');
+        $('#emailError').removeClass('show');
+        setProceedDisabled(false);
+        return true;
+      }
+      var email = $.trim($('#emailToInput').val() || '');
+      var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!email || !ok){
+        $('#emailToInput').addClass('is-invalid');
+        $('#emailError').addClass('show');
+        setProceedDisabled(true);
+        return false;
+      } else {
+        $('#emailToInput').removeClass('is-invalid');
+        $('#emailError').removeClass('show');
+        setProceedDisabled(false);
+        return true;
+      }
+    }
+
+    // reset saat modal dibuka
+    $('#checkoutModal').off('shown.bs.modal.checkout').on('shown.bs.modal.checkout', function(){
+      $('#optNo').prop('checked', true);
+      $('#emailFieldWrap').hide();
+      $('#emailToInput').val('');
       $('#emailHint').hide();
-    } else {
-      $wrap.removeClass('loading');
-      $inp.prop('disabled', false).attr('placeholder','nama@email.com');
-    }
-  }
-
-  function validateEmailField(){
-    var choiceYes = $('input[name="optEmail"]:checked').val() === 'yes';
-    if (!choiceYes){
-      $('#emailToInput').removeClass('is-invalid');
       $('#emailError').removeClass('show');
       setProceedDisabled(false);
-      return true;
-    }
-    var email = $.trim($('#emailToInput').val() || '');
-    var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!email || !ok){
-      $('#emailToInput').addClass('is-invalid');
-      $('#emailError').addClass('show');
-      setProceedDisabled(true);
-      return false;
-    } else {
-      $('#emailToInput').removeClass('is-invalid');
-      $('#emailError').removeClass('show');
-      setProceedDisabled(false);
-      return true;
-    }
-  }
+    });
 
-  // reset saat modal dibuka
-  $('#checkoutModal').off('shown.bs.modal.checkout').on('shown.bs.modal.checkout', function(){
-    $('#optNo').prop('checked', true);
-    $('#emailFieldWrap').hide();
-    $('#emailToInput').val('');
-    $('#emailHint').hide();
-    $('#emailError').removeClass('show');
-    setProceedDisabled(false);
-  });
+    // pilih Ya/Tidak
+    $('input[name="optEmail"]').off('change.checkout').on('change.checkout', function(){
+      if (this.value !== 'yes'){
+        $('#emailFieldWrap').hide();
+        $('#emailError').removeClass('show');
+        setProceedDisabled(false);
+        return;
+      }
 
-  // pilih Ya/Tidak
-  $('input[name="optEmail"]').off('change.checkout').on('change.checkout', function(){
-    if (this.value !== 'yes'){
-      $('#emailFieldWrap').hide();
-      $('#emailError').removeClass('show');
-      setProceedDisabled(false);
-      return;
-    }
-
-    emailLoading(true);
-    var jq = pingOnline();
-    if (!jq || typeof jq.done !== 'function'){
-      $('#emailFieldWrap').hide();
-      setProceedDisabled(true);
-      emailLoading(false);
-      return;
-    }
-
-    jq.done(function(){
-        if (DEBUG_EMAIL_SAVE) console.log('[PING] online OK');
-        $('#emailFieldWrap').show();
-        prefillEmail();
-      })
-      .fail(function(){
-        if (DEBUG_EMAIL_SAVE) console.warn('[PING] offline/timeout');
+      emailLoading(true);
+      var jq = pingOnline();
+      if (!jq || typeof jq.done !== 'function'){
         $('#emailFieldWrap').hide();
         setProceedDisabled(true);
-      })
-      .always(function(){ emailLoading(false); });
-  });
+        emailLoading(false);
+        return;
+      }
 
-  // Ambil email dari server (prefill)
-  function prefillEmail(){
-    emailLoading(true);
-    $.ajax({ url: CHECK_EMAIL, type:'POST', dataType:'json' })
-      .done(function(res, text, xhr){
-        if (DEBUG_EMAIL_SAVE) console.log('[CHECK_EMAIL] success:', res);
+      jq.done(function(){
+          $('#emailFieldWrap').show();
+          prefillEmail();
+        })
+        .fail(function(){
+          $('#emailFieldWrap').hide();
+          setProceedDisabled(true);
+        })
+        .always(function(){ emailLoading(false); });
+    });
+
+    // Ambil email dari server (prefill) — KIRIMKAN user_id = c_id
+    function prefillEmail(){
+      emailLoading(true);
+      var uid = $.trim($('#user_id', $checkoutForm).val() || '');
+      $.ajax({
+        url: CHECK_EMAIL,
+        type: 'POST',
+        dataType: 'json',
+        data: { user_id: uid } // ← konsisten idCustomer
+      })
+      .done(function(res){
         if (res && res.ok && res.email){
           $('#emailToInput').val(res.email);
           $('#emailHint').show();
@@ -587,8 +625,7 @@ function init($){
           $('#emailHint').hide();
         }
       })
-      .fail(function(xhr, text, err){
-        if (DEBUG_EMAIL_SAVE) console.warn('[CHECK_EMAIL] fail:', {status:xhr.status, text:xhr.responseText});
+      .fail(function(){
         $('#emailToInput').val('');
         $('#emailHint').hide();
       })
@@ -596,104 +633,78 @@ function init($){
         emailLoading(false);
         validateEmailField();
       });
-  }
+    }
 
-  // live validate
-  $(document).off('input.checkout keyup.checkout blur.checkout', '#emailToInput')
-             .on('input.checkout keyup.checkout blur.checkout', '#emailToInput', validateEmailField);
+    // live validate
+    $(document).off('input.checkout keyup.checkout blur.checkout', '#emailToInput')
+               .on('input.checkout keyup.checkout blur.checkout', '#emailToInput', validateEmailField);
 
-  // helper submit akhir
-  function proceedSubmit(email){
-    $('#notifyEmail', $checkoutForm).val('1');
-    $('#emailToHidden', $checkoutForm).val(email);
-    $('#checkoutModal').modal('hide');
-    $checkoutForm.trigger('submit');
-  }
-
-  // Klik Checkout
-  $btnProceed.off('click.checkout').on('click.checkout', function(){
-    if ($btnProceed.is(':disabled')) return;
-
-    var choice = $('input[name="optEmail"]:checked').val();
-    var uid    = $.trim($('#user_id', $checkoutForm).val() || '');
-    var email  = $.trim($('#emailToInput').val() || '');
-
-    if (choice === 'no'){
-      $('#notifyEmail', $checkoutForm).val('0');
-      $('#emailToHidden', $checkoutForm).val('');
+    // helper submit akhir
+    function proceedSubmit(email){
+      $('#notifyEmail', $checkoutForm).val('1');
+      $('#emailToHidden', $checkoutForm).val(email);
       $('#checkoutModal').modal('hide');
       $checkoutForm.trigger('submit');
-      return;
     }
 
-    // wajib valid + online
-    if (!validateEmailField()) return;
+    // Klik Checkout
+    $btnProceed.off('click.checkout').on('click.checkout', function(){
+      if ($btnProceed.is(':disabled')) return;
 
-    emailLoading(true);
-    var jq = pingOnline();
-    if (!jq || typeof jq.done !== 'function'){
-      setProceedDisabled(true);
-      emailLoading(false);
-      return;
-    }
+      var choice = $('input[name="optEmail"]:checked').val();
+      var uid    = $.trim($('#user_id', $checkoutForm).val() || '');
+      var email  = $.trim($('#emailToInput').val() || '');
 
-    jq.done(function(){
-        if (DEBUG_EMAIL_SAVE) console.log('[PING] online before SAVE');
+      if (choice === 'no'){
+        $('#notifyEmail', $checkoutForm).val('0');
+        $('#emailToHidden', $checkoutForm).val('');
+        $('#checkoutModal').modal('hide');
+        $checkoutForm.trigger('submit');
+        return;
+      }
 
-        // === SELALU update email customer (tanpa cek sebelumnya) ===
-        var payload = { user_id: uid, email: email };
-        if (DEBUG_EMAIL_SAVE){
-          console.log('[SAVE_EMAIL] payload →', payload);
-          if (!uid) console.warn('[SAVE_EMAIL] WARNING: user_id kosong!');
-        }
+      if (!validateEmailField()) return;
 
-        $.ajax({
-          url: SAVE_EMAIL,
-          type: 'POST',
-          dataType: 'json',
-          data: payload
-        })
-        .done(function(res, text, xhr){
-          if (DEBUG_EMAIL_SAVE) console.log('[SAVE_EMAIL] success:', res, 'http', xhr.status);
-        })
-        .fail(function(xhr, text, err){
-          if (DEBUG_EMAIL_SAVE) console.error('[SAVE_EMAIL] fail:', {status:xhr.status, text:xhr.responseText, err:err});
-        })
-        .always(function(){
-          // === VERIFIKASI: ambil ulang email dari server utk memastikan tersimpan ===
-          if (DEBUG_EMAIL_SAVE) console.log('[VERIFY_EMAIL] fetching latest…');
-          $.ajax({ url: CHECK_EMAIL, type:'POST', dataType:'json' })
-            .done(function(check){
-              var match = !!(check && check.ok && (String(check.email||'').toLowerCase() === String(email).toLowerCase()));
-              if (DEBUG_EMAIL_SAVE){
-                console.log('[VERIFY_EMAIL] server:', check);
-                console.log('[VERIFY_EMAIL] match?', match, 'uid:', uid, 'email:', email);
-              }
-            })
-            .fail(function(xhr){
-              if (DEBUG_EMAIL_SAVE) console.warn('[VERIFY_EMAIL] fail:', xhr.status, xhr.responseText);
+      emailLoading(true);
+      var jq = pingOnline();
+      if (!jq || typeof jq.done !== 'function'){
+        setProceedDisabled(true);
+        emailLoading(false);
+        return;
+      }
+
+      jq.done(function(){
+          // SELALU update email customer (kirim user_id=c_id)
+          var payload = { user_id: uid, email: email };
+          $.ajax({
+            url: '<?= base_url('transaction/save-email') ?>',
+            type: 'POST',
+            dataType: 'json',
+            data: payload
+          })
+          .always(function(){
+            // verifikasi ringan: cek ulang email tersimpan (kirim user_id=c_id)
+            $.ajax({
+              url: '<?= base_url('transaction/check-email') ?>',
+              type: 'POST',
+              dataType: 'json',
+              data: { user_id: uid }
             })
             .always(function(){
-              // apapun hasil verifikasi, lanjut submit
               proceedSubmit(email);
               emailLoading(false);
             });
-        });
+          });
 
-      })
-      .fail(function(){
-        if (DEBUG_EMAIL_SAVE) console.warn('[PING] offline saat Checkout');
-        setProceedDisabled(true);
-        emailLoading(false);
-      });
-  });
-})();
+        })
+        .fail(function(){
+          setProceedDisabled(true);
+          emailLoading(false);
+        });
+    });
+  })();
 
   // Semua siap → tampilkan halaman & tutup overlay
   reveal();
 }
 </script>
-
-
-
-

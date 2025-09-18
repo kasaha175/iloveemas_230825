@@ -872,49 +872,56 @@ class TransactionController extends CI_Controller
 
 	public function buyCart()
 	{
-		// pastikan yang login (admin/staff)
 		$authUser = $this->session->userdata('authUser');
-		if (!$authUser) {
-			redirect(base_url());
-			return;
-		}
-
+		$idUser   = $this->session->userdata('idUser');
 		$this->data['title'] = 'TRANSACTION BUY';
 
-		// id material dari URL
-		$idMaterial = (int) $this->uri->segment(3);
-		$material   = $this->MaterialModel->materialDataBy('m_id', $idMaterial, 'Buy')->row();
+		if ($authUser !== true) { redirect(base_url()); return; }
 
-		if (!$material) {
-			redirect(base_url('transaction/buy'));
-			return;
+		// Konsistensi idCustomer
+		$cidFromQuery = (int) $this->input->get('cid');
+		if ($cidFromQuery > 0) {
+			$this->session->set_userdata('idCustomer', $cidFromQuery);
+		}
+		$idCustomer = (int) $this->session->userdata('idCustomer');
+
+		// (opsional tapi disarankan) paksa pilih customer dulu
+		// if ($idCustomer <= 0) { $this->session->set_flashdata('error','Pelanggan belum dipilih.');
+		//     redirect(base_url('customers')); return;
+		// }
+
+		$idMaterial   = (int) $this->uri->segment(3);
+		$materialName = $this->MaterialModel
+							->materialDataBy('m_id', $idMaterial, 'Buy')
+							->row('m_name');
+
+		if (empty($materialName)) { redirect(base_url('transaction/buy/')); return; }
+
+		$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+
+		// ambil objek customer lengkap → dipakai view
+		if ($idCustomer > 0) {
+			$customerRow = $this->MasterModel->customerDatas($idCustomer)->row(); // harus mengandung c_id, c_name, dst
+			$this->data['customer']     = $customerRow;
+			$this->data['nameCustomer'] = $customerRow ? $customerRow->c_name : null; // fallback untuk view lama
+		} else {
+			$this->data['customer']     = null;
+			$this->data['nameCustomer'] = null;
 		}
 
-		// IMPORTANT: di app ini idUser = ID CUSTOMER
-		$customerId = (int) $this->session->userdata('idUser');
-		if (empty($customerId)) {
-			$customerId = 7; // fallback sesuai implementasi lama
-		}
-
-		// siapkan data untuk view
-		$this->data['customer_id']  = $customerId;          // dipakai hidden input di BuyCart
-		$this->data['userId']       = $customerId;          // kompatibel dgn kode view lama
-		$this->data['nameCustomer'] = $this->MasterModel->customerDatas($customerId)->row('c_name') ?? '-';
-
-		$this->data['materianName'] = $material->m_name;
+		// data lain
+		$this->data['materianName'] = $materialName;
 		$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
 		$this->data['carat']        = $this->MaterialModel->caratData($idMaterial)->result();
 		$this->data['potongan']     = $this->MaterialModel->potonganData($idMaterial)->result();
 
-		// (opsional) kalau memang UserTemplate butuh info admin/staff:
-		// $this->data['adminUser'] = $authUser;
-		// atau jika perlu detail dari DB admin:
-		// $this->data['adminData'] = $this->UserModel->userDataById($authUser['id'])->row();
+		// (tambahan kecil) kirim cid ke view untuk append ?cid=
+		$this->data['cid'] = $idCustomer ?: $cidFromQuery;
 
 		$this->data['content'] = $this->load->view('BuyCart', $this->data, true);
 		$this->load->view('UserTemplate', $this->data);
 	}
-	
+
 	public function buyAddToCart()
 	{
 		$authUser = $this->session->userdata("authUser");
@@ -1385,35 +1392,55 @@ class TransactionController extends CI_Controller
 		return $this->load->view('UserTemplate', $this->data);
 	}
 
-	function sellCart()
+	public function sellCart()
 	{
-		$authUser = $this->session->userdata("authUser");
-		$idUser = $this->session->userdata("idUser");
-		$this->data["title"] = "TRANSACTION SELL";
-		if ($authUser == true) {
-			$idMaterial = $this->uri->segment(3);
-			$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial,'Sell')->row("m_name");
-			if (!empty($materialName)) {
-				$idCustomer = $this->session->userdata("idCustomer");
-				if(empty($idCustomer)){
-					$idCustomer = 7;
-				}
-				$this->data['nameCustomer'] = $this->MasterModel->customerDatas($idCustomer)->row("c_name");
-				$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
-				$this->data['materianName'] = $materialName;
-				$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
-				$this->data['potongan'] = $this->MaterialModel->potonganData($idMaterial)->result();
-				$this->data['carat'] = $this->MaterialModel->caratData($idMaterial)->result();
-				$this->data['content'] = $this->load->view('SellCart', $this->data, true);
-				$this->load->view("UserTemplate", $this->data);
-			}
-			else {
-				redirect(base_url() . "transaction/sell/");
-			}
+		// Auth & user login (tetap)
+		$authUser = $this->session->userdata('authUser');
+		$idUser   = $this->session->userdata('idUser');
+		$this->data['title'] = 'TRANSACTION SELL';
+
+		if ($authUser !== true) { redirect(base_url()); return; }
+
+		// --- Konsistensi idCustomer ---
+		// Jika ada ?cid= di URL, jadikan customer aktif
+		$cidFromQuery = (int) $this->input->get('cid');
+		if ($cidFromQuery > 0) {
+			$this->session->set_userdata('idCustomer', $cidFromQuery);
 		}
-		else {
-			redirect(base_url());
+		// Selalu baca dari idCustomer (bukan idUser)
+		$idCustomer = (int) $this->session->userdata('idCustomer');
+		// --------------------------------
+
+		$idMaterial   = (int) $this->uri->segment(3);
+		// untuk SELL gunakan tipe 'Sell' (samakan dgn skema MaterialModel kamu)
+		$materialName = $this->MaterialModel->materialDataBy('m_id', $idMaterial, 'Sell')->row('m_name');
+		if (empty($materialName)) { redirect(base_url('transaction/sell/')); return; }
+
+		// data user login (tetap)
+		$this->data['userData'] = $this->UserModel->userDataById($idUser)->result();
+
+		// objek customer lengkap → dipakai di view
+		if ($idCustomer > 0) {
+			$customerRow = $this->MasterModel->customerDatas($idCustomer)->row(); // berisi c_id, c_name, dst
+			$this->data['customer']     = $customerRow;
+			$this->data['nameCustomer'] = $customerRow ? $customerRow->c_name : null; // kompatibel dgn view lama
+		} else {
+			$this->data['customer']     = null;
+			$this->data['nameCustomer'] = null;
 		}
+
+		// data lain yang sudah digunakan view kamu
+		$this->data['materianName'] = $materialName;
+		$this->data['materialType'] = $this->MaterialModel->materialTypeData()->result();
+		$this->data['carat']        = $this->MaterialModel->caratData($idMaterial)->result();
+		$this->data['potongan']     = $this->MaterialModel->potonganData($idMaterial)->result();
+
+		// kirim cid agar link-link bisa append ?cid=
+		$this->data['cid'] = $idCustomer ?: $cidFromQuery;
+
+		// render sesuai template proyekmu
+		$this->data['content'] = $this->load->view('SellCart', $this->data, true);
+		$this->load->view('UserTemplate', $this->data);
 	}
 	
 	public function sellAddToCart()
@@ -2523,5 +2550,42 @@ public function getCustomers()
 		$row = $this->MasterModel->customerDatas($id)->row_array(); // atau model yang kamu pakai
 		return $this->output->set_content_type('application/json')
 			->set_output(json_encode(['ok'=> (bool)$row, 'data'=>$row]));
+	}
+
+	// --- Helper: auth wajib
+	private function _requireAuth()
+	{
+		if ($this->session->userdata('authUser') !== true) {
+			redirect(base_url('login'));
+			exit;
+		}
+	}
+
+	// --- Helper: set & get customer aktif (konsisten pakai idCustomer)
+	private function _setActiveCustomer(int $cid): void
+	{
+		if ($cid > 0) {
+			$this->session->set_userdata('idCustomer', $cid);
+		}
+	}
+
+	private function _activeCustomerId(): int
+	{
+		$cid = (int) $this->session->userdata('idCustomer');
+		if (!$cid) {
+			// Fallback legacy: beberapa alur lama menyimpan idCustomer di idUser
+			$cid = (int) $this->session->userdata('idUser');
+			if ($cid) $this->session->set_userdata('idCustomer', $cid);
+		}
+		return $cid ?: 0;
+	}
+
+	// --- Helper: ambil customer atau 404
+	private function _loadCustomerOr404(int $cid)
+	{
+		// Pastikan Model punya fungsi ini (lihat bagian 3)
+		$cust = $this->TransactionModel->getCustomerById($cid);
+		if (!$cust) show_404();
+		return $cust;
 	}
 }

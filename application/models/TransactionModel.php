@@ -585,11 +585,13 @@ if (!defined('BASEPATH'))
                         ->get()->row('t_no_order');
     }
 
-    // (opsional) jika nanti ada tabel SELL berbeda, sesuaikan di sini
     public function getSellNoOrder($t_id)
     {
-        // contoh: return $this->db->select('s_no_order')->from('tb_sell')->where('s_id',(int)$t_id)->get()->row('s_no_order');
-        return null; // sementara kosong bila belum ada
+        return $this->db->select('t_no_order')
+                        ->from('tb_transaction_sell')
+                        ->where('t_id', (int)$t_id)
+                        ->get()
+                        ->row('t_no_order');
     }
 
     /* ===== PRINT LOG ===== */
@@ -611,6 +613,35 @@ if (!defined('BASEPATH'))
     {
         return $this->db->where('id', (int)$id)
                         ->update('tb_transaction_prints', $data);
+    }
+
+	public function getCustomerById(int $id)
+	{
+		return $this->db->where('c_id', $id)->get('tb_customer')->row();
+	}
+
+	/* ========= SELL: header transaksi (untuk print/detail) ========= */
+    public function getSellHeader($t_id)
+    {
+        // NOTE: t_customer bertipe VARCHAR; cast ke int agar join aman
+        return $this->db->select('a.*, b.u_name AS nameCreator, c.u_name AS nameReceive, d.c_name AS nameCustomer, d.*')
+                        ->from('tb_transaction_sell a')
+                        ->join('tb_user b', 'a.t_created_by = b.u_id', 'left')
+                        ->join('tb_user c', 'a.t_receive_by = c.u_id', 'left')
+                        ->join('tb_customer d', 'd.c_id = CAST(a.t_customer AS UNSIGNED)', 'left')
+                        ->where('a.t_id', (int)$t_id)
+                        ->get()
+                        ->row(); // satu baris
+    }
+
+    /* ========= SELL: item transaksi ========= */
+    public function getSellItems($t_id)
+    {
+        return $this->db->from('tb_transaction_items_sell')
+                        ->where('ti_t_id', (int)$t_id)
+                        ->order_by('ti_id', 'asc')
+                        ->get()
+                        ->result();
     }
 
 }

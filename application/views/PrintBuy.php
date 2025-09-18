@@ -303,7 +303,7 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
       </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <!-- Variabel global -->
 <script>
@@ -345,14 +345,16 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
     ajaxdestroy();
   }
 
-  function savePrintThenNext(){
+  // PATCH: support buka PDF/HTML yang dihasilkan backend + tetap jalankan dialog print halaman ini
+  function savePrintThenNext(popupRef){
     var url = window.__BASE_URL + 'transaction/savePrint/' + window.__TRANS_TYPE + '/' + window.__TRANS_ID;
     var payload = {
       cabang: collectCabang(),
       payments: collectPayments(),
       paper: 'A4',
       orientation: 'portrait',
-      rawHtml: document.getElementById('printNow').outerHTML
+      rawHtml: document.getElementById('printNow').outerHTML,
+      forcePdf: 1 // hint ke backend (jika dipakai)
     };
     payload[window.__CSRF_NAME] = window.__CSRF_HASH;
 
@@ -364,8 +366,24 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
         if (!r || !r.ok){
           alert((r && r.msg) ? r.msg : 'Gagal menyimpan arsip print.');
           $btn.prop('disabled',false).removeClass('disabled').css('opacity',1);
+          if (popupRef && !popupRef.closed) popupRef.close();
           return;
         }
+
+        // Coba buka file hasil backend (PDF diutamakan, fallback HTML)
+        try{
+          var target = r.pdf || r.html || '';
+          if (target){
+            if (popupRef && !popupRef.closed){
+              popupRef.location = target; // pastikan tidak dianggap pop-up baru
+              popupRef.focus();
+            } else {
+              window.open(target, '_blank');
+            }
+          } else if (popupRef && !popupRef.closed){
+            popupRef.close();
+          }
+        }catch(_){ /* abaikan */ }
 
         // === BUKA DIALOG PRINT BROWSER PADA HALAMAN INI ===
         var ended = false;
@@ -384,13 +402,16 @@ $selPay = array_map('strtoupper', (array)($printMeta['payments'] ?? []));
       .fail(function(xhr){
         alert('Gagal terhubung ke server ('+xhr.status+').');
         $btn.prop('disabled',false).removeClass('disabled').css('opacity',1);
+        if (popupRef && !popupRef.closed) popupRef.close();
       });
   }
 
-  // klik ikon/btn print → simpan arsip, lalu buka dialog print, lalu finish
+  // klik ikon/btn print → siapkan pop-up (agar tidak diblok), simpan arsip, buka PDF/HTML, lalu dialog print & finish
   $('#doPrint').off('click.print').on('click.print', function(e){
     e.preventDefault();
-    savePrintThenNext();
+    var popup = null;
+    try { popup = window.open('', '_blank'); } catch(_){}
+    savePrintThenNext(popup);
   });
 
 })(jQuery);
@@ -404,7 +425,7 @@ function ajaxdestroy(){
   });
 }
 function clickBack(){ window.location.href = "<?= base_url('dashboard') ?>"; }
-</script>
+</script>  
   </div>
 </body>
 </html>

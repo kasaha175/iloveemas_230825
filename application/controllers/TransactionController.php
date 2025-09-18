@@ -2045,265 +2045,170 @@ public function getCustomers()
 		exit;
 	}
 
-	// public function savePrint($type='buy', $id=0)
-	// {
-	// 	// ===== Auth & method =====
-	// 	if ($this->session->userdata('authUser') !== true) {
-	// 		return $this->output->set_status_header(401)->set_output('Unauthorized');
-	// 	}
-	// 	if (strtoupper($this->input->method()) !== 'POST') {
-	// 		return $this->output->set_status_header(405)->set_output('Method Not Allowed');
-	// 	}
+	public function savePrint($type='buy', $id=0)
+	{
+		// ===== Auth & method =====
+		if ($this->session->userdata('authUser') !== true) {
+			return $this->output->set_status_header(401)->set_output('Unauthorized');
+		}
+		if (strtoupper($this->input->method()) !== 'POST') {
+			return $this->output->set_status_header(405)->set_output('Method Not Allowed');
+		}
 
-	// 	// ===== Validasi type =====
-	// 	$type = strtolower((string)$type);
-	// 	if (!in_array($type, ['buy','sell'], true)) {
-	// 		return $this->output->set_status_header(400)->set_output('Bad Request');
-	// 	}
-	// 	$id = (int)$id;
+		// ===== Validasi type =====
+		$type = strtolower((string)$type);
+		if (!in_array($type, ['buy','sell'], true)) {
+			return $this->output->set_status_header(400)->set_output('Bad Request');
+		}
+		$id = (int)$id;
 
-	// 	// ===== Ambil header transaksi =====
-	// 	$tTable = ($type === 'sell') ? 'tb_transaction_sell' : 'tb_transaction';
-	// 	$row    = $this->db->where('t_id', $id)->get($tTable)->row();
-	// 	if (!$row) {
-	// 		return $this->output->set_status_header(404)->set_output('Transaction not found');
-	// 	}
+		// ===== Ambil header transaksi =====
+		$tTable = ($type === 'sell') ? 'tb_transaction_sell' : 'tb_transaction';
+		$row    = $this->db->where('t_id', $id)->get($tTable)->row();
+		if (!$row) {
+			return $this->output->set_status_header(404)->set_output('Transaction not found');
+		}
 
-	// 	// ===== Payload dari view =====
-	// 	$cabang      = $this->input->post('cabang');                  // array of {id,label}
-	// 	$payments    = $this->input->post('payments');                // array
-	// 	$paper       = strtoupper($this->input->post('paper') ?: 'A4');
-	// 	$orientation = strtolower($this->input->post('orientation') ?: 'portrait');
-	// 	$rawHtml     = (string)$this->input->post('rawHtml', false);  // HTML mentah (tanpa filtering)
+		// ===== Payload dari view =====
+		$cabang      = $this->input->post('cabang');                  // array of {id,label}
+		$payments    = $this->input->post('payments');                // array
+		$paper       = strtoupper($this->input->post('paper') ?: 'A4');
+		$orientation = strtolower($this->input->post('orientation') ?: 'portrait');
+		$rawHtml     = (string)$this->input->post('rawHtml', false);  // HTML mentah (tanpa filtering)
 
-	// 	if ($rawHtml === '') {
-	// 		return $this->output->set_status_header(422)
-	// 			->set_content_type('application/json','utf-8')
-	// 			->set_output(json_encode(['ok'=>false,'msg'=>'rawHtml missing']));
-	// 	}
+		if ($rawHtml === '') {
+			return $this->output->set_status_header(422)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'rawHtml missing']));
+		}
 
-	// 	// ===== Normalisasi cabang & payments =====
-	// 	$branches  = [];
-	// 	$branchIds = [];
-	// 	if (is_array($cabang)) {
-	// 		foreach ($cabang as $r) {
-	// 			$bid   = (int)($r['id'] ?? 0);
-	// 			$label = (string)($r['label'] ?? '');
-	// 			if ($bid > 0) {
-	// 				$branches[]  = ['id'=>$bid, 'label'=>$label];
-	// 				$branchIds[] = $bid;
-	// 			}
-	// 		}
-	// 	}
-	// 	$payments = is_array($payments) ? array_values(array_unique(array_map('strtoupper', $payments))) : [];
+		// ===== Normalisasi cabang & payments =====
+		$branches  = [];
+		$branchIds = [];
+		if (is_array($cabang)) {
+			foreach ($cabang as $r) {
+				$bid   = (int)($r['id'] ?? 0);
+				$label = (string)($r['label'] ?? '');
+				if ($bid > 0) {
+					$branches[]  = ['id'=>$bid, 'label'=>$label];
+					$branchIds[] = $bid;
+				}
+			}
+		}
+		$payments = is_array($payments) ? array_values(array_unique(array_map('strtoupper', $payments))) : [];
 
-	// 	// ===== Tandai checkbox di HTML (1:1 di PDF) =====
-	// 	$htmlFinal = $this->_applyChecksToHtml($rawHtml, $branchIds, $payments);
+		// ===== Tandai checkbox di HTML (1:1 di PDF) =====
+		$htmlFinal = $this->_applyChecksToHtml($rawHtml, $branchIds, $payments);
 
-	// 	// ===== Dapatkan no_order & tanggal Transaksi =====
-	// 	$noOrder = null;
-	// 	foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no','no_invoice'] as $c) {
-	// 		if (!empty($row->{$c})) { $noOrder = (string)$row->{$c}; break; }
-	// 	}
-	// 	if (!$noOrder) { $noOrder = strtoupper($type).'-'.$id; } // fallback aman
+		// ===== Dapatkan no_order & tanggal Transaksi =====
+		$noOrder = null;
+		foreach (['t_no_order','s_no_order','ts_no_order','no_order','order_no','no_invoice'] as $c) {
+			if (!empty($row->{$c})) { $noOrder = (string)$row->{$c}; break; }
+		}
+		if (!$noOrder) { $noOrder = strtoupper($type).'-'.$id; } // fallback aman
 
-	// 	$tDate = null;
-	// 	foreach (['t_date_created','date_created','created_at','t_date'] as $c) {
-	// 		if (!empty($row->{$c})) { $tDate = (string)$row->{$c}; break; }
-	// 	}
-	// 	if (!$tDate) { $tDate = date('Y-m-d'); }
+		$tDate = null;
+		foreach (['t_date_created','date_created','created_at','t_date'] as $c) {
+			if (!empty($row->{$c})) { $tDate = (string)$row->{$c}; break; }
+		}
+		if (!$tDate) { $tDate = date('Y-m-d'); }
 
-	// 	// ===== Build direktori penyimpanan (RELATIVE & ABSOLUTE) =====
-	// 	$tahun   = date('Y', strtotime($tDate));
-	// 	$bulan   = date('m', strtotime($tDate));
-	// 	$relDir  = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
-	// 	$absDir  = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
+		// ===== Build direktori penyimpanan (RELATIVE & ABSOLUTE) =====
+		$tahun   = date('Y', strtotime($tDate));
+		$bulan   = date('m', strtotime($tDate));
+		$relDir  = 'uploads/prints/'.$type.'/'.$tahun.'/'.$bulan.'/';
+		$absDir  = rtrim(str_replace('\\','/', FCPATH), '/').'/'.$relDir;
 
-	// 	// Pastikan folder ada
-	// 	if (!is_dir($absDir) && !@mkdir($absDir, 0775, true)) {
-	// 		return $this->output->set_status_header(500)
-	// 			->set_content_type('application/json','utf-8')
-	// 			->set_output(json_encode(['ok'=>false,'msg'=>'Tidak bisa membuat folder penyimpanan PDF.']));
-	// 	}
+		// Pastikan folder ada
+		if (!is_dir($absDir) && !@mkdir($absDir, 0775, true)) {
+			return $this->output->set_status_header(500)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'Tidak bisa membuat folder penyimpanan PDF.']));
+		}
 
-	// 	// ===== Hapus SEMUA file lama transaksi ini (NOORDER-*.pdf) =====
-	// 	// Jika ada file yang tidak bisa dihapus (locked), hentikan dengan 423
-	// 	$pattern  = $absDir . $noOrder . '-*.pdf';
-	// 	$oldFiles = glob($pattern) ?: [];
-	// 	foreach ($oldFiles as $old) {
-	// 		if (@is_file($old) && !@unlink($old)) {
-	// 			return $this->output->set_status_header(423) // Locked
-	// 				->set_content_type('application/json','utf-8')
-	// 				->set_output(json_encode([
-	// 					'ok'  => false,
-	// 					'msg' => 'File PDF lama sedang dibuka. Tutup halaman PDF terlebih dahulu, lalu ulangi.'
-	// 				]));
-	// 		}
-	// 	}
+		// ===== Hapus SEMUA file lama transaksi ini (NOORDER-*.pdf) =====
+		// Jika ada file yang tidak bisa dihapus (locked), hentikan dengan 423
+		$pattern  = $absDir . $noOrder . '-*.pdf';
+		$oldFiles = glob($pattern) ?: [];
+		foreach ($oldFiles as $old) {
+			if (@is_file($old) && !@unlink($old)) {
+				return $this->output->set_status_header(423) // Locked
+					->set_content_type('application/json','utf-8')
+					->set_output(json_encode([
+						'ok'  => false,
+						'msg' => 'File PDF lama sedang dibuka. Tutup halaman PDF terlebih dahulu, lalu ulangi.'
+					]));
+			}
+		}
 
-	// 	// ===== Nama file BARU: {NOORDER}-{YYYYMMDD-HHMMSS}.pdf =====
-	// 	$stamp    = date('Ymd-His');
-	// 	$fileName = $noOrder . '-' . $stamp . '.pdf';
-	// 	$relPath  = str_replace('\\','/', $relDir . $fileName); // simpan RELATIVE
-	// 	$absPath  = $absDir . $fileName;
+		// ===== Nama file BARU: {NOORDER}-{YYYYMMDD-HHMMSS}.pdf =====
+		$stamp    = date('Ymd-His');
+		$fileName = $noOrder . '-' . $stamp . '.pdf';
+		$relPath  = str_replace('\\','/', $relDir . $fileName); // simpan RELATIVE
+		$absPath  = $absDir . $fileName;
 
-	// 	// ===== Generate PDF: tulis ke temp lalu rename (atomic-ish) =====
-	// 	try {
-	// 		$tmpPath = $absPath . '.part';
+		// ===== Generate PDF: tulis ke temp lalu rename (atomic-ish) =====
+		try {
+			$tmpPath = $absPath . '.part';
 
-	// 		// Chrome-only generator
-	// 		$this->_generatePdf($htmlFinal, $tmpPath, $paper, $orientation);
+			// Chrome-only generator
+			$this->_generatePdf($htmlFinal, $tmpPath, $paper, $orientation);
 
-	// 		// rename -> final
-	// 		if (!@rename($tmpPath, $absPath)) {
-	// 			@unlink($tmpPath);
-	// 			return $this->output->set_status_header(500)
-	// 				->set_content_type('application/json','utf-8')
-	// 				->set_output(json_encode(['ok'=>false,'msg'=>'Gagal menyimpan PDF akhir.']));
-	// 		}
-	// 	} catch (\Throwable $e) {
-	// 		return $this->output->set_status_header(500)
-	// 			->set_content_type('application/json','utf-8')
-	// 			->set_output(json_encode(['ok'=>false,'msg'=>'PDF gagal dibuat: '.$e->getMessage()]));
-	// 	}
+			// rename -> final
+			if (!@rename($tmpPath, $absPath)) {
+				@unlink($tmpPath);
+				return $this->output->set_status_header(500)
+					->set_content_type('application/json','utf-8')
+					->set_output(json_encode(['ok'=>false,'msg'=>'Gagal menyimpan PDF akhir.']));
+			}
+		} catch (\Throwable $e) {
+			return $this->output->set_status_header(500)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'PDF gagal dibuat: '.$e->getMessage()]));
+		}
 
-	// 	// ===== Simpan/Update jejak ke DB — 1 baris per transaksi =====
-	// 	$this->db->trans_start();
+		// ===== Simpan/Update jejak ke DB — 1 baris per transaksi =====
+		$this->db->trans_start();
 
-	// 	$payloadDb = [
-	// 		't_type'        => strtoupper($type),
-	// 		't_id'          => (int)$id,
-	// 		'no_order'      => $noOrder,
-	// 		'paper'         => $paper,
-	// 		'orientation'   => $orientation,
-	// 		'branches_json' => json_encode($branches, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-	// 		'payments_json' => json_encode($payments, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-	// 		'html_raw'      => $rawHtml,
-	// 		'html_final'    => $htmlFinal,
-	// 		'pdf_path'      => $relPath, // RELATIVE (aktif terbaru)
-	// 		'updated_at'    => date('Y-m-d H:i:s'),
-	// 		'updated_by'    => (int)$this->session->userdata('idUser'),
-	// 	];
+		$payloadDb = [
+			't_type'        => strtoupper($type),
+			't_id'          => (int)$id,
+			'no_order'      => $noOrder,
+			'paper'         => $paper,
+			'orientation'   => $orientation,
+			'branches_json' => json_encode($branches, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+			'payments_json' => json_encode($payments, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+			'html_raw'      => $rawHtml,
+			'html_final'    => $htmlFinal,
+			'pdf_path'      => $relPath, // RELATIVE (aktif terbaru)
+			'updated_at'    => date('Y-m-d H:i:s'),
+			'updated_by'    => (int)$this->session->userdata('idUser'),
+		];
 
-	// 	// Upsert manual: coba update; jika tidak ada baris, insert
-	// 	$this->db->where(['t_type'=>strtoupper($type), 't_id'=>$id])->update('tb_transaction_prints', $payloadDb);
-	// 	if ($this->db->affected_rows() === 0) {
-	// 		$payloadDb['created_at'] = $payloadDb['updated_at'];
-	// 		$payloadDb['created_by'] = $payloadDb['updated_by'];
-	// 		$this->db->insert('tb_transaction_prints', $payloadDb);
-	// 	}
+		// Upsert manual: coba update; jika tidak ada baris, insert
+		$this->db->where(['t_type'=>strtoupper($type), 't_id'=>$id])->update('tb_transaction_prints', $payloadDb);
+		if ($this->db->affected_rows() === 0) {
+			$payloadDb['created_at'] = $payloadDb['updated_at'];
+			$payloadDb['created_by'] = $payloadDb['updated_by'];
+			$this->db->insert('tb_transaction_prints', $payloadDb);
+		}
 
-	// 	$this->db->trans_complete();
-	// 	if (!$this->db->trans_status()) {
-	// 		return $this->output->set_status_header(500)
-	// 			->set_content_type('application/json','utf-8')
-	// 			->set_output(json_encode(['ok'=>false,'msg'=>'DB error saat menyimpan metadata PDF.']));
-	// 	}
+		$this->db->trans_complete();
+		if (!$this->db->trans_status()) {
+			return $this->output->set_status_header(500)
+				->set_content_type('application/json','utf-8')
+				->set_output(json_encode(['ok'=>false,'msg'=>'DB error saat menyimpan metadata PDF.']));
+		}
 
-	// 	// ===== Response =====
-	// 	return $this->output->set_content_type('application/json','utf-8')
-	// 		->set_output(json_encode([
-	// 			'ok'       => true,
-	// 			'download' => base_url('transaction/print-file/'.$type.'/'.$id),
-	// 			'path'     => $relPath, // contoh: uploads/prints/buy/2025/09/NO123-20250909-183012.pdf
-	// 			'note'     => 'PDF berhasil dibuat. 1 transaksi 1 file aktif; nama file memakai timestamp.'
-	// 		], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
-	// }
-
-	public function savePrint($type = 'buy', $t_id = 0)
-{
-    if (!$this->input->is_ajax_request()) { show_error('Invalid request', 400); }
-
-    $this->output->set_content_type('application/json');
-    $csrf_name = $this->security->get_csrf_token_name();
-    $csrf_hash = $this->security->get_csrf_hash();
-
-    $type = strtolower(trim($type));
-    $t_id = (int)$t_id;
-
-    $this->load->model('TransactionModel');
-
-    // Ambil no_order sesuai jenis
-    if ($type === 'buy') {
-        $no_order = $this->TransactionModel->getBuyNoOrder($t_id);
-    } else {
-        $no_order = $this->TransactionModel->getSellNoOrder($t_id);
-    }
-    if (!$no_order) {
-        echo json_encode(['ok'=>false,'msg'=>'No. order tidak ditemukan', $csrf_name=>$csrf_hash]);
-        return;
-    }
-
-    $paper       = $this->input->post('paper', true) ?: 'A4';
-    $orientation = $this->input->post('orientation', true) ?: 'portrait';
-    $rawHtml     = $this->input->post('rawHtml');            // jangan xss_clean agar HTML utuh
-    $branches    = $this->input->post('cabang');
-    $payments    = $this->input->post('payments');
-
-    $now     = date('Y-m-d H:i:s');
-    $user_id = (int)$this->session->userdata('authUserId'); // sesuaikan nama session admin
-    $exists  = $this->TransactionModel->getPrintByTransaction($type, $t_id);
-
-    $data = [
-        't_type'        => $type,
-        't_id'          => $t_id,
-        'no_order'      => $no_order,
-        'paper'         => $paper,
-        'orientation'   => $orientation,
-        'branches_json' => json_encode($branches ?: []),
-        'payments_json' => json_encode($payments ?: []),
-        'html_raw'      => $rawHtml ?: '',
-        'updated_by'    => $user_id ?: 0,
-        'updated_at'    => $now,
-    ];
-
-    if ($exists) {
-        $this->TransactionModel->updatePrintMeta((int)$exists->id, $data);
-        $id_print = (int)$exists->id;
-    } else {
-        $data['created_by'] = $user_id ?: 0;
-        $data['created_at'] = $now;
-        $id_print = (int)$this->TransactionModel->insertPrintMeta($data);
-    }
-
-    // ==== Simpan berkas ====
-    $uploadsBase = rtrim(FCPATH, '/\\').DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'prints'.DIRECTORY_SEPARATOR;
-    if (!is_dir($uploadsBase)) { @mkdir($uploadsBase, 0775, true); }
-
-    // Nama file dasar
-    $slugNo = preg_replace('/[^A-Za-z0-9\-]/', '-', $no_order);
-    $baseName = strtolower($type).'-'.$slugNo.'-'.time();
-
-    $pdfPathRel  = ''; // relative path disimpan ke DB
-    try {
-        // === Jika DOMPDF ada, render PDF: ===
-        // $this->load->library('dompdf_gen');
-        // $this->dompdf->load_html($rawHtml);
-        // $this->dompdf->set_paper($paper, $orientation);
-        // $this->dompdf->render();
-        // $pdfFull = $uploadsBase.$baseName.'.pdf';
-        // file_put_contents($pdfFull, $this->dompdf->output());
-        // $pdfPathRel = 'uploads/prints/'.$baseName.'.pdf';
-
-        // === Fallback: simpan HTML (agar print_file bisa tampilkan) ===
-        $htmlFull = $uploadsBase.$baseName.'.html';
-        file_put_contents($htmlFull, $rawHtml ?: '');
-        $pdfPathRel = 'uploads/prints/'.$baseName.'.html'; // simpan sbg "pdf_path" tapi tipe html (akan ditangani di print_file)
-
-        // Update path
-        $this->TransactionModel->updatePrintMeta($id_print, ['pdf_path' => $pdfPathRel]);
-    } catch (\Throwable $e) {
-        log_message('error', 'savePrint: gagal simpan file: '.$e->getMessage());
-    }
-
-    echo json_encode([
-        'ok'        => true,
-        'id'        => $id_print,
-        'no_order'  => $no_order,
-        'pdf_path'  => $pdfPathRel,
-        $csrf_name  => $this->security->get_csrf_hash(),
-    ]);
-}
+		// ===== Response =====
+		return $this->output->set_content_type('application/json','utf-8')
+			->set_output(json_encode([
+				'ok'       => true,
+				'download' => base_url('transaction/print-file/'.$type.'/'.$id),
+				'path'     => $relPath, // contoh: uploads/prints/buy/2025/09/NO123-20250909-183012.pdf
+				'note'     => 'PDF berhasil dibuat. 1 transaksi 1 file aktif; nama file memakai timestamp.'
+			], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+	}
 
 	private function _ping_health(): bool
 	{

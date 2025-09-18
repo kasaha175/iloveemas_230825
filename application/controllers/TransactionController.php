@@ -1813,43 +1813,115 @@ class TransactionController extends CI_Controller
 		$this->cart->destroy();
 	}
 
+// 	public function getTransactions()
+// {
+//     $this->load->model('TransactionModel');
+//     $start = intval($this->input->post('start'));
+//     $length = intval($this->input->post('length'));
+//     $search = $this->input->post('search')['value'] ?? '';
+
+//     $transactions = $this->TransactionModel->getTransactions($start, $length, $search);
+//     $totalRecords = $this->TransactionModel->getTotalRecords();
+//     $filteredRecords = $this->TransactionModel->getFilteredRecords($search);
+
+//     // Tambahkan default value jika price_total tidak ada
+//     $data = [];
+//     foreach ($transactions as $key => $transaction) {
+//         $data[] = [
+//             'no' => $start + $key + 1,
+//             'action' => '<a href="' . base_url('transaction/redirect/' . $transaction->t_no_order) . '" class="btn btn-primary btn-sm">Action</a>',
+//             'transaction' => $transaction->t_type ?? 'N/A',
+//             'no_order' => $transaction->t_no_order ?? 'N/A',
+//             'status' => $transaction->t_status ?? 'N/A',
+//             'date' => $transaction->t_date_created ?? 'N/A',
+//             'customer' => $transaction->t_paid_by ?? 'N/A',
+//             'qty' => intval($transaction->t_qtt ?? 0),
+//             'price_total' => $transaction->t_price_total ?? 0
+//         ];
+//     }
+
+//     // Log untuk debugging
+//     log_message('debug', json_encode($data));
+
+//     echo json_encode([
+//         'draw' => intval($this->input->post('draw')),
+//         'recordsTotal' => $totalRecords,
+//         'recordsFiltered' => $filteredRecords,
+//         'data' => $data
+//     ]);
+// }
+
 	public function getTransactions()
-{
-    $this->load->model('TransactionModel');
-    $start = intval($this->input->post('start'));
-    $length = intval($this->input->post('length'));
-    $search = $this->input->post('search')['value'] ?? '';
+	{
+		// DataTables params
+		$draw   = (int) ($this->input->post('draw') ?? 0);
+		$start  = (int) ($this->input->post('start') ?? 0);
+		$length = (int) ($this->input->post('length') ?? 10);
+		$search = '';
+		$sArr   = $this->input->post('search');
+		if (is_array($sArr) && isset($sArr['value'])) {
+			$search = trim((string)$sArr['value']);
+		}
 
-    $transactions = $this->TransactionModel->getTransactions($start, $length, $search);
-    $totalRecords = $this->TransactionModel->getTotalRecords();
-    $filteredRecords = $this->TransactionModel->getFilteredRecords($search);
+		// exclude status
+		$exclude = ['SELESAI'];
 
-    // Tambahkan default value jika price_total tidak ada
-    $data = [];
-    foreach ($transactions as $key => $transaction) {
-        $data[] = [
-            'no' => $start + $key + 1,
-            'action' => '<a href="' . base_url('transaction/redirect/' . $transaction->t_no_order) . '" class="btn btn-primary btn-sm">Action</a>',
-            'transaction' => $transaction->t_type ?? 'N/A',
-            'no_order' => $transaction->t_no_order ?? 'N/A',
-            'status' => $transaction->t_status ?? 'N/A',
-            'date' => $transaction->t_date_created ?? 'N/A',
-            'customer' => $transaction->t_paid_by ?? 'N/A',
-            'qty' => intval($transaction->t_qtt ?? 0),
-            'price_total' => $transaction->t_price_total ?? 0
-        ];
-    }
+		// ambil data
+		$rows     = $this->TransactionModel->getTransactions($start, $length, $search, $exclude);
+		$total    = $this->TransactionModel->getTotalRecords($exclude);
+		$filtered = $this->TransactionModel->getFilteredRecords($search, $exclude);
 
-    // Log untuk debugging
-    log_message('debug', json_encode($data));
+		// mapping ke kolom DataTables di view
+		$data = [];
+		$no = $start;
+		foreach ($rows as $r) {
+			$no++;
+			$id    = (int)($r->t_id ?? 0);
+			$type  = strtoupper((string)($r->t_type ?? ''));
+			$noOrd = (string)($r->t_no_order ?? '-');
+			$stat  = (string)($r->t_status ?? '-');
+			$date  = (string)($r->t_date_created ?? '-');
+			$cust  = (string)($r->nameCustomer ?? $r->t_customer ?? '-');
+			$qty   = (int)($r->t_qtt ?? 0);
+			$grand = (float)(
+				isset($r->t_price_grand_total) && $r->t_price_grand_total !== null
+					? $r->t_price_grand_total
+					: ($r->t_price_total ?? 0)
+			);
 
-    echo json_encode([
-        'draw' => intval($this->input->post('draw')),
-        'recordsTotal' => $totalRecords,
-        'recordsFiltered' => $filteredRecords,
-        'data' => $data
-    ]);
-}
+			$typeSlug = strtolower($type);
+			$action =
+				'<div class="btn-group btn-group-sm" role="group">'.
+				'<a class="btn btn-primary" href="'.base_url('report/'.$typeSlug.'/'.$id.'/').'"><i class="fas fa-info-circle"></i></a>'.
+				'<a class="btn btn-success" href="'.base_url('report/'.$typeSlug.'-print/'.$id.'/').'"><i class="fas fa-print"></i></a>'.
+				'</div>';
+
+			$data[] = [
+				'no'           => $no,
+				'action'       => $action,
+				'transaction'  => $type ?: '-',
+				'no_order'     => $noOrd,
+				'status'       => $stat,
+				'date'         => $date,
+				'customer'     => $cust,
+				'qty'          => $qty,
+				'price_total'  => $grand,
+			];
+		}
+
+		// kirim response
+		$resp = [
+			'draw'            => $draw,
+			'recordsTotal'    => $total,
+			'recordsFiltered' => $filtered,
+			'data'            => $data,
+		];
+		// optional: refresh CSRF
+		if (isset($this->security)) {
+			$resp[$this->security->get_csrf_token_name()] = $this->security->get_csrf_hash();
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($resp));
+	}
 
 public function getCustomers()
 {

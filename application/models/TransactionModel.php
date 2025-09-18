@@ -17,59 +17,47 @@ if (!defined('BASEPATH'))
     private $table        = 'all_transaction';
     private $dateColumn   = 't_date_created';  // DATETIME/DATE ok
     private $statusColumn = 't_status';      // contoh: status / tr_status
-
-    public function getTransactions($start, $length, $search)
+	
+    public function getTransactions($start, $length, $search, array $exclude = [])
     {
-        // Pencarian (jika ada kata kunci)
         if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('t_no_order', $search);
-            $this->db->or_like('t_type', $search);
-            $this->db->or_like('t_status', $search);
-            $this->db->or_like('t_paid_by', $search);
-            $this->db->group_end();
+            $this->db->group_start()
+                     ->like('t_no_order', $search)
+                     ->or_like('t_type', $search)
+                     ->or_like('t_status', $search)
+                     ->or_like('t_paid_by', $search)
+                     ->or_like('nameCustomer', $search) // kalau kolom ini ada di view
+                     ->group_end();
         }
 
-        // Pagination
-        $this->db->limit($length, $start);
+        $this->applyExcludeStatus($exclude);
 
-        // Ambil data dari view all_transaction
+        $this->db->limit((int)$length, (int)$start);
         return $this->db->get('all_transaction')->result();
     }
 
-    /**
-     * Mendapatkan total semua data transaksi (tanpa filter pencarian)
-     * 
-     * @return int Total semua data
-     */
-    public function getTotalRecords()
+    public function getTotalRecords(array $exclude = [])
     {
-        // Hitung total data dari view all_transaction
-        return $this->db->count_all('all_transaction');
+        $this->applyExcludeStatus($exclude);
+        return (int)$this->db->count_all_results('all_transaction');
     }
 
-    /**
-     * Mendapatkan total data transaksi berdasarkan pencarian
-     * 
-     * @param string $search Kata kunci pencarian
-     * @return int Total data yang sesuai pencarian
-     */
-    public function getFilteredRecords($search)
+    public function getFilteredRecords($search, array $exclude = [])
     {
-        // Filter pencarian (jika ada kata kunci)
         if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('t_no_order', $search);
-            $this->db->or_like('t_type', $search);
-            $this->db->or_like('t_status', $search);
-            $this->db->or_like('t_paid_by', $search);
-            $this->db->group_end();
+            $this->db->group_start()
+                     ->like('t_no_order', $search)
+                     ->or_like('t_type', $search)
+                     ->or_like('t_status', $search)
+                     ->or_like('t_paid_by', $search)
+                     ->or_like('nameCustomer', $search)
+                     ->group_end();
         }
 
-        // Hitung total data dari view all_transaction yang sesuai pencarian
-        return $this->db->count_all_results('all_transaction');
-    }
+        $this->applyExcludeStatus($exclude);
 
+        return (int)$this->db->count_all_results('all_transaction');
+    }
 
 	function buyCheckout($data)
 	{
@@ -642,6 +630,19 @@ if (!defined('BASEPATH'))
                         ->order_by('ti_id', 'asc')
                         ->get()
                         ->result();
+    }
+
+	private function applyExcludeStatus(array $exclude = []): void
+    {
+        if (empty($exclude)) return;
+
+        // saat ini kita hanya pakai 'SELESAI'; tetap fleksibel kalau kelak butuh banyak nilai
+        $this->db->group_start();
+            $this->db->where('t_status IS NULL', null, false);
+            foreach ($exclude as $st) {
+                $this->db->or_where('UPPER(t_status) <>', strtoupper($st));
+            }
+        $this->db->group_end();
     }
 
 }

@@ -1,4 +1,9 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); 
+$transaction = array_values(array_filter((array)$transaction, function($r){
+  $st = isset($r->t_status) ? trim((string)$r->t_status) : '';
+  return ($st === '' || strcasecmp($st,'SELESAI') !== 0);
+}));
+?>
 <style>
   /* ===== Scoped supaya tak bentrok dengan template lain ===== */
   .transaction-list-scope .wrap{ margin-top: calc(var(--topbar-h, 98px) + 12px); padding: clamp(12px, 2vw, 20px); }
